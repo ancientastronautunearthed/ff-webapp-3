@@ -53,26 +53,7 @@ function AppContent() {
     return <Onboarding />;
   }
 
-  // Check if tour should be shown globally
-  const [showGlobalTour, setShowGlobalTour] = useState(false);
-  
-  useEffect(() => {
-    const tourState = sessionStorage.getItem('tourActive');
-    if (tourState === 'true') {
-      setShowGlobalTour(true);
-    }
-  }, []);
 
-  const handleTourComplete = () => {
-    setShowGlobalTour(false);
-    sessionStorage.removeItem('tourActive');
-    localStorage.setItem('hasSeenDashboardTour', 'true');
-  };
-
-  const handleTourSkip = () => {
-    setShowGlobalTour(false);
-    sessionStorage.removeItem('tourActive');
-  };
 
   return (
     <Layout>
@@ -93,14 +74,7 @@ function AppContent() {
         <Route path="/telemedicine" component={TelemedicineScheduling} />
         <Route component={NotFound} />
       </Switch>
-      
-      {/* Global tour that persists across pages */}
-      {showGlobalTour && (
-        <WelcomeTour 
-          onComplete={handleTourComplete}
-          onSkip={handleTourSkip}
-        />
-      )}
+
     </Layout>
   );
 }
