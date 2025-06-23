@@ -205,7 +205,9 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
 
   const nextStep = () => {
     console.log('nextStep called, currentStep:', currentStep, 'totalSteps:', tourSteps.length);
+    console.log('Condition check:', currentStep, '<', tourSteps.length - 1, '=', currentStep < tourSteps.length - 1);
     if (currentStep < tourSteps.length - 1) {
+      console.log('Advancing to step:', currentStep + 1);
       setCurrentStep(currentStep + 1);
     } else {
       console.log('Tour completed, calling onComplete');
