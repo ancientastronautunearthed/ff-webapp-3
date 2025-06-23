@@ -11,6 +11,7 @@ import { Community } from "@/components/Community";
 import { DataVisualization } from "@/components/DataVisualization";
 import { ResearchOptIn } from "@/components/ResearchOptIn";
 import { ProviderReports } from "@/components/ProviderReports";
+import { AIInsights } from "@/components/AIInsights";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
@@ -50,6 +51,7 @@ function AppContent() {
         <Route path="/research" component={ResearchOptIn} />
         <Route path="/reports" component={ProviderReports} />
         <Route path="/calendar" component={CalendarView} />
+        <Route path="/ai-insights" component={AIInsights} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
