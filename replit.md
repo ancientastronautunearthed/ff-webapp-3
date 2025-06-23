@@ -328,6 +328,7 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Provided complete client-side migration from Express API to Firebase Functions
 - ✓ Fixed "Complete Profile & Create Companion" button functionality
 - ✓ Added dropdown selectable options for State and Ethnicity fields in medical profile form
+- ✓ Extended State/Province dropdown to include Canada and Mexico (13 provinces, 32 states)
 
 ## User Preferences
 
