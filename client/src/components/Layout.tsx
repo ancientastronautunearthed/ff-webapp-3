@@ -47,13 +47,12 @@ export const Layout = ({ children }: LayoutProps) => {
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Symptom Tracker', href: '/tracker', icon: Heart },
-    { name: 'Digital Matchbox', href: '/journal', icon: BookOpen },
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Track Symptoms', href: '/tracker', icon: Activity },
     { name: 'Community', href: '/community', icon: Users },
-    { name: 'Telemedicine', href: '/telemedicine', icon: Video },
-    { name: 'Research Dashboard', href: '/research', icon: Microscope },
-    { name: 'Reports', href: '/reports', icon: FileText },
+    { name: 'Find Support', href: '/peer-matching', icon: Users },
+    { name: 'My Data', href: '/insights', icon: TrendingUp },
+    { name: 'Ask a Doctor', href: '/ask-doctor', icon: BookOpen },
   ];
 
   const isActive = (path: string) => location === path;
