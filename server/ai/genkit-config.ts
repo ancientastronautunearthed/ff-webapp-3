@@ -1,7 +1,7 @@
-import { configureGenkit } from '@genkit-ai/core';
+import { configureGenkit } from 'genkit';
 import { firebase } from '@genkit-ai/firebase';
 import { googleAI } from '@genkit-ai/googleai';
-import { defineFlow, runFlow } from '@genkit-ai/flow';
+import { defineFlow } from '@genkit-ai/flow';
 import { generate } from '@genkit-ai/ai';
 
 // Configure Genkit with Firebase and Google AI

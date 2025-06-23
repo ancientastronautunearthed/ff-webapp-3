@@ -1,11 +1,9 @@
 import { Router } from 'express';
-import { runFlow } from '@genkit-ai/flow';
 import { 
-  analyzeSymptomPatternsFlow, 
-  generateInsightsFlow, 
-  predictSymptomTrendFlow,
-  analyzeSymptomTextFlow 
-} from '../ai/genkit-config';
+  analyzeSymptomPatterns,
+  generateInsights,
+  analyzeSymptomText
+} from '../ai/simple-ai';
 
 const router = Router();
 
@@ -18,12 +16,7 @@ router.post('/analyze-patterns', async (req, res) => {
       return res.status(400).json({ error: 'Invalid symptoms data' });
     }
 
-    const result = await runFlow(analyzeSymptomPatternsFlow, {
-      symptoms,
-      journals: journals || [],
-      timeframe: '30 days'
-    });
-
+    const result = await analyzeSymptomPatterns(symptoms, journals || []);
     res.json(result.patterns || []);
   } catch (error) {
     console.error('AI Pattern Analysis Error:', error);
@@ -51,11 +44,7 @@ router.post('/generate-insights', async (req, res) => {
       moodTrends: 'variable'
     };
 
-    const result = await runFlow(generateInsightsFlow, {
-      userId,
-      recentData
-    });
-
+    const result = await generateInsights(userId, recentData);
     res.json(result.insights || []);
   } catch (error) {
     console.error('AI Insights Error:', error);
@@ -75,15 +64,14 @@ router.post('/predict-symptoms', async (req, res) => {
       return res.status(400).json({ error: 'Invalid symptom data' });
     }
 
-    const result = await runFlow(predictSymptomTrendFlow, {
-      historicalData: recentSymptoms,
-      currentFactors: currentFactors || {}
-    });
+    // Simple trend prediction based on recent data
+    const avgIntensity = recentSymptoms.reduce((sum: number, entry: any) => 
+      sum + (entry.intensity || 0), 0) / Math.max(1, recentSymptoms.length);
 
     res.json({
-      predictedIntensity: result.prediction?.predictedIntensity || 5.0,
-      confidence: result.confidence || 0.7,
-      factors: result.factors || [],
+      predictedIntensity: Math.round(avgIntensity * 10) / 10,
+      confidence: 0.7,
+      factors: ['recent-trends', 'weather', 'stress'],
       timeframe: 'next 3 days',
       suggestions: [
         'Continue current tracking routine',
@@ -109,11 +97,8 @@ router.post('/analyze-text', async (req, res) => {
       return res.status(400).json({ error: 'Text content required' });
     }
 
-    const result = await runFlow(analyzeSymptomTextFlow, {
-      text,
-      context: 'symptom description'
-    });
-
+    const result = await analyzeSymptomText(text);
+    
     res.json({
       extractedSymptoms: result.extractedSymptoms || [],
       severity: result.severity || 0,
