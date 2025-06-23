@@ -191,15 +191,20 @@ export const AuthForm = ({ mode, onToggleMode }: AuthFormProps) => {
 
             <Button
               type="submit"
-              className="w-full bg-primary-500 hover:bg-primary-600"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-lg"
               disabled={loading}
             >
               {loading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {mode === 'signup' ? 'Creating Account...' : 'Signing In...'}
+                </>
               ) : (
-                <User className="mr-2 h-4 w-4" />
+                <>
+                  <User className="mr-2 h-4 w-4" />
+                  {mode === 'signup' ? 'Create Account' : 'Sign In'}
+                </>
               )}
-              {mode === 'signup' ? 'Create Account' : 'Sign In'}
             </Button>
           </form>
 
