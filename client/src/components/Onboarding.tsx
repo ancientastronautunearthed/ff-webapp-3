@@ -1,24 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { MedicalProfileForm } from '@/components/MedicalProfileForm';
-import { 
-  Heart, 
-  BookOpen, 
-  Users, 
-  TrendingUp, 
-  FileText, 
-  Calendar,
-  CheckCircle,
-  ArrowRight,
-  Microscope,
-  Shield,
-  Sparkles,
-  Activity
-} from 'lucide-react';
+import { CheckCircle, ArrowRight, Heart, Shield, Users, BarChart3, MessageSquare, FileText, Calendar, FlaskConical } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { MedicalOnboarding } from '@/components/MedicalOnboarding';
+import { ResearchConsentManager } from '@/components/ResearchConsentManager';
+import { WelcomeTour } from '@/components/WelcomeTour';
 import { useToast } from '@/hooks/use-toast';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -31,113 +19,153 @@ interface OnboardingStep {
   completed: boolean;
 }
 
+type OnboardingPhase = 'welcome' | 'medical-profile' | 'research-consent' | 'tour' | 'complete';
+
 export const Onboarding = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
-  const [profileComplete, setProfileComplete] = useState(false);
-  const [tourComplete, setTourComplete] = useState(false);
+  const [currentPhase, setCurrentPhase] = useState<OnboardingPhase>('welcome');
+  const [completedSteps, setCompletedSteps] = useState<Set<string>>(new Set());
 
-  const onboardingSteps: OnboardingStep[] = [
+  const steps: OnboardingStep[] = [
     {
       id: 'welcome',
       title: 'Welcome to Fiber Friends',
       description: 'Your comprehensive Morgellons health companion',
       icon: Heart,
-      completed: false
+      completed: completedSteps.has('welcome'),
     },
     {
       id: 'profile',
-      title: 'Complete Medical Profile',
-      description: 'Help advance research with your health information',
-      icon: FileText,
-      completed: profileComplete
+      title: 'Medical Profile',
+      description: 'Share your health information for personalized insights and research',
+      icon: Users,
+      completed: completedSteps.has('profile'),
     },
     {
-      id: 'features',
-      title: 'Discover Key Features',
-      description: 'Learn how to track symptoms and connect with others',
-      icon: Sparkles,
-      completed: false
+      id: 'research',
+      title: 'Research Participation',
+      description: 'Help advance Morgellons research with your anonymized data',
+      icon: FlaskConical,
+      completed: completedSteps.has('research'),
     },
     {
       id: 'privacy',
-      title: 'Privacy & Research',
-      description: 'Understand how your data contributes to research',
+      title: 'Privacy & Security',
+      description: 'Your data is encrypted and completely secure',
       icon: Shield,
-      completed: false
+      completed: completedSteps.has('privacy'),
     },
     {
-      id: 'ready',
-      title: 'You\'re All Set!',
-      description: 'Start your journey toward better health understanding',
-      icon: CheckCircle,
-      completed: false
-    }
+      id: 'features',
+      title: 'App Features',
+      description: 'Discover symptom tracking, journaling, and community features',
+      icon: BarChart3,
+      completed: completedSteps.has('features'),
+    },
+    {
+      id: 'community',
+      title: 'Join the Community',
+      description: 'Connect with others and share experiences safely',
+      icon: MessageSquare,
+      completed: completedSteps.has('community'),
+    },
   ];
 
-  const handleProfileComplete = async (profileData: any) => {
-    if (!user) return;
+  const handleStepComplete = () => {
+    const currentStepId = steps[currentStep].id;
+    setCompletedSteps(prev => new Set([...prev, currentStepId]));
 
-    try {
-      // In production, this would save to Firestore
-      console.log('Saving comprehensive medical profile:', profileData);
-      
-      // Simulate saving medical profile data
-      localStorage.setItem('medicalProfileData', JSON.stringify(profileData));
-      
-      setProfileComplete(true);
-      setCurrentStep(2);
-      
-      toast({
-        title: "Medical Profile Complete!",
-        description: `Thank you for providing comprehensive health information including ${Object.keys(profileData).length} data points for research.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Profile Save Error",
-        description: "Failed to save profile. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const completeOnboarding = async () => {
-    if (!user) return;
-
-    try {
-      // Mark onboarding as complete
-      localStorage.setItem('onboardingComplete', 'true');
-
-      toast({
-        title: "Welcome to Fiber Friends!",
-        description: "You're ready to start tracking your health journey with comprehensive data collection.",
-      });
-
-      // Navigate to dashboard
-      window.location.href = '/dashboard';
-    } catch (error) {
-      toast({
-        title: "Onboarding Error",
-        description: "Failed to complete onboarding. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const nextStep = () => {
-    if (currentStep < onboardingSteps.length - 1) {
+    if (currentStepId === 'profile') {
+      setCurrentPhase('medical-profile');
+    } else if (currentStepId === 'research') {
+      setCurrentPhase('research-consent');
+    } else if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+    } else {
+      setCurrentPhase('tour');
     }
   };
 
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+  const handleMedicalProfileComplete = (data: any) => {
+    console.log('Medical profile completed:', data);
+    setCompletedSteps(prev => new Set([...prev, 'profile']));
+    setCurrentStep(2); // Move to research step
+    setCurrentPhase('welcome');
   };
 
-  const progress = ((currentStep + 1) / onboardingSteps.length) * 100;
+  const handleMedicalProfileSkip = () => {
+    setCurrentStep(2); // Move to research step
+    setCurrentPhase('welcome');
+  };
+
+  const handleResearchConsentComplete = () => {
+    setCompletedSteps(prev => new Set([...prev, 'research']));
+    setCurrentStep(3); // Move to privacy step
+    setCurrentPhase('welcome');
+  };
+
+  const handleTourComplete = () => {
+    setCurrentPhase('complete');
+    console.log('Onboarding complete');
+    // Here you would typically redirect to the main dashboard
+  };
+
+  const handleTourSkip = () => {
+    setCurrentPhase('complete');
+    console.log('Tour skipped');
+    // Here you would typically redirect to the main dashboard
+  };
+
+  if (currentPhase === 'tour') {
+    return <WelcomeTour onComplete={handleTourComplete} onSkip={handleTourSkip} />;
+  }
+
+  if (currentPhase === 'medical-profile') {
+    return <MedicalOnboarding onComplete={handleMedicalProfileComplete} onSkip={handleMedicalProfileSkip} />;
+  }
+
+  if (currentPhase === 'research-consent') {
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Research Participation</h2>
+          <p className="text-lg text-gray-600">
+            Help advance Morgellons research by choosing what data you're comfortable sharing.
+          </p>
+        </div>
+        <ResearchConsentManager />
+        <div className="flex justify-center">
+          <Button onClick={handleResearchConsentComplete} className="bg-blue-600 hover:bg-blue-700">
+            Continue to App Features
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentPhase === 'complete') {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center">
+        <Card>
+          <CardContent className="p-8">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Welcome to Fiber Friends!</h2>
+            <p className="text-lg text-gray-600 mb-6">
+              Your onboarding is complete. You can now start tracking your symptoms, 
+              journaling, and connecting with the community.
+            </p>
+            <Button onClick={() => window.location.href = '/dashboard'} className="bg-blue-600 hover:bg-blue-700">
+              Go to Dashboard
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50">

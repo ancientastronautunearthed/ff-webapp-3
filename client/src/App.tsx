@@ -16,6 +16,7 @@ import { ProviderReports } from "@/components/ProviderReports";
 import { AIInsights } from "@/components/AIInsights";
 import { ResearchConsentManager } from "@/components/ResearchConsentManager";
 import { ResearchDashboardEnhanced } from "@/components/ResearchDashboardEnhanced";
+import { MedicalOnboarding } from "@/components/MedicalOnboarding";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
@@ -73,6 +74,7 @@ function AppContent() {
         <Route path="/research" component={ResearchDashboard} />
         <Route path="/research-enhanced" component={ResearchDashboardEnhanced} />
         <Route path="/research-consent" component={ResearchConsentManager} />
+        <Route path="/medical-onboarding" component={MedicalOnboarding} />
         <Route path="/profile-setup" component={ProfileSetup} />
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/telemedicine" component={TelemedicineScheduling} />
