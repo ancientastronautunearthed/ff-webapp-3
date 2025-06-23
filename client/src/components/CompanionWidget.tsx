@@ -30,11 +30,31 @@ export const CompanionWidget = () => {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            if (userData.companionImage) {
-              setCompanionImage(userData.companionImage);
+            console.log('User data for companion check:', userData);
+            
+            // Check multiple possible field names for companion data
+            const image = userData.companionImage || userData.aiCompanionImage || userData.companion_image;
+            const config = userData.companionConfig || userData.aiCompanionConfig || userData.companion_config;
+            
+            if (image) {
+              setCompanionImage(image);
             }
-            if (userData.companionConfig) {
-              setCompanionConfig(userData.companionConfig);
+            if (config) {
+              setCompanionConfig(config);
+            }
+            
+            // Also check if companion was created during onboarding
+            if (userData.onboardingCompleted && userData.hasCompanion && !userData.companionSkipped) {
+              // User has completed onboarding with companion, but image might be loading
+              if (!image && !config) {
+                console.log('User has companion flag but no data found - showing fallback');
+                // Show a loading state or basic companion info
+                setCompanionConfig({ 
+                  customName: 'AI Companion', 
+                  species: 'Health Assistant',
+                  personality: 'Caring'
+                });
+              }
             }
           }
         } catch (error) {
@@ -46,7 +66,7 @@ export const CompanionWidget = () => {
     loadCompanionData();
   }, [user]);
 
-  if (!companionImage) {
+  if (!companionImage && !companionConfig) {
     return (
       <Card className="w-full max-w-sm">
         <CardContent className="p-4">

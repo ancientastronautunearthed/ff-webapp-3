@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useAuth } from '@/contexts/AuthContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { CompanionCreatorStep } from './CompanionCreatorStep';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -130,77 +133,63 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
 
   console.log('MedicalProfileForm state:', { currentStep, showCompanionCreator });
 
+  const { user } = useAuth();
+  
   // Define companion creator handlers first
-  const handleCompanionCreated = (imageUrl: string, config: any) => {
+  const handleCompanionCreated = async (imageUrl: string, config: any) => {
     console.log('Companion created:', { imageUrl, config });
     setCompanionData({ imageUrl, config });
+    
+    // Save companion data to Firebase
+    try {
+      if (user?.uid) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          companionImage: imageUrl,
+          companionConfig: config,
+          hasCompanion: true,
+          companionCreatedAt: new Date()
+        });
+        
+        console.log('Companion data saved to Firebase:', { imageUrl, config });
+      }
+    } catch (error) {
+      console.error('Error saving companion data:', error);
+    }
     
     toast({
       title: "Profile & Companion Complete!",
       description: "Your medical profile and AI companion have been created successfully.",
     });
     
-    // Pass a valid medical profile data object to onComplete
-    const mockData = {
-      age: 30,
-      sex: 'prefer-not-to-say' as const,
-      height: 68,
-      weight: 150,
-      state: 'California',
-      zipCode: '90210',
-      ethnicity: 'Prefer not to answer',
-      researchConsent: true,
-      anonymousDataSharing: true,
-      currentSymptomSeverity: 5,
-      initialSymptoms: ['Skin lesions'],
-      currentDiagnoses: [],
-      allergies: [],
-      currentMedications: [],
-      lesionLocations: [],
-      occupation: '',
-      smoking: 'never' as const,
-      alcohol: 'none' as const,
-      exercise: 'moderate' as const,
-      diet: '',
-      chemicalExposures: [],
-      petExposure: false
-    };
-    onComplete(mockData);
+    // Get form data and call onComplete
+    const formData = form.getValues();
+    onComplete(formData as MedicalProfileData);;
   };
 
-  const handleSkipCompanion = () => {
+  const handleSkipCompanion = async () => {
     console.log('Companion creation skipped');
+    
+    // Save skip status to Firebase
+    try {
+      if (user?.uid) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          hasCompanion: false,
+          companionSkipped: true,
+          companionSkippedAt: new Date()
+        });
+      }
+    } catch (error) {
+      console.error('Error saving companion skip status:', error);
+    }
+    
     toast({
       title: "Profile Complete!",
       description: "You can create your AI companion later from settings.",
     });
     
-    // Pass a valid medical profile data object to onComplete
-    const mockData = {
-      age: 30,
-      sex: 'prefer-not-to-say' as const,
-      height: 68,
-      weight: 150,
-      state: 'California',
-      zipCode: '90210',
-      ethnicity: 'Prefer not to answer',
-      researchConsent: true,
-      anonymousDataSharing: true,
-      currentSymptomSeverity: 5,
-      initialSymptoms: ['Skin lesions'],
-      currentDiagnoses: [],
-      allergies: [],
-      currentMedications: [],
-      lesionLocations: [],
-      occupation: '',
-      smoking: 'never' as const,
-      alcohol: 'none' as const,
-      exercise: 'moderate' as const,
-      diet: '',
-      chemicalExposures: [],
-      petExposure: false
-    };
-    onComplete(mockData);
+    // Get form data and call onComplete
+    const formData = form.getValues();
+    onComplete(formData as MedicalProfileData);
   };
 
   const form = useForm<MedicalProfileData>({
