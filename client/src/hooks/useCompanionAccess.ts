@@ -13,10 +13,13 @@ export interface FunctionAccessStatus {
 }
 
 export const useCompanionAccess = () => {
-  const { tierProgress } = useCompanionProgress();
+  const { tierProgress, progressData } = useCompanionProgress();
+
+  const currentTier = progressData?.currentTier || tierProgress?.currentTier || 1;
+  const totalPoints = progressData?.totalPoints || tierProgress?.totalPoints || 0;
 
   const hasAccess = (requiredTier: number): boolean => {
-    return tierProgress.currentTier >= requiredTier;
+    return currentTier >= requiredTier;
   };
 
   const getAccessMessage = (requiredTier: number): string => {
@@ -25,7 +28,7 @@ export const useCompanionAccess = () => {
     }
     
     const tierData = COMPANION_TIERS.find(t => t.level === requiredTier);
-    const pointsNeeded = tierData ? tierData.pointsRequired - tierProgress.totalPoints : 0;
+    const pointsNeeded = tierData ? tierData.pointsRequired - totalPoints : 0;
     
     return `Unlock at Level ${requiredTier} (${pointsNeeded} more points needed)`;
   };
@@ -34,8 +37,8 @@ export const useCompanionAccess = () => {
     const unlocked = hasAccess(requiredTier);
     const tierData = COMPANION_TIERS.find(t => t.level === requiredTier);
     const pointsRequired = tierData?.pointsRequired || 0;
-    const pointsNeeded = unlocked ? 0 : pointsRequired - tierProgress.totalPoints;
-    const progressPercent = pointsRequired > 0 ? Math.min((tierProgress.totalPoints / pointsRequired) * 100, 100) : 0;
+    const pointsNeeded = unlocked ? 0 : pointsRequired - totalPoints;
+    const progressPercent = pointsRequired > 0 ? Math.min((totalPoints / pointsRequired) * 100, 100) : 0;
     
     let category: 'available' | 'soon' | 'locked' = 'locked';
     if (unlocked) {
@@ -99,8 +102,8 @@ export const useCompanionAccess = () => {
     getAvailableFunctions,
     getNextUnlock,
     canUseFunction,
-    currentTier: tierProgress.currentTier,
-    totalPoints: tierProgress.totalPoints,
+    currentTier,
+    totalPoints,
     tierProgress
   };
 };

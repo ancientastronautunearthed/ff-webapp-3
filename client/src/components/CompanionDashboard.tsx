@@ -76,7 +76,7 @@ export const CompanionDashboard = () => {
               {companionConfig?.customName || 'AI Health Companion'}
             </h1>
             <p className="text-gray-600 mt-2">
-              Level {tierProgress.currentTier} • {companionConfig?.species || 'Health Assistant'} • {tierProgress.totalPoints} points
+              Level {tierProgress?.currentTier || 1} • {companionConfig?.species || 'Health Assistant'} • {tierProgress?.totalPoints || 0} points
             </p>
           </div>
         </div>
@@ -87,7 +87,7 @@ export const CompanionDashboard = () => {
           </Badge>
           <Badge variant="outline" className="flex items-center gap-1">
             <Star className="w-3 h-3" />
-            Level {tierProgress.currentTier}
+            Level {tierProgress?.currentTier || 1}
           </Badge>
           <Button variant="outline" size="sm" onClick={() => setActiveTab('settings')}>
             <Settings className="w-4 h-4 mr-2" />

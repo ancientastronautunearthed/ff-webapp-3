@@ -32,25 +32,30 @@ export const CompanionDemo = () => {
     setDemoStep(0);
     
     // Reset to level 1
+    console.log('🔄 Starting demo - resetting to Level 1');
     setPoints(0);
     setDemoStep(1);
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Demo progression through each tier
     for (let tier = 1; tier <= 10; tier++) {
       const tierData = COMPANION_TIERS.find(t => t.level === tier);
       if (tierData) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        console.log(`⚡ Setting points to ${tierData.pointsRequired} for Level ${tier}`);
         setPoints(tierData.pointsRequired);
         setDemoStep(tier + 1);
         
         // Show notification for new unlocks
         const newUnlocks = COMPANION_FUNCTIONS.filter(f => f.tier === tier);
         if (newUnlocks.length > 0) {
-          console.log(`Tier ${tier} unlocked:`, newUnlocks.map(f => f.name));
+          console.log(`✅ Level ${tier} unlocked functions:`, newUnlocks.map(f => f.name));
         }
+        
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
     
+    console.log('🎉 Demo complete - all tiers unlocked');
     setIsRunning(false);
     setDemoStep(11);
   };
@@ -62,6 +67,7 @@ export const CompanionDemo = () => {
   };
   
   const addPointsManually = (points: number) => {
+    console.log(`➕ Adding ${points} points manually`);
     awardPoints(points, `Manual demo points: +${points}`);
   };
   
@@ -179,7 +185,7 @@ export const CompanionDemo = () => {
             
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">Total Points</span>
-              <span className="font-medium">{tierProgress.totalPoints}</span>
+              <span className="font-medium">{totalPoints}</span>
             </div>
             
             {tierInfo.next && (
@@ -187,7 +193,7 @@ export const CompanionDemo = () => {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Progress to Level {tierInfo.next.level}</span>
                   <span className="font-medium">
-                    {tierProgress.totalPoints} / {tierInfo.next.pointsRequired}
+                    {totalPoints} / {tierInfo.next.pointsRequired}
                   </span>
                 </div>
                 <Progress value={tierInfo.progress} className="h-2" />
