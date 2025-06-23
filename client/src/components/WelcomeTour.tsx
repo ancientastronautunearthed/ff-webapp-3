@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,7 +15,8 @@ import {
   ArrowLeft,
   Microscope,
   Activity,
-  X
+  X,
+  Video
 } from 'lucide-react';
 
 interface TourStep {
@@ -24,6 +26,8 @@ interface TourStep {
   icon: React.ElementType;
   features: string[];
   tips: string[];
+  route?: string;
+  highlightElements?: string[];
 }
 
 interface WelcomeTourProps {
@@ -33,6 +37,7 @@ interface WelcomeTourProps {
 
 export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [location, navigate] = useLocation();
 
   const tourSteps: TourStep[] = [
     {
@@ -40,118 +45,159 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
       title: 'Your Health Dashboard',
       description: 'Get an overview of your health journey with visual insights and quick actions.',
       icon: TrendingUp,
+      route: '/dashboard',
       features: [
-        'Recent symptom trends and patterns',
-        'Quick access to log new entries',
-        'AI-generated health insights',
-        'Upcoming calendar events'
+        'Today\'s progress tracking with visual indicators',
+        'Quick action buttons for symptom tracking',
+        'Weekly overview with completion streaks',
+        'AI-generated health insights and correlations'
       ],
       tips: [
         'Check your dashboard daily for pattern recognition',
-        'Use quick actions for faster data entry'
-      ]
+        'Use quick actions for immediate symptom logging',
+        'Review weekly trends to identify patterns'
+      ],
+      highlightElements: ['.quick-actions', '.stats-cards', '.weekly-overview']
     },
     {
       id: 'symptoms',
       title: 'Symptom Tracker',
       description: 'Log detailed symptom information with intensity scales and environmental factors.',
       icon: Heart,
+      route: '/tracker',
       features: [
-        'Comprehensive symptom categories',
-        'Intensity rating scales (1-10)',
-        'Environmental factor tracking',
-        'Photo documentation support'
+        'Pre-populated symptom categories with clickable selections',
+        'Intensity sliders (1-10) for accurate severity tracking',
+        'Environmental factors: weather, stress, diet, chemicals',
+        'Fiber and lesion documentation with photo support'
       ],
       tips: [
-        'Log symptoms consistently for better patterns',
-        'Include environmental factors like weather or stress',
-        'Use the intensity scale honestly for accurate tracking'
-      ]
+        'Use dropdown menus instead of typing for faster entry',
+        'Track environmental factors like weather changes',
+        'Log symptoms at the same time daily for consistency',
+        'Include photos when documenting new lesions or fibers'
+      ],
+      highlightElements: ['.symptom-form', '.intensity-sliders', '.factor-checkboxes']
     },
     {
       id: 'journal',
       title: 'Digital Matchbox',
       description: 'Securely document your observations with detailed notes and photos.',
       icon: BookOpen,
+      route: '/journal',
       features: [
-        'Encrypted photo storage',
-        'Detailed observation notes',
-        'Link entries to symptom logs',
-        'Private and secure documentation'
+        'Encrypted photo storage with multiple file support',
+        'Rich text editor for detailed observations',
+        'Link entries to specific symptom logs',
+        'Date and time stamped entries for tracking'
       ],
       tips: [
-        'Take clear, well-lit photos for documentation',
-        'Write detailed descriptions of what you observe',
-        'Link journal entries to relevant symptom logs'
-      ]
+        'Use good lighting when photographing fibers or lesions',
+        'Include ruler or coin for size reference in photos',
+        'Write detailed descriptions of texture, color, movement',
+        'Link to symptom entries for comprehensive tracking'
+      ],
+      highlightElements: ['.journal-form', '.photo-upload', '.entry-linking']
     },
     {
       id: 'calendar',
       title: 'Calendar & Trends',
       description: 'Visualize your health journey with calendar views and trend analysis.',
       icon: Calendar,
+      route: '/calendar',
       features: [
-        'Monthly calendar with symptom indicators',
-        'Yearly heatmap overview',
-        'Pattern recognition visualization',
-        'Easy navigation to specific dates'
+        'Monthly calendar with color-coded symptom intensity',
+        'Yearly heatmap for long-term pattern recognition',
+        'Quick entry creation from calendar dates',
+        'Visual correlation between environmental factors and symptoms'
       ],
       tips: [
-        'Look for patterns in the heatmap view',
-        'Use calendar navigation to review past entries',
-        'Notice correlations between dates and symptoms'
-      ]
+        'Darker colors indicate higher symptom intensity days',
+        'Click any date to add entries or view details',
+        'Use the yearly view to identify seasonal patterns',
+        'Look for clusters of high-intensity days for triggers'
+      ],
+      highlightElements: ['.calendar-view', '.heatmap', '.date-navigation']
     },
     {
       id: 'community',
       title: 'Community Support',
       description: 'Connect with others who understand your experience in a safe environment.',
       icon: Users,
+      route: '/community',
       features: [
-        'Moderated discussion forums',
-        'Topic-based conversations',
-        'Share experiences and tips',
-        'Support from others with Morgellons'
+        'Moderated discussion forums with topic categories',
+        'Private messaging with other members',
+        'Share treatment experiences and outcomes',
+        'Emotional support from people who understand'
       ],
       tips: [
-        'Be respectful and supportive in discussions',
-        'Share what works for you to help others',
-        'Use the community for emotional support'
-      ]
+        'Read community guidelines before posting',
+        'Share your experiences to help others learn',
+        'Ask questions - the community is here to help',
+        'Respect privacy and never share personal medical details'
+      ],
+      highlightElements: ['.forum-categories', '.discussion-threads', '.support-groups']
+    },
+    {
+      id: 'telemedicine',
+      title: 'Telemedicine Appointments',
+      description: 'Connect with healthcare providers experienced in Morgellons treatment.',
+      icon: Video,
+      route: '/telemedicine',
+      features: [
+        'Search providers with Morgellons experience',
+        'Filter by specialty, location, and ratings',
+        'Book telehealth or in-person appointments',
+        'View provider credentials and patient reviews'
+      ],
+      tips: [
+        'Filter for providers with Morgellons experience',
+        'Read reviews from other patients before booking',
+        'Prepare your symptom timeline before appointments',
+        'Consider telehealth for initial consultations'
+      ],
+      highlightElements: ['.provider-search', '.booking-calendar', '.appointment-types']
     },
     {
       id: 'insights',
       title: 'AI Health Insights',
       description: 'Get intelligent analysis of your data to identify patterns and correlations.',
       icon: Activity,
+      route: '/ai-insights',
       features: [
-        'Pattern recognition in symptoms',
-        'Environmental correlation analysis',
-        'Treatment effectiveness tracking',
-        'Personalized health recommendations'
+        'Automated pattern recognition in your symptom data',
+        'Environmental correlation analysis (weather, stress, diet)',
+        'Treatment effectiveness tracking over time',
+        'Personalized recommendations based on your patterns'
       ],
       tips: [
-        'Review AI insights weekly for new patterns',
-        'Use insights to discuss findings with doctors',
-        'Track recommended lifestyle changes'
-      ]
+        'Review insights weekly to spot new patterns',
+        'Share AI findings with your healthcare providers',
+        'Use correlation data to identify your triggers',
+        'Track suggested lifestyle changes for effectiveness'
+      ],
+      highlightElements: ['.ai-patterns', '.correlation-charts', '.recommendations']
     },
     {
       id: 'reports',
       title: 'Provider Reports',
       description: 'Generate professional health summaries to share with your healthcare team.',
       icon: FileText,
+      route: '/reports',
       features: [
-        'Comprehensive health summaries',
-        'Customizable date ranges',
-        'Professional formatting',
-        'Easy sharing with doctors'
+        'Comprehensive health summaries with symptom trends',
+        'Customizable date ranges for specific periods',
+        'Professional PDF formatting for medical use',
+        'Include photos, notes, and correlation data'
       ],
       tips: [
-        'Generate reports before doctor appointments',
-        'Include 3-6 months of data for comprehensive view',
-        'Bring printed reports to medical consultations'
-      ]
+        'Generate reports 2-3 days before appointments',
+        'Include 3-6 months of data for pattern recognition',
+        'Print reports and bring copies to consultations',
+        'Highlight significant changes or new symptoms'
+      ],
+      highlightElements: ['.report-generator', '.date-range-selector', '.export-options']
     }
   ];
 
@@ -163,6 +209,38 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     }
   };
 
+  // Navigate to appropriate page when step changes
+  useEffect(() => {
+    const currentTourStep = tourSteps[currentStep];
+    if (currentTourStep.route && location !== currentTourStep.route) {
+      navigate(currentTourStep.route);
+    }
+  }, [currentStep, navigate, location]);
+
+  // Add highlighting effects for specific elements
+  useEffect(() => {
+    const currentTourStep = tourSteps[currentStep];
+    if (currentTourStep.highlightElements) {
+      // Add highlighting class to elements
+      currentTourStep.highlightElements.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          el.classList.add('tour-highlight');
+        });
+      });
+
+      // Cleanup function to remove highlights
+      return () => {
+        currentTourStep.highlightElements.forEach(selector => {
+          const elements = document.querySelectorAll(selector);
+          elements.forEach(el => {
+            el.classList.remove('tour-highlight');
+          });
+        });
+      };
+    }
+  }, [currentStep]);
+
   const prevStep = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
@@ -173,7 +251,13 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   const StepIcon = currentTourStep.icon;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <>
+      {/* Tour Overlay */}
+      <div className="fixed inset-0 bg-black bg-opacity-30 z-40" />
+      
+      {/* Tour Modal */}
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+        <div className="pointer-events-auto">
       <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="relative">
           <Button
@@ -201,6 +285,13 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <p className="text-blue-800 text-sm">
+              <strong>Live Demo:</strong> This tour is showing you the actual {currentTourStep.title.toLowerCase()} page. 
+              Look around to see the features being described!
+            </p>
+          </div>
+          
           <div>
             <h4 className="font-semibold text-gray-900 mb-3">Key Features:</h4>
             <ul className="space-y-2">
@@ -265,6 +356,39 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
           </div>
         </CardContent>
       </Card>
-    </div>
+        </div>
+      </div>
+
+      {/* Add CSS for highlighting elements */}
+      <style jsx global>{`
+        .tour-highlight {
+          position: relative;
+          z-index: 45;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 
+                      0 0 0 8px rgba(59, 130, 246, 0.3);
+          border-radius: 8px;
+          transition: all 0.3s ease;
+        }
+        
+        .tour-highlight::before {
+          content: '';
+          position: absolute;
+          top: -4px;
+          left: -4px;
+          right: -4px;
+          bottom: -4px;
+          background: rgba(59, 130, 246, 0.1);
+          border-radius: 12px;
+          z-index: -1;
+          animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.5; }
+          100% { opacity: 1; }
+        }
+      `}</style>
+    </>
   );
 };
