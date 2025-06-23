@@ -125,6 +125,16 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
 
   const onSubmit = async (data: MedicalProfileData) => {
     try {
+      // Validate research consent is checked
+      if (!data.researchConsent || !data.anonymousDataSharing) {
+        toast({
+          title: "Research Consent Required",
+          description: "Please consent to research participation and data sharing to continue.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Add selected arrays to form data
       data.allergies = selectedAllergies;
       data.initialSymptoms = selectedSymptoms;
@@ -164,17 +174,20 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
         research: {
           consent: data.researchConsent,
           dataSharing: data.anonymousDataSharing,
-          contactForStudies: data.contactForStudies
+          contactForStudies: data.contactForStudies || false
         }
       });
       
-      await onComplete(data);
-      
       toast({
-        title: "Medical Profile Saved",
-        description: `Comprehensive profile with ${Object.keys(data).length}+ data points collected for research analysis.`,
+        title: "Medical Profile Complete!",
+        description: "Your comprehensive health information and research participation preferences have been saved.",
       });
+
+      // Call onComplete with the validated data
+      onComplete(data);
+      
     } catch (error) {
+      console.error('Error saving medical profile:', error);
       toast({
         title: "Profile Save Error",
         description: "Failed to save medical profile. Please try again.",
@@ -699,7 +712,18 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                 <Button
                   type="submit"
                   disabled={!form.watch('researchConsent') || !form.watch('anonymousDataSharing')}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                  onClick={(e) => {
+                    console.log('Submit button clicked, research consent:', form.watch('researchConsent'), 'data sharing:', form.watch('anonymousDataSharing'));
+                    if (!form.watch('researchConsent') || !form.watch('anonymousDataSharing')) {
+                      e.preventDefault();
+                      toast({
+                        title: "Research Consent Required",
+                        description: "Please check both research consent checkboxes to continue.",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   Complete Profile & Submit
                 </Button>
