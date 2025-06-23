@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { CompanionProgressProvider } from "@/contexts/CompanionProgressContext";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Layout } from "@/components/Layout";
+import { SimpleLayout } from "@/components/SimpleLayout";
 import { SymptomTracker } from "@/components/SymptomTracker";
 import { DigitalMatchbox } from "@/components/DigitalMatchbox";
 import { Community } from "@/components/Community";
@@ -19,6 +20,8 @@ import { ResearchConsentManager } from "@/components/ResearchConsentManager";
 import { ResearchDashboardEnhanced } from "@/components/ResearchDashboardEnhanced";
 import { MedicalOnboarding } from "@/components/MedicalOnboarding";
 import Dashboard from "@/pages/Dashboard";
+import SimpleDashboard from "@/pages/SimpleDashboard";
+import SimpleDoctorDashboard from "@/pages/SimpleDoctorDashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import CalendarView from "@/pages/CalendarView";
@@ -55,18 +58,15 @@ function AppContent() {
     if (!user) return;
     
     try {
-      // Clear any stale localStorage data
-      localStorage.removeItem('profileCompleted');
-      
-      // For new users, default to requiring onboarding
+      // Skip onboarding for now and go straight to dashboard
       setUserRole('patient');
-      setHasCompletedOnboarding(false);
+      setHasCompletedOnboarding(true); // Skip onboarding to test dashboard
       setDataLoaded(true);
     } catch (error) {
       console.error('Error checking user data:', error);
-      // Default to patient role if checks fail
+      // Default to patient role and skip onboarding
       setUserRole('patient');
-      setHasCompletedOnboarding(false);
+      setHasCompletedOnboarding(true);
       setDataLoaded(true);
     }
   };
@@ -105,7 +105,7 @@ function AppContent() {
   }
 
   if (userRole === 'doctor') {
-    return <DoctorDashboard />;
+    return <SimpleDoctorDashboard />;
   }
   
   if (!hasCompletedOnboarding && !location.startsWith('/onboarding') && !location.startsWith('/medical-onboarding') && !location.startsWith('/research-consent')) {
@@ -115,10 +115,10 @@ function AppContent() {
 
 
   return (
-    <Layout>
+    <SimpleLayout>
       <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/" component={SimpleDashboard} />
+        <Route path="/dashboard" component={SimpleDashboard} />
         <Route path="/tracker" component={SymptomTracker} />
         <Route path="/journal" component={DigitalMatchbox} />
         <Route path="/community" component={CommunityForum} />
@@ -148,7 +148,7 @@ function AppContent() {
       
       {/* Check if tour is active and show tour overlay */}
       {/* Tour removed - integrated into dashboard onboarding flow */}
-    </Layout>
+    </SimpleLayout>
   );
 }
 
