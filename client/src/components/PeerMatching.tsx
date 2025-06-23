@@ -83,6 +83,7 @@ export const PeerMatching = () => {
   });
   
   const [potentialMatches, setPotentialMatches] = useState<PotentialMatch[]>([]);
+  const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([]);
   const [stats, setStats] = useState<MatchingStats>({
     totalUsers: 0,
     activeConnections: 0,
@@ -92,13 +93,14 @@ export const PeerMatching = () => {
   
   const [isSearching, setIsSearching] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('matches');
+  const [activeTab, setActiveTab] = useState('recommendations');
 
   useEffect(() => {
     if (user) {
       loadUserPreferences();
       loadPotentialMatches();
       loadMatchingStats();
+      loadAIRecommendations();
     }
   }, [user]);
 
@@ -488,10 +490,164 @@ export const PeerMatching = () => {
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="matches" className="text-sm">Potential Matches</TabsTrigger>
-          <TabsTrigger value="preferences" className="text-sm">Matching Preferences</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="recommendations" className="text-sm">AI Recommendations</TabsTrigger>
+          <TabsTrigger value="matches" className="text-sm">All Matches</TabsTrigger>
+          <TabsTrigger value="preferences" className="text-sm">Preferences</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="recommendations" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">AI-Powered Recommendations</h3>
+            <Button 
+              variant="outline" 
+              onClick={loadAIRecommendations}
+              disabled={isSearching}
+            >
+              {isSearching ? (
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Brain className="h-4 w-4 mr-2" />
+              )}
+              {isSearching ? 'Analyzing...' : 'Get New Recommendations'}
+            </Button>
+          </div>
+
+          {aiRecommendations.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-8">
+                <Brain className="h-12 w-12 mx-auto text-purple-400 mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  AI Recommendations Loading
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Our AI is analyzing your health data and community activity to find the best connections for you.
+                </p>
+                <Button onClick={loadAIRecommendations} className="gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Generate Recommendations
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {aiRecommendations.map((recommendation) => {
+                const match = potentialMatches.find(m => m.id === recommendation.targetUserId);
+                if (!match) return null;
+
+                const getRecommendationTypeColor = (type: string) => {
+                  switch (type) {
+                    case 'urgent_support': return 'bg-red-50 border-red-200 text-red-800';
+                    case 'mentor': return 'bg-blue-50 border-blue-200 text-blue-800';
+                    case 'research_partner': return 'bg-green-50 border-green-200 text-green-800';
+                    default: return 'bg-purple-50 border-purple-200 text-purple-800';
+                  }
+                };
+
+                const getRecommendationTypeIcon = (type: string) => {
+                  switch (type) {
+                    case 'urgent_support': return <Heart className="h-4 w-4" />;
+                    case 'mentor': return <Star className="h-4 w-4" />;
+                    case 'research_partner': return <Target className="h-4 w-4" />;
+                    default: return <Users className="h-4 w-4" />;
+                  }
+                };
+
+                return (
+                  <Card key={recommendation.targetUserId} className="border-l-4 border-l-purple-500 relative">
+                    <div className="absolute top-4 right-4">
+                      <Badge variant="outline" className={getRecommendationTypeColor(recommendation.recommendationType)}>
+                        {getRecommendationTypeIcon(recommendation.recommendationType)}
+                        <span className="ml-1 capitalize">
+                          {recommendation.recommendationType.replace('_', ' ')}
+                        </span>
+                      </Badge>
+                    </div>
+                    
+                    <CardContent className="p-6 pr-32">
+                      <div className="flex items-start gap-4">
+                        <div className="relative">
+                          <Avatar className="h-16 w-16">
+                            <AvatarFallback className="bg-purple-100 text-purple-600">
+                              {match.displayName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -bottom-1 -right-1 h-6 w-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                            <Brain className="h-3 w-3 text-white" />
+                          </div>
+                        </div>
+                        
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <h4 className="font-semibold text-gray-900">{match.displayName}</h4>
+                            <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                              {Math.round(recommendation.score)}% AI match
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {recommendation.confidence}% confidence
+                            </Badge>
+                          </div>
+
+                          <div className="bg-purple-50 rounded-lg p-3 mb-3">
+                            <p className="text-sm text-purple-800 font-medium mb-1">AI Insight:</p>
+                            <p className="text-sm text-purple-700">{recommendation.aiInsight}</p>
+                          </div>
+
+                          <div className="space-y-2 mb-3">
+                            <div>
+                              <span className="text-xs font-medium text-gray-500">Why this connection is recommended:</span>
+                              <div className="flex flex-wrap gap-1 mt-1">
+                                {recommendation.reasons.map((reason, index) => (
+                                  <Badge key={index} variant="secondary" className="text-xs">
+                                    {reason}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Symptom overlap:</span>
+                              <span className="font-medium">{Math.round(recommendation.compatibility.symptomOverlap * 100)}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Interest alignment:</span>
+                              <span className="font-medium">{Math.round(recommendation.compatibility.interestAlignment * 100)}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Communication match:</span>
+                              <span className="font-medium">{Math.round(recommendation.compatibility.communicationMatch * 100)}%</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-500">Experience match:</span>
+                              <span className="font-medium">{Math.round(recommendation.compatibility.experienceMatch * 100)}%</span>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 mt-4">
+                            <Button 
+                              size="sm" 
+                              onClick={() => connectWithPeer(match.id)}
+                              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                            >
+                              <UserPlus className="h-4 w-4 mr-2" />
+                              Connect Now
+                            </Button>
+                            <Button size="sm" variant="outline">
+                              <MessageCircle className="h-4 w-4 mr-2" />
+                              Send Message
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </TabsContent>
 
         <TabsContent value="matches" className="space-y-4">
           <div className="flex items-center justify-between">
