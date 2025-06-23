@@ -90,44 +90,7 @@ export const Onboarding = () => {
     }
   };
 
-  const handleMedicalProfileComplete = (data: any) => {
-    console.log('Medical profile completed with data points:', Object.keys(data).length);
-    console.log('Research consent status:', {
-      researchConsent: data.researchConsent,
-      anonymousDataSharing: data.anonymousDataSharing,
-      contactForStudies: data.contactForStudies
-    });
-    
-    // Validate research consent was provided
-    if (!data.researchConsent || !data.anonymousDataSharing) {
-      toast({
-        title: "Research Consent Required",
-        description: "Please complete the research consent section to continue.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setCompletedSteps(prev => new Set([...prev, 'profile']));
-    
-    toast({
-      title: "Medical Profile & Research Consent Complete!",
-      description: "Your comprehensive health information and research participation preferences have been saved. Starting interactive tour...",
-    });
-
-    // Transition to tour phase after brief delay to show completion message
-    setTimeout(async () => {
-      // Save onboarding completion to Firebase
-      if (user) {
-        await setDoc(doc(db, 'userPreferences', user.uid), {
-          tourActive: true,
-          onboardingComplete: true,
-          onboardingCompletedAt: new Date()
-        }, { merge: true });
-      }
-      window.location.href = '/dashboard'; // Navigate to dashboard and start tour
-    }, 1500);
-  };
+  // REMOVED: handleMedicalProfileComplete function that was causing the validation loop
 
   const handleMedicalProfileSkip = () => {
     setCurrentStep(2); // Move to research step
@@ -166,11 +129,45 @@ export const Onboarding = () => {
   };
 
   if (currentPhase === 'tour') {
+    console.log('Onboarding: Rendering WelcomeTour');
     return <WelcomeTour onComplete={handleTourComplete} onSkip={handleTourSkip} />;
   }
 
   if (currentPhase === 'medical-profile') {
-    return <MedicalProfileForm onComplete={handleMedicalProfileComplete} isNewUser={true} />;
+    return (
+      <MedicalProfileForm
+        onComplete={(data) => {
+          console.log('Onboarding: Medical profile completed with data:', data);
+          console.log('Onboarding: Transitioning directly to tour phase');
+          
+          // Mark as completed
+          setCompletedSteps(prev => new Set([...prev, 'profile']));
+          
+          toast({
+            title: "Profile & Companion Complete!",
+            description: "Starting interactive tour...",
+          });
+          
+          // Transition directly to tour
+          setTimeout(async () => {
+            // Save onboarding completion to Firebase
+            if (user) {
+              try {
+                await setDoc(doc(db, 'userPreferences', user.uid), {
+                  tourActive: true,
+                  onboardingComplete: true,
+                  onboardingCompletedAt: new Date()
+                }, { merge: true });
+              } catch (error) {
+                console.error('Error saving onboarding completion:', error);
+              }
+            }
+            setOnboardingPhase('tour');
+          }, 1500);
+        }}
+        isNewUser={true}
+      />
+    );
   }
 
   if (currentPhase === 'research-consent') {
