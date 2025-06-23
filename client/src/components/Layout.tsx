@@ -6,6 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { 
   Heart, 
   BarChart3, 
   BookOpen, 
@@ -18,6 +26,8 @@ import {
   Microscope,
   Video,
   Home,
+  User,
+  MoreVertical,
   Activity,
   TrendingUp,
   Stethoscope
