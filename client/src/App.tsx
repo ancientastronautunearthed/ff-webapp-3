@@ -25,6 +25,9 @@ import ResearchDashboard from "@/pages/ResearchDashboard";
 import ProfileSetup from "@/pages/ProfileSetup";
 import { Onboarding } from "@/components/Onboarding";
 import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
+import DoctorLogin from "@/pages/DoctorLogin";
+import DoctorDashboard from "@/pages/DoctorDashboard";
+import { AskDoctorForum } from "@/components/AskDoctorForum";
 
 function AppContent() {
   const { user, loading } = useAuth();
