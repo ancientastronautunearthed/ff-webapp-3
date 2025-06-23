@@ -169,9 +169,14 @@ export const Onboarding = () => {
         description: "Profile complete. Redirecting to your dashboard...",
       });
       
-      // Force immediate navigation
+      // Force immediate navigation with state update
       console.log('=== REDIRECTING TO DASHBOARD ===');
-      window.location.href = '/dashboard';
+      
+      // Store completion status locally to ensure redirect works
+      localStorage.setItem('profileCompleted', 'true');
+      
+      // Use replace to avoid back button issues
+      window.location.replace('/dashboard');
       
     } catch (error) {
       console.error('=== ERROR DURING PROFILE COMPLETION ===', error);

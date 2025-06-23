@@ -55,16 +55,34 @@ function AppContent() {
     if (!user) return;
     
     try {
-      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
-      if (prefsDoc.exists()) {
-        const data = prefsDoc.data();
-        setUserRole(data.userRole || null);
-        setHasCompletedOnboarding(data.onboardingComplete || false);
+      // Check backend API instead of Firebase directly due to connection issues
+      const response = await fetch('/api/users/profile', {
+        headers: {
+          'Authorization': `Bearer ${await user.getIdToken()}`
+        }
+      });
+      
+      if (response.ok) {
+        const profile = await response.json();
+        setUserRole(profile.userRole || 'patient');
+        setHasCompletedOnboarding(profile.onboardingComplete || false);
+      } else {
+        // Check localStorage for recent completion
+        const recentCompletion = localStorage.getItem('profileCompleted');
+        if (recentCompletion) {
+          setUserRole('patient');
+          setHasCompletedOnboarding(true);
+          localStorage.removeItem('profileCompleted'); // Clean up
+        } else {
+          setUserRole('patient');
+          setHasCompletedOnboarding(false);
+        }
       }
       setDataLoaded(true);
     } catch (error) {
       console.error('Error checking user data:', error);
-      setUserRole(null);
+      // Default to patient role if checks fail
+      setUserRole('patient');
       setHasCompletedOnboarding(false);
       setDataLoaded(true);
     }
