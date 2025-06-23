@@ -34,6 +34,7 @@ import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
 import { CompanionDashboard } from "@/components/CompanionDashboard";
+import { UserSettings } from "@/pages/UserSettings";
 
 function AppContent() {
   const { user, loading } = useAuth();
