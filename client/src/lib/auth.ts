@@ -42,3 +42,14 @@ export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
 export const getCurrentUser = (): FirebaseUser | null => {
   return auth.currentUser;
 };
+
+// Additional auth functions for doctor registration
+export const registerWithEmail = async (email: string, password: string): Promise<FirebaseUser> => {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  return userCredential.user;
+};
+
+export const loginWithEmail = async (email: string, password: string): Promise<FirebaseUser> => {
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  return userCredential.user;
+};
