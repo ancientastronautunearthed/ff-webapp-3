@@ -34,10 +34,9 @@ export default function Dashboard() {
   const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
+    // Don't auto-show tour, only show when user clicks button
     const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
-    if (!hasSeenTour) {
-      setShowTour(true);
-    }
+    // Removed auto-show for better UX
   }, []);
 
   const completeTour = () => {
@@ -137,13 +136,23 @@ export default function Dashboard() {
       {showTour && <WelcomeTour onComplete={completeTour} onSkip={skipTour} />}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Good {getTimeOfDay()}, {user?.displayName || user?.email?.split('@')[0] || 'there'}!
-        </h1>
-        <p className="text-xl text-gray-600 mt-2">
-          Here's your health tracking overview for today
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Good {getTimeOfDay()}, {user?.displayName || user?.email?.split('@')[0] || 'there'}!
+          </h1>
+          <p className="text-xl text-gray-600 mt-2">
+            Here's your health tracking overview for today
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={startTour}
+          className="flex items-center gap-2"
+        >
+          <HelpCircle className="h-4 w-4" />
+          Take Tour
+        </Button>
       </div>
 
       {/* Quick Stats */}

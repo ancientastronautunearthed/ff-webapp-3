@@ -241,7 +241,10 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
               <Button variant="ghost" onClick={onSkip}>
                 Skip Tour
               </Button>
-              <Button onClick={nextStep} className="bg-primary-500 hover:bg-primary-600">
+              <Button 
+                onClick={nextStep} 
+                className="bg-primary-500 hover:bg-primary-600 text-white"
+              >
                 {currentStep === tourSteps.length - 1 ? 'Finish Tour' : 'Next'}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
