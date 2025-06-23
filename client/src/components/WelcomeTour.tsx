@@ -317,7 +317,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
           <div className="flex justify-between pt-4">
             <Button
               variant="outline"
-              onClick={prevStep}
+              onClick={previousStep}
               disabled={currentStep === 0}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -330,7 +330,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
               </Button>
               <Button 
                 onClick={nextStep} 
-                className="bg-primary-500 hover:bg-primary-600 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {currentStep === tourSteps.length - 1 ? 'Finish Tour' : 'Next'}
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -344,7 +344,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full ${
-                  index === currentStep ? 'bg-primary-500' : 
+                  index === currentStep ? 'bg-blue-500' : 
                   index < currentStep ? 'bg-green-500' : 'bg-gray-300'
                 }`}
               />
