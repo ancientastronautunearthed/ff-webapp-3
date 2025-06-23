@@ -6,6 +6,7 @@ import { CheckCircle, ArrowRight, ArrowLeft, Heart, Shield, Users, BarChart3, Me
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { MedicalOnboarding } from '@/components/MedicalOnboarding';
+import { MedicalProfileForm } from '@/components/MedicalProfileForm';
 import { ResearchConsentManager } from '@/components/ResearchConsentManager';
 import { WelcomeTour } from '@/components/WelcomeTour';
 import { useToast } from '@/hooks/use-toast';
