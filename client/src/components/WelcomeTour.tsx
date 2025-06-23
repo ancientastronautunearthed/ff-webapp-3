@@ -59,7 +59,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
         'Use quick actions for immediate symptom logging',
         'Review weekly trends to identify patterns'
       ],
-      highlightElements: ['.quick-actions', '.stats-cards', '.weekly-overview']
+      highlightElements: ['[data-tour="quick-actions"]', '[data-tour="stats-cards"]', '[data-tour="weekly-overview"]']
     },
     {
       id: 'symptoms',
@@ -79,7 +79,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
         'Log symptoms at the same time daily for consistency',
         'Include photos when documenting new lesions or fibers'
       ],
-      highlightElements: ['.symptom-form', '.intensity-sliders', '.factor-checkboxes']
+      highlightElements: ['[data-tour="symptom-form"]', '[data-tour="intensity-sliders"]', '[data-tour="factor-checkboxes"]']
     },
     {
       id: 'journal',
@@ -99,7 +99,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
         'Write detailed descriptions of texture, color, movement',
         'Link to symptom entries for comprehensive tracking'
       ],
-      highlightElements: ['.journal-form', '.photo-upload', '.entry-linking']
+      highlightElements: ['[data-tour="journal-form"]', '[data-tour="photo-upload"]', '[data-tour="entry-linking"]']
     },
     {
       id: 'calendar',

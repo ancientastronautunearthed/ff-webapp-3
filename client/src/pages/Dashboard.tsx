@@ -56,7 +56,10 @@ export default function Dashboard() {
   };
 
   const startTour = () => {
-    setShowTour(true);
+    console.log('Starting global tour');
+    sessionStorage.setItem('tourActive', 'true');
+    // Trigger a page reload to start the global tour
+    window.location.reload();
   };
 
   // Calculate real stats from Firebase data
@@ -139,18 +142,7 @@ export default function Dashboard() {
 
   return (
     <>
-      {showTour && (
-        <WelcomeTour 
-          onComplete={() => {
-            console.log('Tour onComplete triggered');
-            completeTour();
-          }}
-          onSkip={() => {
-            console.log('Tour onSkip triggered');
-            skipTour();
-          }}
-        />
-      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Header */}
       <div className="mb-8 flex items-center justify-between">
@@ -230,7 +222,7 @@ export default function Dashboard() {
         {/* Quick Actions */}
         <div className="lg:col-span-2">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="grid md:grid-cols-2 gap-4 mb-8" data-tour="quick-actions">
             {quickActions.map((action, index) => {
               const Icon = action.icon;
               return (
@@ -263,7 +255,7 @@ export default function Dashboard() {
           </div>
 
           {/* Weekly Overview */}
-          <Card>
+          <Card data-tour="weekly-overview">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Calendar className="mr-2 h-5 w-5 text-primary-500" />
