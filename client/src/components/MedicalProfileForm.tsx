@@ -135,9 +135,15 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
   const { user } = useAuth();
   
   // Form submission handler
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formData = form.getValues();
-    onComplete(formData as MedicalProfileData);
+    console.log('MedicalProfileForm: Calling onComplete with data');
+    try {
+      await onComplete(formData as MedicalProfileData);
+      console.log('MedicalProfileForm: onComplete finished successfully');
+    } catch (error) {
+      console.error('MedicalProfileForm: Error in onComplete:', error);
+    }
   };
 
   const form = useForm<MedicalProfileData>({
@@ -802,6 +808,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     }
                     
                     // Complete profile directly
+                    e.preventDefault();
                     handleSubmit();
                   }}
                 >

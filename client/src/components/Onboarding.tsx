@@ -192,8 +192,8 @@ export const Onboarding = () => {
       // Navigate to dashboard after brief delay
       setTimeout(() => {
         console.log('Navigating to dashboard...');
-        window.location.href = '/dashboard';
-      }, 1500);
+        window.location.replace('/dashboard');
+      }, 2000);
       
     } catch (error) {
       console.error('Error saving medical profile:', error);
