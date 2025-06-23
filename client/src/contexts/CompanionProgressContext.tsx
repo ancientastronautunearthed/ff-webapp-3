@@ -51,7 +51,6 @@ interface CompanionProgressContextType {
   loading: boolean;
   addPoints: (points: number, action: string, category: PointSource['category']) => Promise<void>;
   awardPoints: (points: number, reason: string) => Promise<void>;
-  setPoints: (points: number) => void;
   getTierProgress: () => TierProgress;
   checkTierUnlock: () => boolean;
   markCelebrationShown: (tier: number) => Promise<void>;
@@ -234,11 +233,12 @@ export const CompanionProgressProvider = ({ children }: CompanionProgressProvide
 
   const getTierProgress = (): TierProgress => {
     if (!progressData) {
+      // Return empty progress - no fallback data
       return {
-        currentTier: 1,
+        currentTier: 0,
         totalPoints: 0,
         pointsInCurrentTier: 0,
-        pointsToNextTier: 100,
+        pointsToNextTier: 0,
         progressPercentage: 0,
         unlockedFeatures: [],
         recentUnlocks: []

@@ -30,35 +30,34 @@ export const CompanionWidget = () => {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            console.log('User data for companion check:', userData);
+            console.log('CompanionWidget: User data loaded:', userData);
             
-            // Check multiple possible field names for companion data
-            const image = userData.companionImage || userData.aiCompanionImage || userData.companion_image;
-            const config = userData.companionConfig || userData.aiCompanionConfig || userData.companion_config;
+            // Check for companion data - ONLY use real Firebase data
+            const image = userData.companionImage;
+            const config = userData.companionConfig;
+            const hasCompanion = userData.hasCompanion;
+            const companionSkipped = userData.companionSkipped;
+            
+            console.log('CompanionWidget: Companion status -', {
+              hasImage: !!image,
+              hasConfig: !!config,
+              hasCompanion,
+              companionSkipped
+            });
             
             if (image) {
+              console.log('CompanionWidget: Setting companion image');
               setCompanionImage(image);
             }
             if (config) {
+              console.log('CompanionWidget: Setting companion config');
               setCompanionConfig(config);
             }
-            
-            // Also check if companion was created during onboarding
-            if (userData.onboardingCompleted && userData.hasCompanion && !userData.companionSkipped) {
-              // User has completed onboarding with companion, but image might be loading
-              if (!image && !config) {
-                console.log('User has companion flag but no data found - showing fallback');
-                // Show a loading state or basic companion info
-                setCompanionConfig({ 
-                  customName: 'AI Companion', 
-                  species: 'Health Assistant',
-                  personality: 'Caring'
-                });
-              }
-            }
+          } else {
+            console.log('CompanionWidget: No user document found');
           }
         } catch (error) {
-          console.log('Could not load companion data:', error);
+          console.error('CompanionWidget: Error loading companion data:', error);
         }
       }
     };
@@ -66,21 +65,23 @@ export const CompanionWidget = () => {
     loadCompanionData();
   }, [user]);
 
+  // Show creation prompt if user has no companion data
   if (!companionImage && !companionConfig) {
+    console.log('CompanionWidget: No companion data found, showing creation prompt');
     return (
       <Card className="w-full max-w-sm">
         <CardContent className="p-4">
           <div className="text-center space-y-3">
-            <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-              <Heart className="w-8 h-8 text-gray-400" />
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
+              <Heart className="w-8 h-8 text-purple-500" />
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">No AI Companion</h3>
-              <p className="text-sm text-gray-600">Create your personalized health companion</p>
+              <h3 className="font-medium text-gray-900">Create AI Companion</h3>
+              <p className="text-sm text-gray-600">Design your personalized health guide</p>
             </div>
             <Link href="/companion">
-              <Button size="sm" className="w-full">
-                Create Companion
+              <Button size="sm" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                Get Started
               </Button>
             </Link>
           </div>
@@ -89,95 +90,118 @@ export const CompanionWidget = () => {
     );
   }
 
+  console.log('CompanionWidget: Rendering with real data - tier progress:', tierProgress);
+  
+  // Helper functions to display companion config data
+  const getSpeciesDisplayName = (species: string): string => {
+    const speciesMap: Record<string, string> = {
+      'wise-owl': 'Wise Owl',
+      'gentle-dolphin': 'Gentle Dolphin', 
+      'mystical-fox': 'Mystical Fox',
+      'healing-tree-spirit': 'Tree Spirit',
+      'crystal-dragon': 'Crystal Dragon'
+    };
+    return speciesMap[species] || species;
+  };
+
+  const getPersonalityDisplayName = (personality: string): string => {
+    const personalityMap: Record<string, string> = {
+      'encouraging-cheerleader': 'Encouraging',
+      'calm-meditation-guide': 'Zen Master',
+      'scientific-researcher': 'Researcher',
+      'compassionate-friend': 'Compassionate',
+      'wise-mentor': 'Wise Mentor'
+    };
+    return personalityMap[personality] || personality;
+  };
+
+  const getExpertiseDisplayName = (expertise: string): string => {
+    const expertiseMap: Record<string, string> = {
+      'symptom-pattern-detective': 'Pattern Detective',
+      'holistic-wellness-coach': 'Wellness Coach',
+      'stress-management-therapist': 'Stress Therapist',
+      'nutrition-specialist': 'Nutrition Expert',
+      'research-coordinator': 'Research Guide'
+    };
+    return expertiseMap[expertise] || expertise;
+  };
+  
   return (
-    <Card className="w-full max-w-sm relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500" />
-      
+    <Card className="w-full max-w-sm">
       <CardContent className="p-4">
         <div className="space-y-4">
-          {/* Companion Avatar and Info */}
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              <Avatar className="w-12 h-12">
-                <AvatarImage src={companionImage} />
-                <AvatarFallback>AI</AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full flex items-center justify-center">
-                <Heart className="w-2 h-2 text-white" />
+          {/* Companion Avatar */}
+          <div className="text-center">
+            {companionImage ? (
+              <img 
+                src={companionImage} 
+                alt="AI Companion" 
+                className="w-20 h-20 rounded-full mx-auto object-cover border-2 border-purple-200"
+                onError={(e) => {
+                  console.log('CompanionWidget: Image failed to load:', companionImage);
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
+                <Heart className="w-10 h-10 text-purple-500" />
               </div>
-            </div>
+            )}
             
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-2">
-                <h3 className="font-medium text-gray-900 truncate">
-                  {companionConfig?.customName || 'AI Companion'}
-                </h3>
-                <Badge variant="secondary" className="text-xs">
-                  Level {tierProgress.currentTier}
-                </Badge>
+            {/* Status Indicator - only show if real companion exists */}
+            {(companionImage || companionConfig) && (
+              <div className="flex items-center justify-center mt-2 text-xs text-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
+                AI Companion Active
               </div>
-              <p className="text-sm text-gray-600 truncate">
-                {companionConfig?.species || 'Health Assistant'} • {companionConfig?.personality || 'Caring'}
-              </p>
-            </div>
+            )}
           </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="text-center p-2 bg-blue-50 rounded-lg">
-              <div className="text-lg font-bold text-blue-600">{tierProgress.totalPoints}</div>
-              <div className="text-xs text-blue-700">Total Points</div>
-            </div>
-            <div className="text-center p-2 bg-purple-50 rounded-lg">
-              <div className="text-lg font-bold text-purple-600">{tierProgress.unlockedFeatures.length}</div>
-              <div className="text-xs text-purple-700">Features</div>
-            </div>
+          {/* Companion Info - Only real data */}
+          <div className="text-center space-y-1">
+            <h3 className="font-medium text-gray-900">
+              {companionConfig?.customName || 
+               (companionConfig?.species ? getSpeciesDisplayName(companionConfig.species) : 'AI Companion')}
+            </h3>
+            <p className="text-xs text-gray-600">
+              {companionConfig?.personality && companionConfig?.expertise
+                ? `${getPersonalityDisplayName(companionConfig.personality)} • ${getExpertiseDisplayName(companionConfig.expertise)}`
+                : (companionConfig?.personality || companionConfig?.expertise) 
+                  ? `${getPersonalityDisplayName(companionConfig.personality || '')} ${getExpertiseDisplayName(companionConfig.expertise || '')}`
+                  : 'Personalized Health Guide'
+              }
+            </p>
           </div>
 
-          {/* Progress to Next Tier */}
-          {tierProgress.pointsToNextTier > 0 && (
+          {/* Tier Progress - Only show if user has made real progress */}
+          {tierProgress && tierProgress.totalPoints > 0 && tierProgress.currentTier > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Next Level</span>
-                <span className="text-gray-500">{tierProgress.pointsToNextTier} points</span>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-gray-600">Tier {tierProgress.currentTier}</span>
+                <span className="text-gray-600">{tierProgress.totalPoints} pts</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${tierProgress.progressPercentage}%` }}
-                />
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500"
+                  style={{ 
+                    width: `${Math.min(100, tierProgress.progressPercentage)}%` 
+                  }}
+                ></div>
               </div>
+              {tierProgress.pointsToNextTier > 0 && (
+                <p className="text-xs text-gray-500 text-center">
+                  {tierProgress.pointsToNextTier} points to next tier
+                </p>
+              )}
             </div>
           )}
 
-          {/* Recent Unlock Badge */}
-          {tierProgress.recentUnlocks.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2">
-              <div className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4 text-yellow-600" />
-                <span className="text-sm font-medium text-yellow-800">
-                  New: {tierProgress.recentUnlocks[0]}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex space-x-2">
-            <Link href="/companion" className="flex-1">
-              <Button variant="outline" size="sm" className="w-full">
-                <MessageCircle className="w-3 h-3 mr-1" />
-                Chat
-              </Button>
-            </Link>
-            <Link href="/companion" className="flex-1">
-              <Button size="sm" className="w-full">
-                <TrendingUp className="w-3 h-3 mr-1" />
-                Progress
-                <ChevronRight className="w-3 h-3 ml-1" />
-              </Button>
-            </Link>
-          </div>
+          {/* Action Button */}
+          <Link href="/companion">
+            <Button size="sm" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              {companionImage || companionConfig ? 'Chat with Companion' : 'Visit Companion Dashboard'}
+            </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

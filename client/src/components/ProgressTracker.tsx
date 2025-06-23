@@ -55,10 +55,7 @@ export const ProgressTracker = () => {
   const nextTierData = COMPANION_TIERS.find(t => t.level === tierProgress.currentTier + 1);
   const TierIcon = currentTierData?.icon || Star;
 
-  // Demo functions for testing points
-  const addDemoPoints = async (action: string, points: number, category: any) => {
-    await addPoints(points, action, category);
-  };
+  // Remove demo functions - production only
 
   return (
     <>
