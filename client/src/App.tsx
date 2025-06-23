@@ -28,7 +28,7 @@ import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
 import DoctorLogin from "@/pages/DoctorLogin";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import DoctorDemo from "@/pages/DoctorDemo";
-import { PeerMatchingPage } from "@/pages/PeerMatchingPage";
+import { PeerMatching } from "@/components/PeerMatching";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
@@ -102,7 +102,7 @@ function AppContent() {
         <Route path="/doctor/dashboard" component={DoctorDashboard} />
         <Route path="/doctor/demo" component={DoctorDemo} />
         <Route path="/ask-doctor" component={AskDoctorForum} />
-        <Route path="/peer-matching" component={PeerMatchingPage} />
+        <Route path="/peer-matching" component={PeerMatching} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
       </Switch>
