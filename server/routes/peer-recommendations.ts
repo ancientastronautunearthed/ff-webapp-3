@@ -7,7 +7,7 @@ import {
   orderBy, 
   limit 
 } from 'firebase/firestore';
-import { db } from '../firebase-admin';
+import { db, adminDb } from '../firebase-admin';
 import { PeerRecommendationEngine, type UserProfile, type RecommendationContext } from '../ai/peer-recommendation-engine';
 
 export const peerRecommendationsRoutes = Router();

@@ -862,7 +862,7 @@ export const PeerMatching = () => {
                 <Label className="text-base font-medium">Preferred Age Range</Label>
                 <div className="px-3">
                   <Slider
-                    value={preferences.ageRange}
+                    value={preferences.ageRange || [18, 65]}
                     onValueChange={(value) => setPreferences(prev => ({
                       ...prev,
                       ageRange: value as [number, number]
