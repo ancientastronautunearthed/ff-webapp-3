@@ -156,16 +156,17 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       console.error('Error saving companion data:', error);
     }
     
+    // Hide companion creator FIRST before any other operations
+    console.log('MedicalProfileForm: Hiding companion creator immediately');
+    setShowCompanionCreator(false);
+    
     toast({
       title: "Profile & Companion Complete!",
       description: "Your medical profile and AI companion have been created successfully.",
     });
     
-    // Hide companion creator and proceed to completion
-    console.log('MedicalProfileForm: Hiding companion creator and calling onComplete');
-    setShowCompanionCreator(false);
-    
     // Get form data and call onComplete to proceed to tour
+    console.log('MedicalProfileForm: Calling onComplete to proceed to tour');
     const formData = form.getValues();
     onComplete(formData as MedicalProfileData);
   };
@@ -186,16 +187,17 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       console.error('Error saving companion skip status:', error);
     }
     
+    // Hide companion creator FIRST before any other operations
+    console.log('MedicalProfileForm: Hiding companion creator immediately');
+    setShowCompanionCreator(false);
+    
     toast({
       title: "Profile Complete!",
       description: "You can create your AI companion later from settings.",
     });
     
-    // Hide companion creator and proceed to completion
-    console.log('MedicalProfileForm: Hiding companion creator and calling onComplete');
-    setShowCompanionCreator(false);
-    
     // Get form data and call onComplete to proceed to tour
+    console.log('MedicalProfileForm: Calling onComplete to proceed to tour');
     const formData = form.getValues();
     onComplete(formData as MedicalProfileData);
   };
@@ -344,11 +346,19 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
 
   // Show companion creator if flag is set
   if (showCompanionCreator) {
-    console.log('Rendering CompanionCreatorStep');
+    console.log('Rendering CompanionCreatorStep - showCompanionCreator:', showCompanionCreator);
     return (
       <CompanionCreatorStep
-        onComplete={handleCompanionCreated}
-        onSkip={handleSkipCompanion}
+        onComplete={(imageUrl: string, config: any) => {
+          console.log('CompanionCreatorStep onComplete called, setting showCompanionCreator to false immediately');
+          setShowCompanionCreator(false);
+          handleCompanionCreated(imageUrl, config);
+        }}
+        onSkip={() => {
+          console.log('CompanionCreatorStep onSkip called, setting showCompanionCreator to false immediately');
+          setShowCompanionCreator(false);
+          handleSkipCompanion();
+        }}
       />
     );
   }
