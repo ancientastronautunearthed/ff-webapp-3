@@ -76,8 +76,8 @@ export const AIInsights = () => {
       });
     } catch (error) {
       toast({
-        title: "Analysis Error",
-        description: "Unable to generate insights. Please try again later.",
+        title: "AI Analysis Failed",
+        description: error instanceof Error ? error.message : "Unable to connect to AI service. Check your connection.",
         variant: "destructive",
       });
     } finally {
@@ -149,7 +149,7 @@ export const AIInsights = () => {
             <Alert>
               <Lightbulb className="h-4 w-4" />
               <AlertDescription>
-                Add at least 3 symptom entries to enable AI pattern analysis and insights.
+                Add at least 3 symptom entries to enable AI pattern analysis and insights. AI analysis requires real data to identify meaningful patterns.
               </AlertDescription>
             </Alert>
           )}
