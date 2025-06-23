@@ -10,6 +10,7 @@ import {
   where
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { Layout } from '@/components/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -197,7 +198,7 @@ export default function Dashboard() {
   };
 
   return (
-    <>
+    <Layout>
       {showTour && (
         <WelcomeTour 
           onComplete={() => {
@@ -221,14 +222,23 @@ export default function Dashboard() {
             Here's your health tracking overview for today
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={startTour}
-          className="flex items-center gap-2"
-        >
-          <HelpCircle className="h-4 w-4" />
-          Take Tour
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowCheckin(true)}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            <Target className="h-4 w-4 mr-2" />
+            Daily Check-in
+          </Button>
+          <Button
+            variant="outline"
+            onClick={startTour}
+            className="flex items-center gap-2"
+          >
+            <HelpCircle className="h-4 w-4" />
+            Take Tour
+          </Button>
+        </div>
       </div>
 
       {/* Daily Task List - Main Focus */}
@@ -314,10 +324,8 @@ export default function Dashboard() {
                   <Card 
                     key={index} 
                     className="hover:shadow-md transition-shadow cursor-pointer group"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Card clicked, calling action');
+                    onClick={() => {
+                      console.log('Daily Check-in card clicked');
                       action.action();
                     }}
                   >
@@ -547,6 +555,6 @@ export default function Dashboard() {
         }}
       />
       </div>
-    </>
+    </Layout>
   );
 }
