@@ -3,6 +3,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSymptomEntries } from '@/hooks/useSymptomData';
 import { useJournalEntries } from '@/hooks/useJournalData';
 import { getWeeklyStats } from '@/utils/symptomAnalysis';
+import { 
+  collection, 
+  getDocs, 
+  query, 
+  where
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +19,7 @@ import { AIHealthCoach } from '@/components/AIHealthCoach';
 import { SmartDailyCheckin } from '@/components/SmartDailyCheckin';
 import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { DailyTaskList } from '@/components/DailyTaskList';
+import { DailyCheckin } from '@/components/DailyCheckin';
 import { Link } from 'wouter';
 import { 
   Activity, 
@@ -28,7 +36,8 @@ import {
   Target,
   Clock,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  CheckCircle
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -36,12 +45,40 @@ export default function Dashboard() {
   const { data: symptomEntries } = useSymptomEntries();
   const { data: journalEntries } = useJournalEntries();
   const [showTour, setShowTour] = useState(false);
+  const [showCheckin, setShowCheckin] = useState(false);
+  const [checkinCompleted, setCheckinCompleted] = useState(false);
 
   useEffect(() => {
     // Don't auto-show tour, only show when user clicks button
     const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
     // Removed auto-show for better UX
+    
+    // Check if daily check-in was completed today
+    checkDailyCheckinStatus();
   }, []);
+
+  const checkDailyCheckinStatus = async () => {
+    if (!user) return;
+
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const checkinQuery = query(
+        collection(db, 'dailyCheckins'),
+        where('userId', '==', user.uid),
+        where('timestamp', '>=', today),
+        where('timestamp', '<', tomorrow)
+      );
+
+      const snapshot = await getDocs(checkinQuery);
+      setCheckinCompleted(!snapshot.empty);
+    } catch (error) {
+      console.error('Error checking daily checkin status:', error);
+    }
+  };
 
   const completeTour = () => {
     console.log('completeTour called');

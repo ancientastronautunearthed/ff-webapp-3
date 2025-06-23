@@ -118,6 +118,9 @@ The application uses a comprehensive database schema with the following core ent
 - June 23, 2025. Fixed Digital Matchbox submit functionality and community platform real data integration
 
 ## Recent Changes
+- ✓ Created fully functional Daily Check-in system with 4-step health assessment workflow
+- ✓ Daily Check-in includes wellbeing scales, sleep tracking, mood selection, symptom reporting, and notes
+- ✓ Prevents duplicate check-ins and integrates with symptom tracking system
 - ✓ Enhanced AI Insights system with real Firebase data integration and personalized analysis
 - ✓ AI Health Coach now generates insights from actual user symptom and journal entries
 - ✓ Pattern detection, correlation analysis, and predictions based on real user data
