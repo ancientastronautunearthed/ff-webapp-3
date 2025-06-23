@@ -150,5 +150,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
 
+  // AI Health Companion endpoints
+  app.post('/api/companion/chat', async (req: Request, res: Response) => {
+    try {
+      const { userId, message } = req.body;
+      
+      if (!userId || !message) {
+        return res.status(400).json({ error: 'User ID and message required' });
+      }
+
+      // Generate AI response using Google AI
+      const { generateCompanionResponse } = await import('./routes/companion');
+      const aiResponse = await generateCompanionResponse(userId, message);
+      
+      res.json(aiResponse);
+    } catch (error) {
+      console.error('Error generating companion response:', error);
+      res.status(500).json({ 
+        message: "I understand you're reaching out, and I want you to know that I'm here for you. Sometimes I have brief moments where I need to process - could you try sharing that with me again?",
+        sentiment: 'supportive'
+      });
+    }
+  });
+
+  app.post('/api/companion/insights', async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ error: 'User ID required' });
+      }
+
+      // Generate companion insights
+      const { generateCompanionInsights } = await import('./routes/companion');
+      const insights = await generateCompanionInsights(userId);
+      
+      res.json(insights);
+    } catch (error) {
+      console.error('Error generating companion insights:', error);
+      res.json([
+        {
+          type: 'encouragement',
+          message: 'Remember to be gentle with yourself on this health journey.',
+          priority: 'medium'
+        }
+      ]);
+    }
+  });
+
   return httpServer;
 }

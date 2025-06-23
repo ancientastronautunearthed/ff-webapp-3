@@ -24,7 +24,7 @@ export default function SimpleDashboard() {
           <p className="text-gray-600">Your health tracking dashboard</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Symptom Tracker</CardTitle>
@@ -51,6 +51,21 @@ export default function SimpleDashboard() {
               </p>
               <Link href="/journal">
                 <Button className="w-full">Write Entry</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">AI Companion</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground mb-4">
+                Chat with your compassionate AI health companion
+              </p>
+              <Link href="/companion-chat">
+                <Button className="w-full">Start Chat</Button>
               </Link>
             </CardContent>
           </Card>

@@ -37,6 +37,7 @@ import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
 import { CompanionDashboard } from "@/components/CompanionDashboard";
+import { AIHealthCompanion } from "@/components/AIHealthCompanion";
 import { UserSettings } from "@/pages/UserSettings";
 
 function AppContent() {
@@ -121,6 +122,7 @@ function AppContent() {
         <Route path="/dashboard" component={SimpleDashboard} />
         <Route path="/tracker" component={SymptomTracker} />
         <Route path="/journal" component={DigitalMatchbox} />
+        <Route path="/companion-chat" component={AIHealthCompanion} />
         <Route path="/community" component={CommunityForum} />
         <Route path="/insights" component={DataVisualization} />
         <Route path="/research-opt-in" component={ResearchOptIn} />

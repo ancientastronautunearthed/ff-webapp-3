@@ -10,7 +10,8 @@ import {
   BarChart3,
   Calendar,
   FileText,
-  LogOut
+  LogOut,
+  MessageCircle
 } from 'lucide-react';
 
 interface SimpleLayoutProps {
@@ -35,6 +36,7 @@ export function SimpleLayout({ children }: SimpleLayoutProps) {
     { name: 'Dashboard', href: '/', icon: Home },
     { name: 'Symptom Tracker', href: '/tracker', icon: Activity },
     { name: 'Journal', href: '/journal', icon: BookOpen },
+    { name: 'AI Companion', href: '/companion-chat', icon: MessageCircle },
     { name: 'Community', href: '/community', icon: Users },
     { name: 'Insights', href: '/insights', icon: BarChart3 },
     { name: 'Calendar', href: '/calendar', icon: Calendar },

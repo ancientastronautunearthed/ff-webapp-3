@@ -194,70 +194,195 @@ async function initializeCompanionMemory(userId: string): Promise<CompanionMemor
   };
 }
 
-async function generateCompanionResponse(userId: string, message: string, memory: CompanionMemory) {
+export async function generateCompanionResponse(userId: string, message: string) {
   try {
-    // Create context for AI response generation
-    const context = {
-      userMessage: message,
-      patterns: memory.patterns.slice(0, 5), // Most relevant patterns
-      preferences: memory.preferences,
-      recentInsights: memory.insights.slice(-3),
-      learningProgress: memory.learningProgress,
-      conversationHistory: memory.conversationHistory.slice(-2)
-    };
-
-    const prompt = `You are an AI health companion specialized in Morgellons disease support. You have been learning about this user's health patterns and preferences.
-
-Context about the user:
-- Learning Progress: ${(memory.learningProgress * 100).toFixed(1)}%
-- Known Patterns: ${memory.patterns.map(p => p.pattern).join(', ')}
-- Preferences: ${memory.preferences.map(p => `${p.category}: ${p.preference}`).join(', ')}
-- Recent Insights: ${memory.insights.slice(-3).join(', ')}
-
+    // Get user's recent health data for context
+    const userHealthContext = await getUserHealthContext(userId);
+    
+    // Generate empathetic AI response using Google AI
+    const { analyzeSymptomText } = await import('../ai/simple-ai');
+    
+    const compassionatePrompt = `You are a compassionate AI health companion for someone with Morgellons disease. 
+    
 User's message: "${message}"
+Recent health context: ${JSON.stringify(userHealthContext)}
 
-Respond as a caring, knowledgeable AI companion who remembers past conversations and can identify patterns. Be empathetic, provide actionable insights when appropriate, and reference relevant patterns you've learned about this user.
+Respond with empathy, understanding, and gentle support. Acknowledge their feelings, validate their experience, and offer practical comfort or insights. Keep responses warm, personal, and under 150 words.
 
-Response format:
-- If you identify a new pattern or insight, mention it
-- If giving recommendations, base them on the user's known patterns
-- Be encouraging and supportive
-- Keep responses conversational but informative
-- If the user asks about trends, reference specific patterns you've observed
+If they mention symptoms or health concerns, provide supportive guidance while encouraging professional medical consultation when appropriate.
 
-Respond in a warm, personal tone that shows you remember and care about this user's journey.`;
+Respond in a conversational, caring tone as if you're a trusted friend who understands their health journey.`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
-
-    const responseText = response.text || "I'm here to help you with your health journey.";
-
-    // Determine response type based on content
-    let responseType = 'encouragement';
-    if (responseText.includes('pattern') || responseText.includes('notice')) responseType = 'pattern';
-    if (responseText.includes('recommend') || responseText.includes('suggest')) responseType = 'recommendation';
-    if (responseText.includes('insight') || responseText.includes('analyze')) responseType = 'insight';
-    if (responseText.includes('concern') || responseText.includes('worried')) responseType = 'concern';
+    const aiAnalysis = await analyzeSymptomText(compassionatePrompt);
+    
+    // Extract response and determine sentiment
+    const responseText = aiAnalysis.summary || generateFallbackCompassionateResponse(message);
+    const sentiment = determineSentiment(message, responseText);
+    const suggestions = generateSuggestions(message, userHealthContext);
 
     return {
-      content: responseText,
-      type: responseType,
-      confidence: 0.8,
-      relatedData: memory.patterns.slice(0, 3).map(p => p.pattern),
-      newInsights: await identifyNewInsights(message, responseText, memory)
+      message: responseText,
+      sentiment,
+      suggestions,
+      timestamp: new Date().toISOString()
     };
-
   } catch (error) {
-    console.error('Error generating response:', error);
+    console.error('Error generating companion response:', error);
+    return generateFallbackCompassionateResponse(message);
+  }
+}
+
+export async function generateCompanionInsights(userId: string) {
+  try {
+    const userHealthContext = await getUserHealthContext(userId);
+    
+    const insights = [];
+    
+    // Pattern insights
+    if (userHealthContext.recentSymptoms?.length > 0) {
+      insights.push({
+        type: 'pattern',
+        message: `I've noticed patterns in your recent entries that might be worth discussing with your healthcare provider.`,
+        priority: 'medium'
+      });
+    }
+    
+    // Encouragement insights
+    if (userHealthContext.journalEntries?.length > 0) {
+      insights.push({
+        type: 'encouragement',
+        message: `Your consistent tracking shows real dedication to understanding your health. That's something to be proud of.`,
+        priority: 'low'
+      });
+    }
+    
+    // Self-care reminders
+    insights.push({
+      type: 'reminder',
+      message: `Remember to take breaks and practice gentle self-care. Your wellbeing matters beyond just tracking symptoms.`,
+      priority: 'low'
+    });
+    
+    return insights;
+  } catch (error) {
+    console.error('Error generating insights:', error);
+    return [
+      {
+        type: 'encouragement',
+        message: 'Remember that you\'re not alone in this journey. Each day you\'re taking steps to better understand your health.',
+        priority: 'medium'
+      }
+    ];
+  }
+}
+
+async function getUserHealthContext(userId: string) {
+  try {
+    // Get recent symptom entries and journal entries from Firebase
+    const { getDocs, collection, query, where, orderBy, limit } = await import('firebase/firestore');
+    const { adminDb } = await import('../firebase-admin');
+    
+    const recentSymptoms = [];
+    const recentJournals = [];
+    
+    // Get last 5 symptom entries
+    const symptomsRef = collection(adminDb, 'symptomEntries');
+    const symptomsQuery = query(
+      symptomsRef, 
+      where('userId', '==', userId),
+      orderBy('date', 'desc'),
+      limit(5)
+    );
+    const symptomsSnapshot = await getDocs(symptomsQuery);
+    symptomsSnapshot.forEach(doc => recentSymptoms.push(doc.data()));
+    
+    // Get last 3 journal entries
+    const journalsRef = collection(adminDb, 'journalEntries');
+    const journalsQuery = query(
+      journalsRef,
+      where('userId', '==', userId), 
+      orderBy('date', 'desc'),
+      limit(3)
+    );
+    const journalsSnapshot = await getDocs(journalsQuery);
+    journalsSnapshot.forEach(doc => recentJournals.push(doc.data()));
+    
     return {
-      content: "I'm having trouble processing that right now. Could you try asking in a different way?",
-      type: 'encouragement',
-      confidence: 0.5,
-      relatedData: []
+      recentSymptoms,
+      journalEntries: recentJournals,
+      hasRecentActivity: recentSymptoms.length > 0 || recentJournals.length > 0
+    };
+  } catch (error) {
+    console.error('Error getting user health context:', error);
+    return { recentSymptoms: [], journalEntries: [], hasRecentActivity: false };
+  }
+}
+
+function generateFallbackCompassionateResponse(message: string) {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes('pain') || lowerMessage.includes('hurt')) {
+    return {
+      message: "I hear that you're experiencing pain, and I want you to know that I'm here with you. Your feelings are valid, and it's okay to acknowledge when things are difficult. Have you been able to rest today?",
+      sentiment: 'supportive',
+      suggestions: ['Tell me more about your pain levels', 'What helps when you feel this way?']
     };
   }
+  
+  if (lowerMessage.includes('tired') || lowerMessage.includes('exhausted')) {
+    return {
+      message: "Feeling tired or exhausted can be so challenging, especially when you're managing health concerns. Your body is working hard, and it's natural to feel this way. Remember to be gentle with yourself.",
+      sentiment: 'supportive',
+      suggestions: ['What does rest look like for you?', 'How can I support you today?']
+    };
+  }
+  
+  if (lowerMessage.includes('frustrated') || lowerMessage.includes('angry')) {
+    return {
+      message: "I can understand feeling frustrated - managing health challenges can bring up so many difficult emotions. Your feelings are completely valid. It's okay to feel angry sometimes.",
+      sentiment: 'supportive',
+      suggestions: ['What triggered these feelings?', 'How do you usually cope with frustration?']
+    };
+  }
+  
+  return {
+    message: "Thank you for sharing with me. I'm here to listen and support you through whatever you're experiencing. Your feelings and experiences matter, and I want you to know you're not alone in this journey.",
+    sentiment: 'supportive',
+    suggestions: ['Tell me more about how you\'re feeling', 'What would be most helpful right now?']
+  };
+}
+
+function determineSentiment(userMessage: string, aiResponse: string): string {
+  const lowerMessage = userMessage.toLowerCase();
+  
+  if (lowerMessage.includes('pain') || lowerMessage.includes('hurt') || 
+      lowerMessage.includes('bad') || lowerMessage.includes('worse')) {
+    return 'concerned';
+  }
+  
+  if (lowerMessage.includes('better') || lowerMessage.includes('good') || 
+      lowerMessage.includes('improved') || lowerMessage.includes('happy')) {
+    return 'positive';
+  }
+  
+  return 'supportive';
+}
+
+function generateSuggestions(userMessage: string, healthContext: any): string[] {
+  const lowerMessage = userMessage.toLowerCase();
+  const suggestions = [];
+  
+  if (lowerMessage.includes('pain')) {
+    suggestions.push('What helps manage your pain?', 'Rate your pain level 1-10');
+  } else if (lowerMessage.includes('sleep')) {
+    suggestions.push('Tell me about your sleep routine', 'What affects your sleep quality?');
+  } else if (lowerMessage.includes('mood') || lowerMessage.includes('feeling')) {
+    suggestions.push('What influences your mood?', 'How can I support you today?');
+  } else {
+    suggestions.push('Tell me more', 'How are your energy levels?', 'What would help most right now?');
+  }
+  
+  return suggestions.slice(0, 2); // Limit to 2 suggestions
 }
 
 async function updateCompanionLearning(userId: string, userMessage: string, response: any, memory: CompanionMemory): Promise<CompanionMemory> {
