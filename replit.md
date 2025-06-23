@@ -397,6 +397,13 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Updated all user statistics calculations to use real Firebase data exclusively
 - ✓ Fixed doctor authentication to verify through Firebase doctor collections
 - ✓ Application now operates with 100% authentic data and no fallback mechanisms
+- ✓ Social Impact Leaderboard with Meaningful Achievements
+- ✓ Comprehensive impact scoring system based on real user activities
+- ✓ Multi-dimensional scoring: research participation, community support, knowledge sharing, mentoring, consistency
+- ✓ Real-time leaderboard with tier-based ranking system (Bronze to Diamond)
+- ✓ Meaningful achievements that recognize authentic contributions
+- ✓ Impact metrics dashboard showing weighted scoring breakdown
+- ✓ Integration with all existing features for automatic score calculation
 
 ## User Preferences
 
