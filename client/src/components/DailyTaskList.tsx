@@ -69,9 +69,16 @@ export const DailyTaskList = () => {
   const [streak, setStreak] = useState(0);
 
   useEffect(() => {
-    loadDailyTasks();
-    calculateProgress();
-  }, []);
+    if (user) {
+      loadDailyTasks();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      calculateProgress();
+    }
+  }, [categories]);
 
   const loadDailyTasks = async () => {
     if (!user) return;
@@ -279,7 +286,13 @@ export const DailyTaskList = () => {
     setCategories(taskCategories);
     } catch (error) {
       console.error('Error loading daily tasks:', error);
-      setCategories([]);
+      // Initialize with empty categories to ensure UI renders
+      setCategories([
+        { id: 'health', name: 'Health Tracking', icon: Heart, color: 'bg-red-500', tasks: [], completedCount: 0, totalCount: 0 },
+        { id: 'community', name: 'Community', icon: Users, color: 'bg-green-500', tasks: [], completedCount: 0, totalCount: 0 },
+        { id: 'data', name: 'Data & Research', icon: FileText, color: 'bg-blue-500', tasks: [], completedCount: 0, totalCount: 0 },
+        { id: 'wellness', name: 'Wellness', icon: Brain, color: 'bg-purple-500', tasks: [], completedCount: 0, totalCount: 0 }
+      ]);
     }
   };
 
@@ -327,15 +340,15 @@ export const DailyTaskList = () => {
         lastUpdated: new Date()
       });
     
-    // Update state
-    setCategories(prev => prev.map(category => ({
-      ...category,
-      tasks: category.tasks.map(task => ({
-        ...task,
-        completed: newCompletedTasks.includes(task.id)
-      })),
-      completedCount: category.tasks.filter(task => newCompletedTasks.includes(task.id)).length
-    })));
+      // Update local state immediately for responsiveness
+      setCategories(prevCategories => prevCategories.map(category => ({
+        ...category,
+        tasks: category.tasks.map(task => ({
+          ...task,
+          completed: newCompletedTasks.includes(task.id)
+        })),
+        completedCount: category.tasks.filter(task => newCompletedTasks.includes(task.id)).length
+      })));
     
       // Award points if completing task
       if (!completedTasks.includes(taskId)) {
@@ -401,19 +414,37 @@ export const DailyTaskList = () => {
     }, 5000);
   };
 
-  const openGratitudeModal = () => {
+  const openGratitudeModal = async () => {
     const gratitudeItems = prompt("What are 3 things you're grateful for today? (separate with commas):");
-    if (gratitudeItems) {
-      localStorage.setItem(`gratitude_${new Date().toDateString()}`, gratitudeItems);
-      toggleTask('gratitude');
+    if (gratitudeItems && user) {
+      try {
+        await setDoc(doc(db, 'gratitudeEntries', `${user.uid}_${new Date().toDateString()}`), {
+          userId: user.uid,
+          items: gratitudeItems,
+          date: new Date().toDateString(),
+          createdAt: new Date()
+        });
+        toggleTask('gratitude');
+      } catch (error) {
+        console.error('Error saving gratitude:', error);
+      }
     }
   };
 
-  const openPlanningModal = () => {
+  const openPlanningModal = async () => {
     const tomorrowPlan = prompt("What's one wellness goal for tomorrow?");
-    if (tomorrowPlan) {
-      localStorage.setItem(`tomorrowPlan_${new Date().toDateString()}`, tomorrowPlan);
-      toggleTask('plan_tomorrow');
+    if (tomorrowPlan && user) {
+      try {
+        await setDoc(doc(db, 'wellnessPlans', `${user.uid}_${new Date().toDateString()}`), {
+          userId: user.uid,
+          plan: tomorrowPlan,
+          date: new Date().toDateString(),
+          createdAt: new Date()
+        });
+        toggleTask('plan_tomorrow');
+      } catch (error) {
+        console.error('Error saving wellness plan:', error);
+      }
     }
   };
 
@@ -448,7 +479,12 @@ export const DailyTaskList = () => {
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {categories.map((category) => {
+        {categories.length === 0 ? (
+          <div className="text-center py-8">
+            <Target className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+            <p className="text-gray-600">Loading your daily tasks...</p>
+          </div>
+        ) : categories.map((category) => {
           const IconComponent = category.icon;
           return (
             <div key={category.id} className="space-y-3">
@@ -463,7 +499,11 @@ export const DailyTaskList = () => {
               </div>
               
               <div className="space-y-2">
-                {category.tasks.map((task) => {
+                {category.tasks.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 text-sm">
+                    No tasks in this category today
+                  </div>
+                ) : category.tasks.map((task) => {
                   const TaskIcon = task.icon;
                   const TaskComponent = task.href ? Link : 'div';
                   const taskProps = task.href ? { href: task.href } : {};

@@ -6,18 +6,31 @@ export const aiRoutes = Router();
 
 aiRoutes.post('/analyze-health-patterns', async (req, res) => {
   try {
-    const { userId, symptoms, journals, checkins } = req.body;
+    const healthData = req.body;
+    const { userId } = healthData;
 
     if (!userId) {
       return res.status(400).json({ error: 'User ID required' });
     }
 
+    // Validate and sanitize input data
+    const symptoms = Array.isArray(healthData.symptoms) ? healthData.symptoms : [];
+    const journals = Array.isArray(healthData.journals) ? healthData.journals : [];
+    const checkins = Array.isArray(healthData.checkins) ? healthData.checkins : [];
+
+    if (symptoms.length === 0 && journals.length === 0 && checkins.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No health data available for analysis'
+      });
+    }
+
     // Prepare data for AI analysis
     const analysisData = {
       userId,
-      symptoms: symptoms || [],
-      journals: journals || [],
-      checkins: checkins || [],
+      symptoms,
+      journals,
+      checkins,
       analysisType: 'health_patterns'
     };
 
@@ -25,13 +38,13 @@ aiRoutes.post('/analyze-health-patterns', async (req, res) => {
     const prompt = `You are a specialized health AI assistant analyzing Morgellons disease patterns. Analyze this real patient data:
 
     SYMPTOM DATA (${symptoms.length} entries):
-    ${symptoms.map(s => `- Severity: ${s.severity}/10, Location: ${s.location}, Factors: ${s.environmentalFactors?.join(', ') || 'None'}`).join('\n')}
+    ${symptoms.length > 0 ? symptoms.map(s => `- Severity: ${s.severity || 'N/A'}/10, Location: ${s.location || 'N/A'}, Factors: ${s.environmentalFactors?.join(', ') || 'None'}`).join('\n') : 'No symptom data available'}
     
     JOURNAL DATA (${journals.length} entries):
-    ${journals.map(j => `- Mood: ${j.mood || 'Not specified'}, Notes: ${j.content?.substring(0, 100) || 'No content'}`).join('\n')}
+    ${journals.length > 0 ? journals.map(j => `- Mood: ${j.mood || 'Not specified'}, Notes: ${j.content?.substring(0, 100) || 'No content'}`).join('\n') : 'No journal data available'}
     
     CHECK-IN DATA (${checkins.length} entries):
-    ${checkins.map(c => `- Wellbeing: ${c.overallWellbeing}/10, Sleep: ${c.sleepQuality}/10, Pain: ${c.painLevel}/10`).join('\n')}
+    ${checkins.length > 0 ? checkins.map(c => `- Wellbeing: ${c.overallWellbeing || 'N/A'}/10, Sleep: ${c.sleepQuality || 'N/A'}/10, Pain: ${c.painLevel || 'N/A'}/10`).join('\n') : 'No check-in data available'}
 
     Provide comprehensive analysis in JSON format:
     {
