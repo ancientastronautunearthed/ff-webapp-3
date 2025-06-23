@@ -134,7 +134,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
 
   const { user } = useAuth();
   
-  // Companion handlers removed
+  // Form submission handler
+  const handleSubmit = () => {
+    const formData = form.getValues();
+    onComplete(formData as MedicalProfileData);
+  };
 
   const form = useForm<MedicalProfileData>({
     resolver: zodResolver(medicalProfileSchema),
@@ -797,12 +801,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                       return;
                     }
                     
-                    // Show companion creator after profile completion
-                    // Skip companion creator and complete profile
+                    // Complete profile directly
                     handleSubmit();
                   }}
                 >
-                  Complete Profile & Create Companion
+                  Complete Profile
                 </Button>
               )}
             </div>
@@ -882,7 +885,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     handleSubmit();
                   }}
                 >
-                  Complete Profile & Create Companion
+                  Complete Profile
                 </Button>
               )}
             </div>
