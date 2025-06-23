@@ -29,6 +29,7 @@ import DoctorLogin from "@/pages/DoctorLogin";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import DoctorDemo from "@/pages/DoctorDemo";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
+import LandingPage from "@/pages/LandingPage";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -99,6 +100,7 @@ function AppContent() {
         <Route path="/doctor/dashboard" component={DoctorDashboard} />
         <Route path="/doctor/demo" component={DoctorDemo} />
         <Route path="/ask-doctor" component={AskDoctorForum} />
+        <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
       </Switch>
       

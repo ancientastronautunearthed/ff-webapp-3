@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { AuthForm } from '@/components/AuthForm';
+import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Stethoscope, Users, ArrowLeft } from 'lucide-react';
-import { Link } from 'wouter';
 
 export default function Login() {
   const [showRoleSelection, setShowRoleSelection] = useState(true);
