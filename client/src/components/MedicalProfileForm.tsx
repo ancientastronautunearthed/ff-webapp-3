@@ -614,10 +614,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                 </div>
 
                 <div className="space-y-4">
-                  <label className="flex items-start space-x-3">
+                  <label className="flex items-start space-x-3 cursor-pointer">
                     <Checkbox
-                      {...form.register('researchConsent')}
+                      checked={form.watch('researchConsent')}
                       onCheckedChange={(checked) => form.setValue('researchConsent', !!checked)}
+                      className="mt-1"
                     />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-700">
@@ -629,10 +630,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     </div>
                   </label>
 
-                  <label className="flex items-start space-x-3">
+                  <label className="flex items-start space-x-3 cursor-pointer">
                     <Checkbox
-                      {...form.register('anonymousDataSharing')}
+                      checked={form.watch('anonymousDataSharing')}
                       onCheckedChange={(checked) => form.setValue('anonymousDataSharing', !!checked)}
+                      className="mt-1"
                     />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-700">
@@ -644,10 +646,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     </div>
                   </label>
 
-                  <label className="flex items-start space-x-3">
+                  <label className="flex items-start space-x-3 cursor-pointer">
                     <Checkbox
-                      {...form.register('contactForStudies')}
+                      checked={form.watch('contactForStudies')}
                       onCheckedChange={(checked) => form.setValue('contactForStudies', !!checked)}
+                      className="mt-1"
                     />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-700">

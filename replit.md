@@ -184,6 +184,10 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ 50+ data points collected including demographics, symptoms, lifestyle
 - ✓ Registration flows directly from signup into medical profile setup
 - ✓ Onboarding completion tracked to prevent dashboard access without profile
+- ✓ Fixed Research Opt-in Checkbox Display Issues
+- ✓ Research consent checkboxes now properly visible and functional in step 5
+- ✓ Enhanced Tour Navigation with Page Loading Delays
+- ✓ Tour pages now load properly with content before highlighting elements
 
 ## User Preferences
 
