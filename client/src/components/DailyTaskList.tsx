@@ -84,12 +84,18 @@ export const DailyTaskList = () => {
     if (!user) return;
     
     const today = new Date().toDateString();
+    let completedTasks: string[] = [];
     
     try {
       // Load completed tasks from Firebase
       const userTasksDoc = await getDoc(doc(db, 'userTasks', `${user.uid}_${today}`));
-      const completedTasks = userTasksDoc.exists() ? userTasksDoc.data().completedTasks || [] : [];
+      completedTasks = userTasksDoc.exists() ? userTasksDoc.data().completedTasks || [] : [];
+    } catch (error) {
+      console.error('Error loading completed tasks:', error);
+      completedTasks = [];
+    }
     
+    // Always provide default tasks - 7 key activities for new users
     const taskCategories: TaskCategory[] = [
       {
         id: 'health',
@@ -100,10 +106,10 @@ export const DailyTaskList = () => {
           {
             id: 'daily_checkin',
             title: 'Complete Daily Check-in',
-            description: 'Answer adaptive health questions',
+            description: 'Answer adaptive health questions and track wellbeing',
             category: 'health',
-            points: 20,
-            estimatedTime: '2 min',
+            points: 25,
+            estimatedTime: '3 min',
             completed: completedTasks.includes('daily_checkin'),
             priority: 'high',
             icon: CheckCircle2,
@@ -112,26 +118,14 @@ export const DailyTaskList = () => {
           {
             id: 'track_symptoms',
             title: 'Log Today\'s Symptoms',
-            description: 'Record current symptoms and triggers',
+            description: 'Record current symptoms, severity, and triggers',
             category: 'health',
-            points: 15,
-            estimatedTime: '3 min',
+            points: 20,
+            estimatedTime: '5 min',
             completed: completedTasks.includes('track_symptoms'),
             priority: 'high',
             icon: Target,
             href: '/tracker'
-          },
-          {
-            id: 'journal_entry',
-            title: 'Add Journal Entry',
-            description: 'Document observations in Digital Matchbox',
-            category: 'health',
-            points: 10,
-            estimatedTime: '5 min',
-            completed: completedTasks.includes('journal_entry'),
-            priority: 'medium',
-            icon: FileText,
-            href: '/journal'
           }
         ],
         completedCount: 0,
@@ -144,39 +138,27 @@ export const DailyTaskList = () => {
         color: 'bg-green-500',
         tasks: [
           {
+            id: 'journal_entry',
+            title: 'Add Digital Matchbox Entry',
+            description: 'Document today\'s observations with photos if needed',
+            category: 'community',
+            points: 15,
+            estimatedTime: '5 min',
+            completed: completedTasks.includes('journal_entry'),
+            priority: 'high',
+            icon: FileText,
+            href: '/journal'
+          },
+          {
             id: 'help_someone',
-            title: 'Help a Community Member',
-            description: 'Reply to a question or offer support',
+            title: 'Support a Community Member',
+            description: 'Reply to a question or offer encouragement in the forum',
             category: 'community',
             points: 15,
             estimatedTime: '5 min',
             completed: completedTasks.includes('help_someone'),
             priority: 'medium',
             icon: Heart,
-            href: '/community'
-          },
-          {
-            id: 'check_matches',
-            title: 'Review Peer Matches',
-            description: 'Connect with compatible community members',
-            category: 'community',
-            points: 10,
-            estimatedTime: '3 min',
-            completed: completedTasks.includes('check_matches'),
-            priority: 'low',
-            icon: Users,
-            href: '/peer-matching'
-          },
-          {
-            id: 'share_experience',
-            title: 'Share Your Experience',
-            description: 'Create a helpful post for others',
-            category: 'community',
-            points: 20,
-            estimatedTime: '10 min',
-            completed: completedTasks.includes('share_experience'),
-            priority: 'low',
-            icon: Star,
             href: '/community'
           }
         ],
@@ -191,11 +173,11 @@ export const DailyTaskList = () => {
         tasks: [
           {
             id: 'review_insights',
-            title: 'Review AI Insights',
-            description: 'Check daily health predictions and patterns',
+            title: 'Review AI Health Insights',
+            description: 'Check personalized health predictions and pattern analysis',
             category: 'data',
-            points: 5,
-            estimatedTime: '2 min',
+            points: 10,
+            estimatedTime: '3 min',
             completed: completedTasks.includes('review_insights'),
             priority: 'medium',
             icon: Brain,
@@ -203,26 +185,14 @@ export const DailyTaskList = () => {
           },
           {
             id: 'view_progress',
-            title: 'Check Weekly Progress',
-            description: 'Review symptom trends and improvements',
-            category: 'data',
-            points: 5,
-            estimatedTime: '2 min',
-            completed: completedTasks.includes('view_progress'),
-            priority: 'low',
-            icon: TrendingUp,
-            href: '/insights'
-          },
-          {
-            id: 'update_goals',
-            title: 'Update Health Goals',
-            description: 'Adjust targets based on progress',
+            title: 'Check Your Data Trends',
+            description: 'Review weekly symptom patterns and improvements',
             category: 'data',
             points: 10,
             estimatedTime: '3 min',
-            completed: completedTasks.includes('update_goals'),
-            priority: 'low',
-            icon: Target,
+            completed: completedTasks.includes('view_progress'),
+            priority: 'medium',
+            icon: TrendingUp,
             href: '/insights'
           }
         ],
@@ -236,9 +206,21 @@ export const DailyTaskList = () => {
         color: 'bg-purple-500',
         tasks: [
           {
+            id: 'peer_connections',
+            title: 'Connect with Peers',
+            description: 'Review peer matches and send connection requests',
+            category: 'wellness',
+            points: 15,
+            estimatedTime: '5 min',
+            completed: completedTasks.includes('peer_connections'),
+            priority: 'medium',
+            icon: Users,
+            href: '/peer-matching'
+          },
+          {
             id: 'mindfulness',
-            title: 'Practice Mindfulness',
-            description: '5-minute breathing exercise or meditation',
+            title: 'Practice 5-Minute Mindfulness',
+            description: 'Take a moment for breathing exercise or meditation',
             category: 'wellness',
             points: 10,
             estimatedTime: '5 min',
@@ -248,24 +230,12 @@ export const DailyTaskList = () => {
             action: () => startMindfulnessTimer()
           },
           {
-            id: 'gratitude',
-            title: 'Note Three Positive Things',
-            description: 'Focus on what went well today',
+            id: 'plan_tomorrow',
+            title: 'Set Tomorrow\'s Intention',
+            description: 'Plan one wellness goal for tomorrow',
             category: 'wellness',
             points: 5,
             estimatedTime: '2 min',
-            completed: completedTasks.includes('gratitude'),
-            priority: 'low',
-            icon: Star,
-            action: () => openGratitudeModal()
-          },
-          {
-            id: 'plan_tomorrow',
-            title: 'Plan Tomorrow',
-            description: 'Set intentions for tomorrow\'s wellness',
-            category: 'wellness',
-            points: 5,
-            estimatedTime: '3 min',
             completed: completedTasks.includes('plan_tomorrow'),
             priority: 'low',
             icon: Calendar,
@@ -277,23 +247,13 @@ export const DailyTaskList = () => {
       }
     ];
 
-    // Calculate completion counts
+    // Calculate completion counts for each category
     taskCategories.forEach(category => {
       category.completedCount = category.tasks.filter(task => task.completed).length;
       category.totalCount = category.tasks.length;
     });
 
     setCategories(taskCategories);
-    } catch (error) {
-      console.error('Error loading daily tasks:', error);
-      // Initialize with empty categories to ensure UI renders
-      setCategories([
-        { id: 'health', name: 'Health Tracking', icon: Heart, color: 'bg-red-500', tasks: [], completedCount: 0, totalCount: 0 },
-        { id: 'community', name: 'Community', icon: Users, color: 'bg-green-500', tasks: [], completedCount: 0, totalCount: 0 },
-        { id: 'data', name: 'Data & Research', icon: FileText, color: 'bg-blue-500', tasks: [], completedCount: 0, totalCount: 0 },
-        { id: 'wellness', name: 'Wellness', icon: Brain, color: 'bg-purple-500', tasks: [], completedCount: 0, totalCount: 0 }
-      ]);
-    }
   };
 
   const calculateProgress = async () => {
