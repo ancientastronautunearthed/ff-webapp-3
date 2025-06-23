@@ -21,6 +21,7 @@ import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { DailyTaskList } from '@/components/DailyTaskList';
 import { DailyCheckin } from '@/components/DailyCheckin';
 import { Link } from 'wouter';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Activity, 
   Calendar, 
@@ -523,6 +524,20 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+      
+      {/* Daily Check-in Modal */}
+      <DailyCheckin 
+        isOpen={showCheckin} 
+        onClose={() => setShowCheckin(false)}
+        onComplete={() => {
+          setCheckinCompleted(true);
+          checkDailyCheckinStatus(); // Refresh status
+          toast({
+            title: "Daily Check-in Complete!",
+            description: "Your health data has been recorded for today.",
+          });
+        }}
+      />
       </div>
     </>
   );
