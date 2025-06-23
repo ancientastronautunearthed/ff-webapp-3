@@ -19,7 +19,7 @@ import {
 
 export const CompanionDemo = () => {
   const { tierProgress, awardPoints, setPoints } = useCompanionProgress();
-  const { getAvailableFunctions, currentTier } = useCompanionAccess();
+  const { getAvailableFunctions, currentTier, totalPoints } = useCompanionAccess();
   const [isRunning, setIsRunning] = useState(false);
   const [demoStep, setDemoStep] = useState(0);
   
