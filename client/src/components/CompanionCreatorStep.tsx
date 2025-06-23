@@ -128,6 +128,7 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
     setIsGenerating(true);
     try {
       const prompt = createImagePrompt(config);
+      console.log('Generating companion with prompt:', prompt);
       
       const response = await fetch('/api/ai/generate-image', {
         method: 'POST',
@@ -142,12 +143,15 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
       }
 
       const data = await response.json();
+      console.log('Companion image generated successfully:', data.imageUrl);
       
       toast({
         title: "Companion Created!",
         description: "Your AI health companion has been successfully generated.",
       });
 
+      // Call onComplete which should transition to the next step
+      console.log('Calling onComplete with:', { imageUrl: data.imageUrl, config });
       onComplete(data.imageUrl, config);
     } catch (error) {
       console.error('Error generating companion:', error);
@@ -156,9 +160,9 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
         description: "Unable to create your companion. Please try again or skip for now.",
         variant: "destructive",
       });
-    } finally {
-      setIsGenerating(false);
+      setIsGenerating(false); // Reset state on error
     }
+    // Don't reset isGenerating on success - let parent handle it
   };
 
   const createImagePrompt = (config: CompanionConfig): string => {
@@ -252,7 +256,7 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
           <Button
             variant="outline"
             onClick={prevStep}
-            disabled={currentStep === 0}
+            disabled={currentStep === 0 || isGenerating}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -260,14 +264,21 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
           </Button>
 
           <div className="flex gap-2">
-            <Button variant="ghost" onClick={onSkip}>
-              Skip for Now
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                console.log('Skip button clicked');
+                onSkip();
+              }}
+              disabled={isGenerating}
+            >
+              Skip & Continue
             </Button>
             
             {currentStep < questions.length - 1 ? (
               <Button
                 onClick={nextStep}
-                disabled={!isStepComplete()}
+                disabled={!isStepComplete() || isGenerating}
                 className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
               >
                 Next

@@ -1,0 +1,1178 @@
+CompanionCreatorStep rendered
+token.ts:98 Refused to connect to 'https://securetoken.googleapis.com/v1/token?key=AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk' because it violates the following Content Security Policy directive: "connect-src 'self' https://firestore.googleapis.com https://firebase.googleapis.com https://identitytoolkit.googleapis.com https://accounts.google.com https://oauth2.googleapis.com".
+
+(anonymous) @ token.ts:98
+await in (anonymous)
+_performFetchWithErrorHandling @ index.ts:206
+requestStsToken @ token.ts:68
+refresh @ token_manager.ts:105
+getToken @ token_manager.ts:93
+getIdToken @ user_impl.ts:105
+getToken @ firebase_internal.ts:50
+await in getToken
+getToken @ credentials.ts:349
+auth @ persistent_stream.ts:465
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187Understand this error
+token.ts:98 Fetch API cannot load https://securetoken.googleapis.com/v1/token?key=AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk. Refused to connect because it violates the document's Content Security Policy.
+(anonymous) @ token.ts:98
+await in (anonymous)
+_performFetchWithErrorHandling @ index.ts:206
+requestStsToken @ token.ts:68
+refresh @ token_manager.ts:105
+getToken @ token_manager.ts:93
+getIdToken @ user_impl.ts:105
+getToken @ firebase_internal.ts:50
+await in getToken
+getToken @ credentials.ts:349
+auth @ persistent_stream.ts:465
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+__PRIVATE_startWatchStream @ remote_store.ts:381
+__PRIVATE_onWatchStreamClose @ remote_store.ts:440
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187Understand this error
+MedicalProfileForm.tsx:134 MedicalProfileForm state: {currentStep: 5, showCompanionCreator: true}
+MedicalProfileForm.tsx:339 Rendering CompanionCreatorStep
+CompanionCreatorStep.tsx:41 CompanionCreatorStep rendered
+MedicalProfileForm.tsx:140 Companion created: {imageUrl: '/temp/companion-f642171a-b51d-4bae-a487-68d0f80e9738.png', config: {…}}
+MedicalProfileForm.tsx:134 MedicalProfileForm state: {currentStep: 5, showCompanionCreator: true}
+MedicalProfileForm.tsx:339 Rendering CompanionCreatorStep
+CompanionCreatorStep.tsx:41 CompanionCreatorStep rendered
+token.ts:98 Refused to connect to 'https://securetoken.googleapis.com/v1/token?key=AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk' because it violates the following Content Security Policy directive: "connect-src 'self' https://firestore.googleapis.com https://firebase.googleapis.com https://identitytoolkit.googleapis.com https://accounts.google.com https://oauth2.googleapis.com".
+
+(anonymous) @ token.ts:98
+await in (anonymous)
+_performFetchWithErrorHandling @ index.ts:206
+requestStsToken @ token.ts:68
+refresh @ token_manager.ts:105
+getToken @ token_manager.ts:93
+getIdToken @ user_impl.ts:105
+getToken @ firebase_internal.ts:50
+await in getToken
+getToken @ credentials.ts:349
+auth @ persistent_stream.ts:465
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187Understand this error
+token.ts:98 Fetch API cannot load https://securetoken.googleapis.com/v1/token?key=AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk. Refused to connect because it violates the document's Content Security Policy.
+(anonymous) @ token.ts:98
+await in (anonymous)
+_performFetchWithErrorHandling @ index.ts:206
+requestStsToken @ token.ts:68
+refresh @ token_manager.ts:105
+getToken @ token_manager.ts:93
+getIdToken @ user_impl.ts:105
+getToken @ firebase_internal.ts:50
+await in getToken
+getToken @ credentials.ts:349
+auth @ persistent_stream.ts:465
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:481
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+(anonymous) @ persistent_stream.ts:561
+(anonymous) @ backoff.ts:137
+(anonymous) @ async_queue.ts:196
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+handleDelayElapsed @ async_queue.ts:193
+(anonymous) @ async_queue.ts:160
+setTimeout
+start @ async_queue.ts:160
+createAndSchedule @ async_queue.ts:151
+enqueueAfterDelay @ async_queue_impl.ts:225
+y_ @ backoff.ts:132
+B_ @ persistent_stream.ts:554
+start @ persistent_stream.ts:256
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_onWriteStreamClose @ remote_store.ts:825
+close @ persistent_stream.ts:419
+j_ @ persistent_stream.ts:580
+(anonymous) @ persistent_stream.ts:486
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187Understand this error
