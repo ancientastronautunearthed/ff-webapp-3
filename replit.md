@@ -118,6 +118,10 @@ The application uses a comprehensive database schema with the following core ent
 - June 23, 2025. Fixed Digital Matchbox submit functionality and community platform real data integration
 
 ## Recent Changes
+- ✓ Created comprehensive patient demo video script showcasing all features
+- ✓ Fixed doctor portal logout functionality with proper session management
+- ✓ Resolved patient login redirect issues - patients now properly access patient dashboard
+- ✓ Enhanced Ask a Doctor forum with complete patient-doctor interaction workflow
 - ✓ Implemented Firebase Authentication with Google OAuth
 - ✓ Created Firestore data models for users, symptoms, journal entries, and forum posts
 - ✓ Added Firebase Storage integration for secure media uploads
