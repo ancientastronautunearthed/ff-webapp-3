@@ -77,6 +77,7 @@ export const Layout = ({ children }: LayoutProps) => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Track Symptoms', href: '/tracker', icon: Activity },
+    { name: 'AI Companion', href: '/companion', icon: Heart },
     { name: 'Community', href: '/community', icon: Users },
     { name: 'Telemedicine', href: '/telemedicine', icon: Stethoscope },
     { name: 'My Data', href: '/insights', icon: TrendingUp },
@@ -125,9 +126,29 @@ export const Layout = ({ children }: LayoutProps) => {
             <div className="hidden md:flex items-center space-x-6">
               <NavigationItems />
               <div className="flex items-center space-x-3 ml-6 pl-6 border-l border-gray-200">
-                <span className="text-sm text-gray-600">
-                  {user?.displayName || user?.email}
-                </span>
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={companionImage || user?.photoURL || undefined} />
+                      <AvatarFallback>
+                        {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    {companionImage && (
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full flex items-center justify-center">
+                        <Heart className="w-1.5 h-1.5 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="hidden md:block">
+                    <p className="text-sm font-medium text-gray-900">
+                      {user?.displayName || user?.email}
+                    </p>
+                    {companionImage && (
+                      <p className="text-xs text-gray-500">AI Companion Active</p>
+                    )}
+                  </div>
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"

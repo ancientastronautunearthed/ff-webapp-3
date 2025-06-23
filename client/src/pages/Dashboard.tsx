@@ -42,6 +42,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { PeerMatchingWidget } from '@/components/PeerMatchingWidget';
+import { CompanionWidget } from '@/components/CompanionWidget';
 
 export default function Dashboard() {
   const { user } = useAuth();

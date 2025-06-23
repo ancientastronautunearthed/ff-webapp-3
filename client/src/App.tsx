@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { CompanionProgressProvider } from "@/contexts/CompanionProgressContext";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Layout } from "@/components/Layout";
 import { SymptomTracker } from "@/components/SymptomTracker";
