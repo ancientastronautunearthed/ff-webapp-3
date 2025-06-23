@@ -27,7 +27,8 @@ import {
   ChevronRight,
   User,
   Award,
-  Globe
+  Globe,
+  Stethoscope
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format, addDays, isSameDay } from 'date-fns';

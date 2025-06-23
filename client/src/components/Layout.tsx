@@ -54,7 +54,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Track Symptoms', href: '/tracker', icon: Activity },
     { name: 'Community', href: '/community', icon: Users },
-    { name: 'Find Support', href: '/telemedicine', icon: Stethoscope },
+    { name: 'Telemedicine', href: '/telemedicine', icon: Stethoscope },
     { name: 'My Data', href: '/insights', icon: TrendingUp },
     { name: 'Ask a Doctor', href: '/ask-doctor', icon: BookOpen },
   ];
