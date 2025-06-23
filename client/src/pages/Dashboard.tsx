@@ -42,6 +42,7 @@ import {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { data: symptomEntries } = useSymptomEntries();
   const { data: journalEntries } = useJournalEntries();
   const [showTour, setShowTour] = useState(false);
@@ -133,7 +134,17 @@ export default function Dashboard() {
       href: '/tracker',
       icon: Heart,
       color: 'bg-primary-500 hover:bg-primary-600',
-      urgent: todayStats.entriesCompleted < 3
+      urgent: todayStats.entriesCompleted < 3,
+      type: 'link'
+    },
+    {
+      title: 'Complete Daily Check-in',
+      description: checkinCompleted ? 'Completed today!' : 'Quick health assessment',
+      icon: Target,
+      color: checkinCompleted ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-600',
+      urgent: !checkinCompleted,
+      type: 'action',
+      action: () => setShowCheckin(true)
     },
     {
       title: 'Add Journal Entry',
@@ -141,7 +152,8 @@ export default function Dashboard() {
       href: '/journal',
       icon: BookOpen,
       color: 'bg-secondary-500 hover:bg-secondary-600',
-      urgent: false
+      urgent: false,
+      type: 'link'
     },
     {
       title: 'View Community',
@@ -149,7 +161,8 @@ export default function Dashboard() {
       href: '/community',
       icon: Users,
       color: 'bg-purple-500 hover:bg-purple-600',
-      urgent: false
+      urgent: false,
+      type: 'link'
     },
     {
       title: 'Generate Report',
@@ -157,7 +170,8 @@ export default function Dashboard() {
       href: '/reports',
       icon: FileText,
       color: 'bg-indigo-500 hover:bg-indigo-600',
-      urgent: false
+      urgent: false,
+      type: 'link'
     }
   ];
 
@@ -290,6 +304,43 @@ export default function Dashboard() {
           <div className="grid md:grid-cols-2 gap-4 mb-8" data-tour="quick-actions">
             {quickActions.map((action, index) => {
               const Icon = action.icon;
+              
+              if (action.type === 'action') {
+                return (
+                  <Card 
+                    key={index} 
+                    className="hover:shadow-md transition-shadow cursor-pointer group"
+                    onClick={action.action}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <Icon className="h-6 w-6 text-white" />
+                        </div>
+                        {action.urgent && (
+                          <Badge variant="destructive" className="text-xs">
+                            Due today
+                          </Badge>
+                        )}
+                        {action.title.includes('Check-in') && checkinCompleted && (
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                        {action.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3">{action.description}</p>
+                      <div className="flex items-center text-primary-600 text-sm font-medium">
+                        <span className="group-hover:mr-2 transition-all">
+                          {checkinCompleted && action.title.includes('Check-in') ? 'View details' : 'Get started'}
+                        </span>
+                        <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+              
               return (
                 <Link key={index} href={action.href}>
                   <Card className="hover:shadow-md transition-shadow cursor-pointer group">
