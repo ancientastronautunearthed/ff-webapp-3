@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanionProgress } from '@/contexts/CompanionProgressContext';
 import { useToast } from '@/hooks/use-toast';
+import { useLocation } from 'wouter';
 import { 
   Trophy, 
   Target, 
@@ -115,6 +116,7 @@ export const ChallengeSystem = () => {
   const { user } = useAuth();
   const { addPoints, tierProgress } = useCompanionProgress();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'active' | 'completed' | 'upcoming'>('active');
@@ -399,10 +401,59 @@ export const ChallengeSystem = () => {
     }
   };
 
-  // Check for automatic challenge updates based on user actions
-  const checkChallengeUpdates = async () => {
-    // This would be called from other components when users complete actions
-    // For now, showing the structure for integration
+  // Navigate user to the appropriate page to complete challenge
+  const navigateToChallenge = (challenge: Challenge) => {
+    switch (challenge.id) {
+      case 'daily_symptom_track':
+      case 'weekly_consistency':
+        setLocation('/tracker');
+        toast({
+          title: "Challenge Started",
+          description: "Complete your symptom tracking to progress this challenge!",
+        });
+        break;
+      case 'daily_journal':
+        setLocation('/journal');
+        toast({
+          title: "Challenge Started", 
+          description: "Write a journal entry to complete this challenge!",
+        });
+        break;
+      case 'daily_community':
+      case 'weekly_community_leader':
+        setLocation('/community');
+        toast({
+          title: "Challenge Started",
+          description: "Engage with the community to progress this challenge!",
+        });
+        break;
+      case 'weekly_insights':
+        setLocation('/insights');
+        toast({
+          title: "Challenge Started",
+          description: "Review your AI health insights to complete this challenge!",
+        });
+        break;
+      case 'research_hero':
+        setLocation('/research');
+        toast({
+          title: "Challenge Started",
+          description: "Participate in research studies to complete this challenge!",
+        });
+        break;
+      case 'companion_master':
+        setLocation('/companion');
+        toast({
+          title: "Challenge Started",
+          description: "Interact with your AI companion to progress your tier!",
+        });
+        break;
+      default:
+        toast({
+          title: "Challenge Available",
+          description: "Complete the required actions in the app to progress this challenge!",
+        });
+    }
   };
 
   const getDifficultyColor = (difficulty: Challenge['difficulty']) => {
