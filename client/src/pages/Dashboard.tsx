@@ -50,7 +50,7 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { data: symptomEntries } = useSymptomEntries();
   const { data: journalEntries } = useJournalEntries();
-  const [showTour, setShowTour] = useState(false);
+  // Tour removed per user request
   const [showCheckin, setShowCheckin] = useState(false);
   const [checkinCompleted, setCheckinCompleted] = useState(false);
 
@@ -98,45 +98,7 @@ export default function Dashboard() {
     }
   };
 
-  const completeTour = async () => {
-    if (!user) return;
-    
-    try {
-      await setDoc(doc(db, 'userPreferences', user.uid), {
-        hasSeenDashboardTour: true,
-        tourCompletedAt: new Date()
-      }, { merge: true });
-      
-      setShowTour(false);
-      toast({
-        title: "Welcome to Fiber Friends!",
-        description: "You're all set to start tracking your health journey.",
-      });
-    } catch (error) {
-      console.error('Error saving tour completion:', error);
-      setShowTour(false);
-    }
-  };
-
-  const skipTour = async () => {
-    if (!user) return;
-    
-    try {
-      await setDoc(doc(db, 'userPreferences', user.uid), {
-        hasSeenDashboardTour: true,
-        tourSkippedAt: new Date()
-      }, { merge: true });
-      
-      setShowTour(false);
-    } catch (error) {
-      console.error('Error saving tour skip:', error);
-      setShowTour(false);
-    }
-  };
-
-  const startTour = () => {
-    setShowTour(true);
-  };
+  // Tour functions removed
 
   // Calculate real stats from Firebase data
   const [todayStats, setTodayStats] = useState({
@@ -342,18 +304,7 @@ export default function Dashboard() {
 
   return (
     <>
-      {showTour && (
-        <WelcomeTour 
-          onComplete={() => {
-            console.log('Tour onComplete triggered');
-            completeTour();
-          }}
-          onSkip={() => {
-            console.log('Tour onSkip triggered');
-            skipTour();
-          }}
-        />
-      )}
+      {/* Tour removed per user request */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Header */}
       <div className="mb-8 flex items-center justify-between">
@@ -373,15 +324,7 @@ export default function Dashboard() {
             <Target className="h-4 w-4 mr-2" />
             Daily Check-in
           </Button>
-          <Button
-            variant="outline"
-            onClick={startTour}
-            className="flex items-center gap-2"
-            data-tour="take-tour-button"
-          >
-            <HelpCircle className="h-4 w-4" />
-            Take Tour
-          </Button>
+          {/* Tour button removed */}
         </div>
       </div>
 

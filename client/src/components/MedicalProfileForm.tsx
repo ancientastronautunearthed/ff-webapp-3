@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { CompanionCreatorStep } from './CompanionCreatorStep';
+// Companion creator removed per user request
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,7 +87,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  const [showCompanionCreator, setShowCompanionCreator] = useState(false);
+  // Companion creator removed
   const [companionData, setCompanionData] = useState<{imageUrl: string, config: any} | null>(null);
   const { toast } = useToast();
 
@@ -863,8 +863,8 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     }
                     
                     // Show companion creator after profile completion
-                    console.log('Setting showCompanionCreator to true');
-                    setShowCompanionCreator(true);
+                    // Skip companion creator and complete profile
+                    handleSubmit();
                   }}
                 >
                   Complete Profile & Create Companion
@@ -944,7 +944,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                       return;
                     }
                     
-                    setShowCompanionCreator(true);
+                    handleSubmit();
                   }}
                 >
                   Complete Profile & Create Companion

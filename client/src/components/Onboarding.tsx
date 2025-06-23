@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { MedicalOnboarding } from '@/components/MedicalOnboarding';
 import { MedicalProfileForm } from '@/components/MedicalProfileForm';
 import { ResearchConsentManager } from '@/components/ResearchConsentManager';
-import { WelcomeTour } from '@/components/WelcomeTour';
+// Tour removed per user request
 import { useToast } from '@/hooks/use-toast';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -166,7 +166,8 @@ export const Onboarding = () => {
   };
 
   if (currentPhase === 'tour') {
-    return <WelcomeTour onComplete={handleTourComplete} onSkip={handleTourSkip} />;
+    // Tour removed - go directly to completion
+    return null;
   }
 
   if (currentPhase === 'medical-profile') {

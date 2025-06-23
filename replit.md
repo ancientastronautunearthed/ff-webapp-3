@@ -397,6 +397,11 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Updated all user statistics calculations to use real Firebase data exclusively
 - ✓ Fixed doctor authentication to verify through Firebase doctor collections
 - ✓ Application now operates with 100% authentic data and no fallback mechanisms
+- ✓ Removed AI companion creation system and tour components per user request
+- ✓ Replaced with generic Health Assistant companion for AI function tiers
+- ✓ Eliminated all companion creator imports and tour references from codebase
+- ✓ Simplified onboarding flow to go directly from medical profile to dashboard
+- ✓ Updated CompanionWidget to use generic companion instead of Firebase-loaded custom companions
 
 ## User Preferences
 
