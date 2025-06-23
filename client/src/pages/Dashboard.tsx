@@ -51,6 +51,8 @@ export default function Dashboard() {
   const [showCheckin, setShowCheckin] = useState(false);
   const [checkinCompleted, setCheckinCompleted] = useState(false);
 
+  console.log('Dashboard state - showCheckin:', showCheckin);
+
   useEffect(() => {
     // Don't auto-show tour, only show when user clicks button
     const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
@@ -224,8 +226,11 @@ export default function Dashboard() {
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => setShowCheckin(true)}
-            className="bg-purple-600 hover:bg-purple-700"
+            onClick={() => {
+              console.log('Header Daily Check-in button clicked');
+              setShowCheckin(true);
+            }}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2"
           >
             <Target className="h-4 w-4 mr-2" />
             Daily Check-in
@@ -238,6 +243,25 @@ export default function Dashboard() {
             <HelpCircle className="h-4 w-4" />
             Take Tour
           </Button>
+        </div>
+      </div>
+
+      {/* Test Button for Daily Check-in */}
+      <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <h3 className="font-semibold text-yellow-800 mb-2">Debug: Daily Check-in Test</h3>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => {
+              console.log('TEST: Setting showCheckin to true');
+              setShowCheckin(true);
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white"
+          >
+            TEST: Open Daily Check-in
+          </Button>
+          <span className="text-sm text-yellow-700">
+            showCheckin: {String(showCheckin)}
+          </span>
         </div>
       </div>
 
