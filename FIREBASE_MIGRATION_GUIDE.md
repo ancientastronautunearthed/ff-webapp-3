@@ -194,29 +194,444 @@ service firebase.storage {
 ### Phase 3: Database Migration (PostgreSQL to Firestore)
 
 #### 3.1 Current Database Schema Analysis
-The application currently uses both PostgreSQL (from Replit) and Firestore. PostgreSQL should be completely eliminated.
+The application currently uses both PostgreSQL (from Replit) and Firestore. PostgreSQL should be completely eliminated as all data operations should use Firestore exclusively.
 
-#### 3.2 Remove PostgreSQL Dependencies
-Remove from `package.json`:
-- `@neondatabase/serverless`
-- `drizzle-orm`
-- `drizzle-kit`
-- `@types/connect-pg-simple`
-- `connect-pg-simple`
+**Current PostgreSQL Tables to Migrate:**
+- `users` - User profile data (already in Firestore)
+- `symptom_entries` - Symptom tracking data (already in Firestore)
+- `journal_entries` - Digital matchbox entries (already in Firestore)
+- `forum_posts` - Community posts (already in Firestore)
+- `forum_replies` - Community replies (already in Firestore)
+- `research_consent` - Research participation data (already in Firestore)
+- `medical_profiles` - Medical onboarding data (already in Firestore)
+- `doctors` - Verified doctor profiles (needs Firestore migration)
 
-#### 3.3 Update Database Connection Files
-Modify `server/db.ts`:
-```typescript
-// Remove PostgreSQL imports
-// Keep only Firebase imports
-import { initializeApp } from 'firebase-admin/app';
-import { getFirestore } from 'firebase-admin/firestore';
+#### 3.2 Data Migration Strategy
 
-const app = initializeApp();
-export const db = getFirestore(app);
+**Step 1: Export PostgreSQL Data (if any critical data exists)**
+```bash
+# Connect to Replit PostgreSQL and export data
+pg_dump $DATABASE_URL > backup.sql
+
+# Or export specific tables
+pg_dump $DATABASE_URL --table=doctors --data-only --inserts > doctors_data.sql
 ```
 
-Remove `drizzle.config.ts` completely.
+**Step 2: Import to Firestore (if needed)**
+Create migration script `migrate-doctors.js`:
+```javascript
+const admin = require('firebase-admin');
+const { Pool } = require('pg');
+
+// Initialize Firebase Admin
+admin.initializeApp();
+const db = admin.firestore();
+
+// PostgreSQL connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
+
+async function migrateDoctors() {
+  try {
+    // Fetch doctors from PostgreSQL
+    const result = await pool.query('SELECT * FROM doctors');
+    const doctors = result.rows;
+    
+    // Migrate each doctor to Firestore
+    for (const doctor of doctors) {
+      await db.collection('doctors').doc(doctor.id).set({
+        name: doctor.name,
+        email: doctor.email,
+        specialty: doctor.specialty,
+        license: doctor.license,
+        verified: doctor.verified,
+        morgellonsExperience: doctor.morgellons_experience,
+        location: doctor.location,
+        createdAt: admin.firestore.Timestamp.fromDate(new Date(doctor.created_at)),
+        updatedAt: admin.firestore.Timestamp.fromDate(new Date(doctor.updated_at))
+      });
+      console.log(`Migrated doctor: ${doctor.name}`);
+    }
+    
+    console.log('Migration completed successfully');
+  } catch (error) {
+    console.error('Migration failed:', error);
+  } finally {
+    await pool.end();
+  }
+}
+
+migrateDoctors();
+```
+
+#### 3.3 Remove PostgreSQL Dependencies
+
+**Step 1: Update package.json**
+Remove the following dependencies:
+```bash
+npm uninstall @neondatabase/serverless drizzle-orm drizzle-kit @types/connect-pg-simple connect-pg-simple
+```
+
+**Step 2: Remove Database Files**
+```bash
+# Remove PostgreSQL-specific files
+rm server/db.ts
+rm drizzle.config.ts
+rm -rf drizzle/
+```
+
+**Step 3: Update shared/schema.ts**
+Replace Drizzle schema with TypeScript interfaces:
+```typescript
+// Remove all Drizzle imports
+// Replace with TypeScript interfaces for Firestore
+
+export interface User {
+  id: string;
+  email: string;
+  displayName?: string;
+  createdAt: Date;
+  researchOptIn: boolean;
+  onboardingCompleted: boolean;
+}
+
+export interface SymptomEntry {
+  id: string;
+  userId: string;
+  symptoms: string[];
+  severity: number;
+  location: string[];
+  environmentalFactors: string[];
+  notes?: string;
+  timestamp: Date;
+}
+
+export interface JournalEntry {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  mood?: number;
+  photoUrls: string[];
+  treatments: string[];
+  timestamp: Date;
+}
+
+export interface ForumPost {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  authorId: string;
+  authorName: string;
+  timestamp: Date;
+  likes: number;
+  replies: number;
+  isAnonymous: boolean;
+  tags: string[];
+}
+
+export interface Doctor {
+  id: string;
+  name: string;
+  email: string;
+  specialty: string;
+  license: string;
+  verified: boolean;
+  morgellonsExperience: boolean;
+  location: string;
+  rating?: number;
+  reviewCount?: number;
+  createdAt: Date;
+}
+
+// Add validation schemas using Zod
+import { z } from 'zod';
+
+export const createSymptomEntrySchema = z.object({
+  symptoms: z.array(z.string()),
+  severity: z.number().min(1).max(10),
+  location: z.array(z.string()),
+  environmentalFactors: z.array(z.string()),
+  notes: z.string().optional(),
+});
+
+export const createJournalEntrySchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  mood: z.number().min(1).max(10).optional(),
+  treatments: z.array(z.string()),
+});
+
+export const createForumPostSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  category: z.string(),
+  isAnonymous: z.boolean(),
+  tags: z.array(z.string()),
+});
+```
+
+#### 3.4 Update Server Code
+
+**Step 1: Replace server/storage.ts**
+```typescript
+import { getFirestore } from 'firebase-admin/firestore';
+import { User, SymptomEntry, JournalEntry } from '@shared/schema';
+
+const db = getFirestore();
+
+export class FirestoreStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const doc = await db.collection('users').doc(id).get();
+    if (!doc.exists) return undefined;
+    return { id: doc.id, ...doc.data() } as User;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const snapshot = await db.collection('users')
+      .where('email', '==', email)
+      .limit(1)
+      .get();
+    
+    if (snapshot.empty) return undefined;
+    const doc = snapshot.docs[0];
+    return { id: doc.id, ...doc.data() } as User;
+  }
+
+  async createUser(userData: Partial<User>): Promise<User> {
+    const docRef = await db.collection('users').add({
+      ...userData,
+      createdAt: new Date(),
+    });
+    
+    const doc = await docRef.get();
+    return { id: doc.id, ...doc.data() } as User;
+  }
+
+  async createSymptomEntry(entry: Omit<SymptomEntry, 'id'>): Promise<SymptomEntry> {
+    const docRef = await db.collection('symptomEntries').add({
+      ...entry,
+      timestamp: new Date(),
+    });
+    
+    const doc = await docRef.get();
+    return { id: doc.id, ...doc.data() } as SymptomEntry;
+  }
+
+  async getSymptomEntries(userId: string): Promise<SymptomEntry[]> {
+    const snapshot = await db.collection('symptomEntries')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .get();
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as SymptomEntry));
+  }
+}
+
+export const storage = new FirestoreStorage();
+```
+
+**Step 2: Update server/routes.ts**
+```typescript
+import express from 'express';
+import { storage } from './storage';
+import { createSymptomEntrySchema } from '@shared/schema';
+
+export function registerRoutes(app: express.Express) {
+  // Remove all Drizzle/PostgreSQL imports
+  // Update to use Firestore storage methods
+  
+  app.post('/api/symptoms', async (req, res) => {
+    try {
+      const validatedData = createSymptomEntrySchema.parse(req.body);
+      const entry = await storage.createSymptomEntry({
+        ...validatedData,
+        userId: req.user.uid, // From Firebase Auth
+      });
+      res.json(entry);
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+
+  app.get('/api/symptoms', async (req, res) => {
+    try {
+      const entries = await storage.getSymptomEntries(req.user.uid);
+      res.json(entries);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+}
+```
+
+#### 3.5 Environment Variables Cleanup
+
+**Remove PostgreSQL Environment Variables:**
+```bash
+# Remove from environment configuration
+unset DATABASE_URL
+unset PGDATABASE
+unset PGHOST
+unset PGPASSWORD
+unset PGPORT
+unset PGUSER
+```
+
+**Keep Firebase Environment Variables:**
+```bash
+# Keep these for Firebase configuration
+GOOGLE_GENAI_API_KEY
+VITE_FIREBASE_API_KEY
+VITE_FIREBASE_APP_ID
+VITE_FIREBASE_PROJECT_ID
+```
+
+#### 3.6 Update Client-Side Data Hooks
+
+**Update hooks to use Firestore directly:**
+```typescript
+// client/src/hooks/useSymptomData.ts
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { collection, query, where, orderBy, getDocs, addDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/AuthContext';
+
+export function useSymptomEntries() {
+  const { user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['symptomEntries', user?.uid],
+    queryFn: async () => {
+      if (!user) return [];
+      
+      const q = query(
+        collection(db, 'symptomEntries'),
+        where('userId', '==', user.uid),
+        orderBy('timestamp', 'desc')
+      );
+      
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    },
+    enabled: !!user,
+  });
+}
+
+export function useCreateSymptomEntry() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: any) => {
+      if (!user) throw new Error('User not authenticated');
+      
+      return await addDoc(collection(db, 'symptomEntries'), {
+        ...data,
+        userId: user.uid,
+        timestamp: new Date(),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['symptomEntries'] });
+    },
+  });
+}
+```
+
+#### 3.7 Testing Database Migration
+
+**Step 1: Verify Firestore Data**
+```javascript
+// Test script to verify Firestore data
+const admin = require('firebase-admin');
+admin.initializeApp();
+const db = admin.firestore();
+
+async function verifyData() {
+  // Check users collection
+  const usersSnapshot = await db.collection('users').limit(5).get();
+  console.log(`Users: ${usersSnapshot.size} documents`);
+  
+  // Check symptom entries
+  const symptomsSnapshot = await db.collection('symptomEntries').limit(5).get();
+  console.log(`Symptom entries: ${symptomsSnapshot.size} documents`);
+  
+  // Check doctors
+  const doctorsSnapshot = await db.collection('doctors').limit(5).get();
+  console.log(`Doctors: ${doctorsSnapshot.size} documents`);
+}
+
+verifyData();
+```
+
+**Step 2: Test Application Without PostgreSQL**
+```bash
+# Remove DATABASE_URL from environment
+unset DATABASE_URL
+
+# Start application and verify all features work
+npm run dev
+
+# Test key features:
+# - User authentication
+# - Symptom entry creation
+# - Journal entries
+# - Community posts
+# - Doctor listings
+```
+
+#### 3.8 Performance Optimization
+
+**Firestore Indexes (firestore.indexes.json):**
+```json
+{
+  "indexes": [
+    {
+      "collectionGroup": "symptomEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "userId", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "journalEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "userId", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "forumPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "category", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "doctors",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "verified", "order": "ASCENDING"},
+        {"fieldPath": "specialty", "order": "ASCENDING"}
+      ]
+    }
+  ]
+}
+```
+
+This completes the DATABASE_URL migration by fully eliminating PostgreSQL dependencies and ensuring all data operations use Firestore exclusively.
 
 ### Phase 4: Backend Migration to Cloud Functions
 
