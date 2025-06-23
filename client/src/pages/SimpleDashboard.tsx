@@ -62,7 +62,7 @@ export default function SimpleDashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-xs text-muted-foreground mb-4">
-                Chat with your compassionate AI health companion
+                Consult with your medically-trained AI companion
               </p>
               <Link href="/companion-chat">
                 <Button className="w-full">Start Chat</Button>

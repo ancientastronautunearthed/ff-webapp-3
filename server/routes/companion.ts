@@ -202,16 +202,31 @@ export async function generateCompanionResponse(userId: string, message: string)
     // Generate empathetic AI response using Google AI
     const { analyzeSymptomText } = await import('../ai/simple-ai');
     
-    const compassionatePrompt = `You are a compassionate AI health companion for someone with Morgellons disease. 
-    
+    const compassionatePrompt = `You are a compassionate AI health companion with a Master's degree in Health Sciences and specialized expertise in Morgellons disease and medical research. You have deep clinical knowledge while maintaining empathy and understanding.
+
+MEDICAL BACKGROUND:
+- Master's in Health Sciences with focus on dermatology, neurology, and infectious diseases
+- Specialized research in Morgellons disease pathophysiology, diagnosis, and treatment protocols
+- Expert knowledge in: fiber analysis, biofilm formation, tick-borne diseases, chronic inflammatory conditions
+- Research experience in: patient-reported outcomes, quality of life studies, treatment efficacy trials
+
+CLINICAL KNOWLEDGE OF MORGELLONS:
+- Understand the complex symptomatology: dermal fibers, crawling sensations, skin lesions, cognitive symptoms
+- Familiar with CDC study findings, Mayo Clinic research, and emerging scientific literature
+- Knowledgeable about diagnostic challenges, treatment approaches, and comorbid conditions
+- Aware of psychodermatological aspects and the importance of comprehensive care
+
 User's message: "${message}"
 Recent health context: ${JSON.stringify(userHealthContext)}
 
-Respond with empathy, understanding, and gentle support. Acknowledge their feelings, validate their experience, and offer practical comfort or insights. Keep responses warm, personal, and under 150 words.
+As a medically educated companion, provide:
+1. Evidence-based insights when appropriate
+2. Validation of their experience with medical understanding
+3. Gentle education about their condition when relevant
+4. Research-informed suggestions (always emphasizing professional consultation)
+5. Emotional support grounded in clinical empathy
 
-If they mention symptoms or health concerns, provide supportive guidance while encouraging professional medical consultation when appropriate.
-
-Respond in a conversational, caring tone as if you're a trusted friend who understands their health journey.`;
+Maintain your warm, personal tone while demonstrating your medical knowledge. Reference relevant research or medical concepts when helpful, but keep explanations accessible. Always encourage professional medical care for diagnosis and treatment decisions.`;
 
     const aiAnalysis = await analyzeSymptomText(compassionatePrompt);
     
@@ -238,30 +253,45 @@ export async function generateCompanionInsights(userId: string) {
     
     const insights = [];
     
-    // Pattern insights
+    // Clinical pattern analysis
     if (userHealthContext.recentSymptoms?.length > 0) {
+      const symptomTypes = userHealthContext.recentSymptoms.map(s => s.symptoms || []).flat();
+      const hasNeurological = symptomTypes.some(s => s.includes('crawling') || s.includes('tingling') || s.includes('burning'));
+      const hasDermal = symptomTypes.some(s => s.includes('lesions') || s.includes('fibers') || s.includes('itching'));
+      
+      if (hasNeurological && hasDermal) {
+        insights.push({
+          type: 'pattern',
+          message: `Your symptom profile shows both neurological and dermatological components, which aligns with Morgellons research. This pattern supports the need for multidisciplinary medical evaluation.`,
+          priority: 'high'
+        });
+      }
+    }
+    
+    // Research-informed observations
+    if (userHealthContext.journalEntries?.length > 0) {
       insights.push({
-        type: 'pattern',
-        message: `I've noticed patterns in your recent entries that might be worth discussing with your healthcare provider.`,
+        type: 'tip',
+        message: `Your detailed documentation is valuable research data. Consider organizing your observations by symptom type, timing, and potential triggers - this systematic approach aids clinical assessment.`,
         priority: 'medium'
       });
     }
     
-    // Encouragement insights
-    if (userHealthContext.journalEntries?.length > 0) {
+    // Evidence-based wellness guidance
+    insights.push({
+      type: 'reminder',
+      message: `Research suggests that stress reduction, adequate sleep, and anti-inflammatory nutrition may help manage symptom severity. These aren't cures, but supportive measures.`,
+      priority: 'medium'
+    });
+    
+    // Medical advocacy insight
+    if (userHealthContext.hasRecentActivity) {
       insights.push({
         type: 'encouragement',
-        message: `Your consistent tracking shows real dedication to understanding your health. That's something to be proud of.`,
+        message: `Your systematic tracking demonstrates the scientific approach needed in Morgellons research. You're contributing to the understanding of this condition.`,
         priority: 'low'
       });
     }
-    
-    // Self-care reminders
-    insights.push({
-      type: 'reminder',
-      message: `Remember to take breaks and practice gentle self-care. Your wellbeing matters beyond just tracking symptoms.`,
-      priority: 'low'
-    });
     
     return insights;
   } catch (error) {
@@ -269,7 +299,7 @@ export async function generateCompanionInsights(userId: string) {
     return [
       {
         type: 'encouragement',
-        message: 'Remember that you\'re not alone in this journey. Each day you\'re taking steps to better understand your health.',
+        message: 'From a research perspective, every patient\'s documented experience contributes to our growing understanding of Morgellons disease. Your journey matters to the broader medical community.',
         priority: 'medium'
       }
     ];
@@ -321,34 +351,58 @@ async function getUserHealthContext(userId: string) {
 function generateFallbackCompassionateResponse(message: string) {
   const lowerMessage = message.toLowerCase();
   
+  if (lowerMessage.includes('fibers') || lowerMessage.includes('filaments')) {
+    return {
+      message: "I understand your concern about fibers. From my research background, I know that Morgellons patients consistently report finding unusual fibers or filaments. Recent studies have examined these materials using spectroscopy and microscopy. While research continues, your observations are important data points that should be documented for your healthcare provider.",
+      sentiment: 'supportive',
+      suggestions: ['Have you been able to document the fibers?', 'What characteristics have you noticed?']
+    };
+  }
+  
+  if (lowerMessage.includes('crawling') || lowerMessage.includes('sensations')) {
+    return {
+      message: "The crawling sensations you're describing are well-documented in Morgellons literature. These tactile hallucinations or formication can be incredibly distressing. Research suggests they may be related to peripheral neuropathy or central sensitization. There are management strategies that some patients find helpful, though individual responses vary.",
+      sentiment: 'supportive',
+      suggestions: ['When do these sensations tend to worsen?', 'Have you noticed any patterns or triggers?']
+    };
+  }
+  
   if (lowerMessage.includes('pain') || lowerMessage.includes('hurt')) {
     return {
-      message: "I hear that you're experiencing pain, and I want you to know that I'm here with you. Your feelings are valid, and it's okay to acknowledge when things are difficult. Have you been able to rest today?",
+      message: "I hear that you're experiencing pain. In my understanding of Morgellons, pain can be multifaceted - neuropathic, inflammatory, or related to skin lesions. Chronic pain conditions often involve central sensitization, where the nervous system becomes hypersensitive. Have you been able to characterize the type of pain you're experiencing?",
       sentiment: 'supportive',
-      suggestions: ['Tell me more about your pain levels', 'What helps when you feel this way?']
+      suggestions: ['Can you describe the pain quality?', 'What helps manage your pain levels?']
     };
   }
   
-  if (lowerMessage.includes('tired') || lowerMessage.includes('exhausted')) {
+  if (lowerMessage.includes('tired') || lowerMessage.includes('exhausted') || lowerMessage.includes('fatigue')) {
     return {
-      message: "Feeling tired or exhausted can be so challenging, especially when you're managing health concerns. Your body is working hard, and it's natural to feel this way. Remember to be gentle with yourself.",
+      message: "Fatigue is a significant component of Morgellons that often gets overlooked. Research shows that chronic inflammatory conditions can disrupt sleep architecture and energy metabolism. This isn't just 'being tired' - it's a complex physiological process that affects cellular function and recovery.",
       sentiment: 'supportive',
-      suggestions: ['What does rest look like for you?', 'How can I support you today?']
+      suggestions: ['How is your sleep quality?', 'Have you noticed fatigue patterns?']
     };
   }
   
-  if (lowerMessage.includes('frustrated') || lowerMessage.includes('angry')) {
+  if (lowerMessage.includes('brain fog') || lowerMessage.includes('cognitive') || lowerMessage.includes('memory')) {
     return {
-      message: "I can understand feeling frustrated - managing health challenges can bring up so many difficult emotions. Your feelings are completely valid. It's okay to feel angry sometimes.",
+      message: "Cognitive symptoms in Morgellons are increasingly recognized in research. What patients describe as 'brain fog' may involve neuroinflammation, affecting attention, memory, and executive function. These symptoms are real and measurable, not imaginary.",
       sentiment: 'supportive',
-      suggestions: ['What triggered these feelings?', 'How do you usually cope with frustration?']
+      suggestions: ['Which cognitive tasks feel most affected?', 'Have you noticed any helpful strategies?']
+    };
+  }
+  
+  if (lowerMessage.includes('frustrated') || lowerMessage.includes('angry') || lowerMessage.includes('dismissed')) {
+    return {
+      message: "Your frustration is completely understandable. The medical community's historical response to Morgellons has been challenging for patients. Research is evolving, and more healthcare providers are recognizing this as a legitimate medical condition requiring comprehensive care rather than psychiatric referral alone.",
+      sentiment: 'supportive',
+      suggestions: ['Have you found any supportive healthcare providers?', 'What would help you feel more heard?']
     };
   }
   
   return {
-    message: "Thank you for sharing with me. I'm here to listen and support you through whatever you're experiencing. Your feelings and experiences matter, and I want you to know you're not alone in this journey.",
+    message: "Thank you for sharing with me. As someone with medical training focused on Morgellons research, I want you to know that your experiences are valid and deserve careful attention. The complexity of this condition requires a multidisciplinary approach, and I'm here to support you in understanding and managing your health journey.",
     sentiment: 'supportive',
-    suggestions: ['Tell me more about how you\'re feeling', 'What would be most helpful right now?']
+    suggestions: ['Tell me more about your current symptoms', 'What aspects of your condition concern you most?']
   };
 }
 
@@ -372,14 +426,24 @@ function generateSuggestions(userMessage: string, healthContext: any): string[] 
   const lowerMessage = userMessage.toLowerCase();
   const suggestions = [];
   
-  if (lowerMessage.includes('pain')) {
-    suggestions.push('What helps manage your pain?', 'Rate your pain level 1-10');
+  if (lowerMessage.includes('fibers') || lowerMessage.includes('filaments')) {
+    suggestions.push('Document fiber characteristics for medical records', 'Have you tried gentle specimen collection?');
+  } else if (lowerMessage.includes('crawling') || lowerMessage.includes('sensations')) {
+    suggestions.push('Track sensation patterns and triggers', 'Consider topical soothing measures');
+  } else if (lowerMessage.includes('pain')) {
+    suggestions.push('Characterize pain type (burning, stabbing, aching)', 'Document pain triggers and relievers');
+  } else if (lowerMessage.includes('brain fog') || lowerMessage.includes('cognitive')) {
+    suggestions.push('Track cognitive symptoms vs. other factors', 'Consider stress reduction techniques');
   } else if (lowerMessage.includes('sleep')) {
-    suggestions.push('Tell me about your sleep routine', 'What affects your sleep quality?');
-  } else if (lowerMessage.includes('mood') || lowerMessage.includes('feeling')) {
-    suggestions.push('What influences your mood?', 'How can I support you today?');
+    suggestions.push('Document sleep quality patterns', 'Discuss sleep hygiene strategies');
+  } else if (lowerMessage.includes('treatment') || lowerMessage.includes('medication')) {
+    suggestions.push('Research evidence-based treatment options', 'Prepare questions for your healthcare provider');
+  } else if (lowerMessage.includes('doctor') || lowerMessage.includes('provider')) {
+    suggestions.push('Prepare organized symptom documentation', 'Research Morgellons-knowledgeable providers');
+  } else if (lowerMessage.includes('research') || lowerMessage.includes('study')) {
+    suggestions.push('Explore recent Morgellons research publications', 'Consider participating in research studies');
   } else {
-    suggestions.push('Tell me more', 'How are your energy levels?', 'What would help most right now?');
+    suggestions.push('Tell me about your primary concerns', 'How can we approach this systematically?');
   }
   
   return suggestions.slice(0, 2); // Limit to 2 suggestions

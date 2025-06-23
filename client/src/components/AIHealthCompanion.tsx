@@ -209,7 +209,7 @@ export function AIHealthCompanion() {
             AI Health Companion
           </h1>
           <p className="text-gray-600">
-            Your compassionate AI companion is here to support your health journey
+            Your medically-trained AI companion with specialized knowledge in Morgellons disease research
           </p>
         </div>
 
@@ -240,8 +240,9 @@ export function AIHealthCompanion() {
                       <Heart className="h-12 w-12 mx-auto mb-4 text-pink-300" />
                       <p className="text-lg font-medium mb-2">Welcome to your AI Health Companion</p>
                       <p className="text-sm">
-                        I'm here to listen, support, and help you understand your health patterns. 
-                        How are you feeling today?
+                        I'm a medically-trained companion with expertise in Morgellons disease research. 
+                        I'm here to provide evidence-based support and help you understand your health journey. 
+                        How can I assist you today?
                       </p>
                     </div>
                   )}
@@ -302,7 +303,7 @@ export function AIHealthCompanion() {
                   value={currentMessage}
                   onChange={(e) => setCurrentMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Share how you're feeling or ask a question..."
+                  placeholder="Ask about symptoms, research, or get medical insights..."
                   disabled={isLoading}
                   className="flex-1"
                 />
@@ -361,26 +362,26 @@ export function AIHealthCompanion() {
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => setCurrentMessage("How am I doing with my health goals?")}
+                  onClick={() => setCurrentMessage("Can you analyze my symptom patterns from a medical perspective?")}
                 >
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Check Progress
+                  Medical Analysis
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => setCurrentMessage("What patterns do you notice in my symptoms?")}
+                  onClick={() => setCurrentMessage("What does current research say about my symptoms?")}
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
-                  Discuss Patterns
+                  Research Insights
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start"
-                  onClick={() => setCurrentMessage("I'm feeling overwhelmed today")}
+                  onClick={() => setCurrentMessage("Help me prepare for my doctor appointment")}
                 >
                   <Heart className="h-4 w-4 mr-2" />
-                  Need Support
+                  Medical Advocacy
                 </Button>
               </CardContent>
             </Card>
