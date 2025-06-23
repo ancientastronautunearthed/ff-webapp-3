@@ -565,13 +565,32 @@ export default function Dashboard() {
         </div>
       </div>
       
-      {/* Daily Check-in Modal */}
+      {/* Daily Check-in Modal - Debug Version */}
+      {showCheckin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <h2 className="text-xl font-bold mb-4">Daily Check-in Modal Test</h2>
+            <p className="mb-4">Modal is working! This confirms the state management is functional.</p>
+            <Button 
+              onClick={() => setShowCheckin(false)}
+              className="bg-gray-600 hover:bg-gray-700 text-white"
+            >
+              Close Test Modal
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Full Daily Check-in Modal */}
       <DailyCheckin 
         isOpen={showCheckin} 
-        onClose={() => setShowCheckin(false)}
+        onClose={() => {
+          console.log('Closing Daily Check-in modal');
+          setShowCheckin(false);
+        }}
         onComplete={() => {
           setCheckinCompleted(true);
-          checkDailyCheckinStatus(); // Refresh status
+          checkDailyCheckinStatus();
           toast({
             title: "Daily Check-in Complete!",
             description: "Your health data has been recorded for today.",
