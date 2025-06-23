@@ -92,7 +92,7 @@ function AppContent() {
         <Route path="/doctor" component={DoctorLogin} />
         <Route path="/doctor/login" component={DoctorLogin} />
         <Route path="/doctor/dashboard" component={DoctorDashboard} />
-        <Route path="/ask-doctor" component={() => import('@/components/AskDoctorForum').then(({ AskDoctorForum }) => <AskDoctorForum />)} />
+        <Route path="/ask-doctor" component={AskDoctorForum} />
         <Route component={NotFound} />
       </Switch>
       
