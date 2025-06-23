@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { useCompanionProgress } from '@/contexts/CompanionProgressContext';
 import { useCompanionAccess } from '@/hooks/useCompanionAccess';
 import { COMPANION_TIERS } from './CompanionTierSystem';
+import { COMPANION_FUNCTIONS, getFunctionsByCategory } from '@/constants/companionFunctions';
 import { 
   Lock, 
   Unlock, 
@@ -126,35 +127,33 @@ export const DynamicFunctionGating: React.FC = () => {
       name: 'Basic Health Functions',
       description: 'Essential health tracking and basic insights',
       functions: [
-        { name: 'Basic Chat', tier: 1, category: 'health' as const },
-        { name: 'Symptom Logging', tier: 1, category: 'health' as const },
-        { name: 'Daily Check-ins', tier: 2, category: 'health' as const }
+        ...getFunctionsByCategory('communication'),
+        ...getFunctionsByCategory('tracking')
       ]
     },
     {
       name: 'AI Analysis & Insights',
       description: 'Intelligent pattern recognition and health analytics',
       functions: [
-        { name: 'Meal Suggestions', tier: 3, category: 'recommendations' as const },
-        { name: 'Pattern Analysis', tier: 4, category: 'analysis' as const },
-        { name: 'Supplement Recommendations', tier: 5, category: 'recommendations' as const }
+        ...getFunctionsByCategory('recommendations'),
+        ...getFunctionsByCategory('analysis')
       ]
     },
     {
       name: 'Advanced AI Features',
       description: 'Predictive modeling and advanced personalization',
       functions: [
-        { name: 'Symptom Predictions', tier: 6, category: 'advanced' as const },
-        { name: 'Treatment Optimization', tier: 7, category: 'advanced' as const },
-        { name: 'Research Matching', tier: 8, category: 'advanced' as const }
+        ...getFunctionsByCategory('predictions'),
+        ...getFunctionsByCategory('optimization'),
+        ...getFunctionsByCategory('research')
       ]
     },
     {
       name: 'Expert-Level Functions',
       description: 'Professional-grade analysis and comprehensive insights',
       functions: [
-        { name: 'Advanced Analytics', tier: 9, category: 'advanced' as const },
-        { name: 'Comprehensive Reports', tier: 10, category: 'advanced' as const }
+        ...getFunctionsByCategory('analytics'),
+        ...getFunctionsByCategory('reports')
       ]
     }
   ];

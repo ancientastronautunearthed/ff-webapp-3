@@ -1,5 +1,6 @@
 import { useCompanionProgress } from '@/contexts/CompanionProgressContext';
 import { COMPANION_TIERS } from '@/components/CompanionTierSystem';
+import { COMPANION_FUNCTIONS } from '@/constants/companionFunctions';
 
 export interface FunctionAccessStatus {
   unlocked: boolean;
@@ -55,21 +56,7 @@ export const useCompanionAccess = () => {
   };
 
   const getAvailableFunctions = () => {
-    const allFunctions = [
-      { name: 'Basic Chat', tier: 1, category: 'communication' },
-      { name: 'Symptom Logging', tier: 1, category: 'tracking' },
-      { name: 'Daily Check-ins', tier: 2, category: 'tracking' },
-      { name: 'Meal Suggestions', tier: 3, category: 'recommendations' },
-      { name: 'Pattern Analysis', tier: 4, category: 'analysis' },
-      { name: 'Supplement Recommendations', tier: 5, category: 'recommendations' },
-      { name: 'Symptom Predictions', tier: 6, category: 'predictions' },
-      { name: 'Treatment Optimization', tier: 7, category: 'optimization' },
-      { name: 'Research Matching', tier: 8, category: 'research' },
-      { name: 'Advanced Analytics', tier: 9, category: 'analytics' },
-      { name: 'Comprehensive Reports', tier: 10, category: 'reports' }
-    ];
-
-    return allFunctions.map(func => ({
+    return COMPANION_FUNCTIONS.map(func => ({
       ...func,
       status: getFunctionStatus(func.tier)
     }));
