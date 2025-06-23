@@ -1,0 +1,41 @@
+Submit button clicked, research consent: true data sharing: true
+MedicalProfileForm.tsx:827 Setting showCompanionCreator to true
+MedicalProfileForm.tsx:131 MedicalProfileForm state: {currentStep: 5, showCompanionCreator: true}
+MedicalProfileForm.tsx:300 Rendering CompanionCreatorStep
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+3CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+4CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+MedicalProfileForm.tsx:135 Companion created: {imageUrl: '/temp/companion-5e4d1ccf-c798-49ce-8f40-c110317eb3ef.png', config: {…}}
+CompanionCreatorStep.tsx:149 Error generating companion: TypeError: Cannot convert undefined or null to object
+    at Object.keys (<anonymous>)
+    at handleMedicalProfileComplete (Onboarding.tsx:94:71)
+    at handleCompanionCreated (MedicalProfileForm.tsx:143:5)
+    at generateCompanionImage (CompanionCreatorStep.tsx:147:7)
+generateCompanionImage @ CompanionCreatorStep.tsx:149
+await in generateCompanionImage
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+MedicalProfileForm.tsx:131 MedicalProfileForm state: {currentStep: 5, showCompanionCreator: true}
+MedicalProfileForm.tsx:300 Rendering CompanionCreatorStep
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered
+MedicalProfileForm.tsx:131 MedicalProfileForm state: {currentStep: 5, showCompanionCreator: true}
+MedicalProfileForm.tsx:300 Rendering CompanionCreatorStep
+CompanionCreatorStep.tsx:37 CompanionCreatorStep rendered

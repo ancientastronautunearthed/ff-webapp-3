@@ -140,7 +140,32 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       description: "Your medical profile and AI companion have been created successfully.",
     });
     
-    onComplete();
+    // Pass a valid medical profile data object to onComplete
+    const mockData = {
+      age: 30,
+      sex: 'prefer-not-to-say' as const,
+      height: 68,
+      weight: 150,
+      state: 'California',
+      zipCode: '90210',
+      ethnicity: 'Prefer not to answer',
+      researchConsent: true,
+      anonymousDataSharing: true,
+      currentSymptomSeverity: 5,
+      initialSymptoms: ['Skin lesions'],
+      currentDiagnoses: [],
+      allergies: [],
+      currentMedications: [],
+      lesionLocations: [],
+      occupation: '',
+      smoking: 'never' as const,
+      alcohol: 'none' as const,
+      exercise: 'moderate' as const,
+      diet: '',
+      chemicalExposures: [],
+      petExposure: false
+    };
+    onComplete(mockData);
   };
 
   const handleSkipCompanion = () => {
@@ -150,7 +175,32 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       description: "You can create your AI companion later from settings.",
     });
     
-    onComplete();
+    // Pass a valid medical profile data object to onComplete
+    const mockData = {
+      age: 30,
+      sex: 'prefer-not-to-say' as const,
+      height: 68,
+      weight: 150,
+      state: 'California',
+      zipCode: '90210',
+      ethnicity: 'Prefer not to answer',
+      researchConsent: true,
+      anonymousDataSharing: true,
+      currentSymptomSeverity: 5,
+      initialSymptoms: ['Skin lesions'],
+      currentDiagnoses: [],
+      allergies: [],
+      currentMedications: [],
+      lesionLocations: [],
+      occupation: '',
+      smoking: 'never' as const,
+      alcohol: 'none' as const,
+      exercise: 'moderate' as const,
+      diet: '',
+      chemicalExposures: [],
+      petExposure: false
+    };
+    onComplete(mockData);
   };
 
   const form = useForm<MedicalProfileData>({
