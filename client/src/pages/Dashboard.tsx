@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSymptomEntries } from '@/hooks/useSymptomData';
 import { useJournalEntries } from '@/hooks/useJournalData';
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { WelcomeTour } from '@/components/WelcomeTour';
 import { Link } from 'wouter';
 import { 
   Activity, 
@@ -21,13 +23,36 @@ import {
   Lightbulb,
   Target,
   Clock,
-  ChevronRight
+  ChevronRight,
+  HelpCircle
 } from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { data: symptomEntries } = useSymptomEntries();
   const { data: journalEntries } = useJournalEntries();
+  const [showTour, setShowTour] = useState(false);
+
+  useEffect(() => {
+    const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
+    if (!hasSeenTour) {
+      setShowTour(true);
+    }
+  }, []);
+
+  const completeTour = () => {
+    localStorage.setItem('hasSeenDashboardTour', 'true');
+    setShowTour(false);
+  };
+
+  const skipTour = () => {
+    localStorage.setItem('hasSeenDashboardTour', 'true');
+    setShowTour(false);
+  };
+
+  const startTour = () => {
+    setShowTour(true);
+  };
 
   // Calculate real stats from Firebase data
   const weeklyData = symptomEntries ? getWeeklyStats(symptomEntries) : null;
@@ -108,7 +133,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      {showTour && <WelcomeTour onComplete={completeTour} onSkip={skipTour} />}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
@@ -362,6 +389,7 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
