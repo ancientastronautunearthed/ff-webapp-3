@@ -55,28 +55,31 @@ function AppContent() {
     if (!user) return;
     
     try {
-      // Check backend API instead of Firebase directly due to connection issues
-      const response = await fetch('/api/users/profile', {
-        headers: {
-          'Authorization': `Bearer ${await user.getIdToken()}`
-        }
-      });
+      // Check localStorage first for recent completion
+      const recentCompletion = localStorage.getItem('profileCompleted');
+      if (recentCompletion) {
+        setUserRole('patient');
+        setHasCompletedOnboarding(true);
+        localStorage.removeItem('profileCompleted');
+        setDataLoaded(true);
+        return;
+      }
       
-      if (response.ok) {
-        const profile = await response.json();
-        setUserRole(profile.userRole || 'patient');
-        setHasCompletedOnboarding(profile.onboardingComplete || false);
-      } else {
-        // Check localStorage for recent completion
-        const recentCompletion = localStorage.getItem('profileCompleted');
-        if (recentCompletion) {
-          setUserRole('patient');
-          setHasCompletedOnboarding(true);
-          localStorage.removeItem('profileCompleted'); // Clean up
+      // Try backend API without Firebase token (due to connection issues)
+      try {
+        const response = await fetch('/api/users/profile');
+        if (response.ok) {
+          const profile = await response.json();
+          setUserRole(profile.userRole || 'patient');
+          setHasCompletedOnboarding(profile.onboardingComplete || false);
         } else {
           setUserRole('patient');
           setHasCompletedOnboarding(false);
         }
+      } catch (apiError) {
+        console.log('API check failed, defaulting to new user');
+        setUserRole('patient');
+        setHasCompletedOnboarding(false);
       }
       setDataLoaded(true);
     } catch (error) {
