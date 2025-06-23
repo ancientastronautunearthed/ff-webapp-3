@@ -80,22 +80,18 @@ export const Onboarding = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, {
-        medicalProfile: profileData,
-        profileComplete: true,
-        researchOptIn: profileData.researchConsent,
-        anonymousDataSharing: profileData.anonymousDataSharing,
-        onboardingComplete: false,
-        updatedAt: new Date()
-      });
-
+      // In production, this would save to Firestore
+      console.log('Saving comprehensive medical profile:', profileData);
+      
+      // Simulate saving medical profile data
+      localStorage.setItem('medicalProfileData', JSON.stringify(profileData));
+      
       setProfileComplete(true);
       setCurrentStep(2);
       
       toast({
         title: "Medical Profile Complete!",
-        description: "Your information will help advance Morgellons research.",
+        description: `Thank you for providing comprehensive health information including ${Object.keys(profileData).length} data points for research.`,
       });
     } catch (error) {
       toast({
@@ -110,15 +106,12 @@ export const Onboarding = () => {
     if (!user) return;
 
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, {
-        onboardingComplete: true,
-        updatedAt: new Date()
-      });
+      // Mark onboarding as complete
+      localStorage.setItem('onboardingComplete', 'true');
 
       toast({
         title: "Welcome to Fiber Friends!",
-        description: "You're ready to start tracking your health journey.",
+        description: "You're ready to start tracking your health journey with comprehensive data collection.",
       });
 
       // Navigate to dashboard

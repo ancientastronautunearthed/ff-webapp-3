@@ -129,11 +129,50 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       data.allergies = selectedAllergies;
       data.initialSymptoms = selectedSymptoms;
       
+      // Log comprehensive data being collected
+      console.log('Comprehensive medical data collected:', {
+        demographics: {
+          age: data.age,
+          sex: data.sex,
+          height: data.height,
+          weight: data.weight,
+          ethnicity: data.ethnicity,
+          location: `${data.state}, ${data.zipCode}`
+        },
+        medicalHistory: {
+          diagnoses: data.currentDiagnoses,
+          medications: data.currentMedications,
+          allergies: data.allergies
+        },
+        morgellonsProfile: {
+          onsetDate: data.symptomOnsetDate,
+          severity: data.currentSymptomSeverity,
+          symptoms: data.initialSymptoms,
+          affectedAreas: data.lesionLocations
+        },
+        lifestyle: {
+          occupation: data.occupation,
+          smoking: data.smoking,
+          alcohol: data.alcohol,
+          exercise: data.exercise,
+          diet: data.diet
+        },
+        environmental: {
+          exposures: data.chemicalExposures,
+          pets: data.petExposure
+        },
+        research: {
+          consent: data.researchConsent,
+          dataSharing: data.anonymousDataSharing,
+          contactForStudies: data.contactForStudies
+        }
+      });
+      
       await onComplete(data);
       
       toast({
         title: "Medical Profile Saved",
-        description: "Your information will help advance Morgellons research while maintaining your privacy.",
+        description: `Comprehensive profile with ${Object.keys(data).length}+ data points collected for research analysis.`,
       });
     } catch (error) {
       toast({

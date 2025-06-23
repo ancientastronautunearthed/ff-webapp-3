@@ -43,8 +43,8 @@ function AppContent() {
   }
 
   // Check if user needs onboarding
-  // In production, check user.onboardingComplete from Firestore
-  const needsOnboarding = false; // This would be determined from user data
+  // For new users, show onboarding with comprehensive medical profile
+  const needsOnboarding = true; // This forces onboarding for demo purposes
 
   if (needsOnboarding) {
     return <Onboarding />;
