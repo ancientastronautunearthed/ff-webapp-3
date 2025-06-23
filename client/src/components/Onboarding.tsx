@@ -108,13 +108,16 @@ export const Onboarding = () => {
     }
     
     setCompletedSteps(prev => new Set([...prev, 'profile']));
-    setCurrentStep(2); // Move to research step
-    setCurrentPhase('welcome');
     
     toast({
       title: "Medical Profile & Research Consent Complete!",
-      description: "Your comprehensive health information and research participation preferences have been saved.",
+      description: "Your comprehensive health information and research participation preferences have been saved. Starting interactive tour...",
     });
+
+    // Transition to tour phase after brief delay to show completion message
+    setTimeout(() => {
+      setCurrentPhase('tour');
+    }, 1500);
   };
 
   const handleMedicalProfileSkip = () => {
@@ -132,6 +135,11 @@ export const Onboarding = () => {
     localStorage.setItem('onboardingComplete', 'true');
     setCurrentPhase('complete');
     console.log('Onboarding complete - medical data captured for research');
+    
+    toast({
+      title: "Welcome to Fiber Friends!",
+      description: "Your onboarding is complete. You can now access all features of the application.",
+    });
   };
 
   const handleTourSkip = () => {
