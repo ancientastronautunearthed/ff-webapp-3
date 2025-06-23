@@ -110,6 +110,60 @@ export async function getUserCommunityContributions(userId: string, limitCount =
   }
 }
 
+// Save peer connection request
+export async function savePeerConnectionRequest(fromUserId: string, toUserId: string, connectionData: any) {
+  try {
+    const docRef = await addDoc(collection(db, 'peer_connections'), {
+      fromUserId,
+      toUserId,
+      status: 'pending',
+      ...connectionData,
+      createdAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error saving peer connection request:', error);
+    throw error;
+  }
+}
+
+// Get potential peer matches
+export async function getPotentialMatches(userId: string, preferences: any) {
+  try {
+    // In a real implementation, this would use complex matching algorithms
+    // For now, return a basic query
+    const q = query(
+      collection(db, 'users'),
+      limit(20)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs
+      .filter(doc => doc.id !== userId) // Exclude self
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+  } catch (error) {
+    console.error('Error getting potential matches:', error);
+    return [];
+  }
+}
+
+// Update peer connection status
+export async function updatePeerConnectionStatus(connectionId: string, status: 'accepted' | 'declined') {
+  try {
+    const connectionRef = doc(db, 'peer_connections', connectionId);
+    await updateDoc(connectionRef, {
+      status,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error('Error updating peer connection status:', error);
+    throw error;
+  }
+}
+
 // Update user points and level
 export async function updateUserProgress(userId: string, progressData: any) {
   try {

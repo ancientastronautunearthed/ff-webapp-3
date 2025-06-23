@@ -212,13 +212,21 @@ export const CommunityEngagementWidget = () => {
           </div>
         </div>
 
-        {/* CTA Button */}
-        <Link href="/community">
-          <Button className="w-full bg-green-600 hover:bg-green-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Join Community Discussion
-          </Button>
-        </Link>
+        {/* CTA Buttons */}
+        <div className="grid grid-cols-1 gap-2">
+          <Link href="/community">
+            <Button className="w-full bg-green-600 hover:bg-green-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Join Community Discussion
+            </Button>
+          </Link>
+          <Link href="/peer-matching">
+            <Button variant="outline" className="w-full">
+              <Users className="h-4 w-4 mr-2" />
+              Find Peer Matches
+            </Button>
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );
