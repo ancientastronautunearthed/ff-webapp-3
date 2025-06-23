@@ -232,6 +232,9 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   const currentTourStep = tourSteps[currentStep];
 
   useEffect(() => {
+    // Add tour-active class to body
+    document.body.classList.add('tour-active');
+    
     if (currentTourStep && currentTourStep.route) {
       setLocation(currentTourStep.route);
       
@@ -240,6 +243,11 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
         highlightElements(currentTourStep.highlightElements || []);
       }, 1500);
     }
+    
+    // Cleanup function to remove tour-active class
+    return () => {
+      document.body.classList.remove('tour-active');
+    };
   }, [currentStep, currentTourStep, setLocation]);
 
   const highlightElements = (selectors: string[]) => {
@@ -278,6 +286,11 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     setHighlightedElements([]);
   };
 
+  const cleanupTour = () => {
+    removeHighlights();
+    document.body.classList.remove('tour-active');
+  };
+
   const nextStep = () => {
     if (currentStep < tourSteps.length - 1) {
       removeHighlights();
@@ -295,41 +308,33 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   };
 
   const completeTour = () => {
-    removeHighlights();
+    cleanupTour();
     setIsVisible(false);
     onComplete();
   };
 
   const skipTour = () => {
-    removeHighlights();
+    cleanupTour();
     setIsVisible(false);
     onSkip();
-  };
-
-  const goToStep = (stepIndex: number) => {
-    removeHighlights();
-    setCurrentStep(stepIndex);
   };
 
   if (!isVisible) return null;
 
   return (
     <>
-      {/* Tour overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={(e) => e.preventDefault()} />
-      
-      {/* Tour modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-        <Card className="w-full max-w-4xl bg-white shadow-2xl pointer-events-auto relative">
-          <CardContent className="p-8">
-            <div className="flex items-center justify-between mb-6">
+      {/* Tour modal - positioned at bottom to show page content */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4">
+        <Card className="w-full max-w-5xl mx-auto bg-white shadow-2xl border-t-4 border-primary-500">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
-                  <currentTourStep.icon className="h-6 w-6 text-white" />
+                <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center">
+                  <currentTourStep.icon className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">{currentTourStep.title}</h2>
-                  <Badge variant="secondary">
+                  <h2 className="text-xl font-bold text-gray-900">{currentTourStep.title}</h2>
+                  <Badge variant="secondary" className="text-xs">
                     Step {currentStep + 1} of {tourSteps.length}
                   </Badge>
                 </div>
@@ -339,67 +344,81 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
               </Button>
             </div>
 
-            <Progress value={(currentStep + 1) / tourSteps.length * 100} className="mb-6" />
+            <Progress value={(currentStep + 1) / tourSteps.length * 100} className="mb-4" />
 
-            <p className="text-lg text-gray-700 mb-6">{currentTourStep.description}</p>
+            <p className="text-base text-gray-700 mb-4">{currentTourStep.description}</p>
             
-            {/* Step Navigation */}
-            <div className="flex flex-wrap gap-2 mb-6">
+            {/* Step Progress Indicators (non-clickable) */}
+            <div className="flex flex-wrap gap-2 mb-4">
               {tourSteps.map((step, index) => (
-                <Button
+                <div
                   key={step.id}
-                  variant={index === currentStep ? "default" : index < currentStep ? "outline" : "ghost"}
-                  size="sm"
-                  onClick={() => goToStep(index)}
-                  className="flex items-center gap-1"
+                  className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
+                    index === currentStep 
+                      ? "bg-primary-500 text-white" 
+                      : index < currentStep 
+                        ? "bg-green-100 text-green-700" 
+                        : "bg-gray-100 text-gray-500"
+                  }`}
                 >
                   {index < currentStep && <CheckCircle className="h-3 w-3" />}
+                  {index === currentStep && <Eye className="h-3 w-3" />}
                   <step.icon className="h-3 w-3" />
                   <span className="hidden sm:inline">{step.title}</span>
-                </Button>
+                </div>
               ))}
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="grid lg:grid-cols-2 gap-4 mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Sparkles className="mr-2 h-5 w-5 text-yellow-500" />
+                <h3 className="text-base font-semibold text-gray-900 mb-2 flex items-center">
+                  <Sparkles className="mr-2 h-4 w-4 text-yellow-500" />
                   Key Features
                 </h3>
-                <ul className="space-y-2">
-                  {currentTourStep.features.map((feature, index) => (
-                    <li key={index} className="flex items-start space-x-2 text-sm">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                <ul className="space-y-1">
+                  {currentTourStep.features.slice(0, 3).map((feature, index) => (
+                    <li key={index} className="flex items-start space-x-2 text-xs">
+                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
                       <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
+                  {currentTourStep.features.length > 3 && (
+                    <li className="text-xs text-gray-500 pl-5">
+                      +{currentTourStep.features.length - 3} more features
+                    </li>
+                  )}
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <Lightbulb className="mr-2 h-5 w-5 text-blue-500" />
+                <h3 className="text-base font-semibold text-gray-900 mb-2 flex items-center">
+                  <Lightbulb className="mr-2 h-4 w-4 text-blue-500" />
                   Pro Tips
                 </h3>
-                <ul className="space-y-2">
-                  {currentTourStep.tips.map((tip, index) => (
-                    <li key={index} className="flex items-start space-x-2 text-sm">
-                      <Eye className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <ul className="space-y-1">
+                  {currentTourStep.tips.slice(0, 3).map((tip, index) => (
+                    <li key={index} className="flex items-start space-x-2 text-xs">
+                      <Eye className="w-3 h-3 text-blue-500 mt-0.5 flex-shrink-0" />
                       <span className="text-gray-700">{tip}</span>
                     </li>
                   ))}
+                  {currentTourStep.tips.length > 3 && (
+                    <li className="text-xs text-gray-500 pl-5">
+                      +{currentTourStep.tips.length - 3} more tips
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
             
             {highlightedElements.length > 0 && (
-              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div className="flex items-center gap-2 text-yellow-800 mb-2">
-                  <Eye className="h-4 w-4" />
-                  <span className="font-medium">Look for highlighted elements</span>
+              <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-2 text-yellow-800 mb-1">
+                  <Eye className="h-3 w-3" />
+                  <span className="font-medium text-sm">Look for highlighted elements above</span>
                 </div>
-                <p className="text-sm text-yellow-700">
-                  The yellow highlighted areas on the page show the features we're discussing. Take a moment to explore them!
+                <p className="text-xs text-yellow-700">
+                  The yellow highlighted areas on the page show the features we're discussing.
                 </p>
               </div>
             )}
@@ -439,7 +458,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
       <style jsx global>{`
         .tour-highlight {
           position: relative;
-          z-index: 60;
+          z-index: 40;
           outline: 3px solid #fbbf24 !important;
           outline-offset: 2px;
           border-radius: 8px;
@@ -454,6 +473,11 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
           50% { 
             box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.2);
           }
+        }
+        
+        /* Add padding to body when tour is active to prevent content overlap */
+        body.tour-active {
+          padding-bottom: 350px;
         }
       `}</style>
     </>
