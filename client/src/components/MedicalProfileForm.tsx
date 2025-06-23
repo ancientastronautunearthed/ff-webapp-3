@@ -694,12 +694,13 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
 
             {/* Navigation Buttons */}
             <Separator />
-            <div className="flex justify-between pt-4">
+            <div className="flex justify-between pt-4 bg-gray-50 px-6 py-4 -mx-6 -mb-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 1}
+                className="bg-white hover:bg-gray-50 border-gray-300"
               >
                 Previous
               </Button>
@@ -708,7 +709,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                 <Button
                   type="button"
                   onClick={nextStep}
-                  className="bg-primary-500 hover:bg-primary-600"
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg border-2 border-blue-700"
                 >
                   Next Step
                 </Button>
