@@ -209,6 +209,12 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     }
   };
 
+  const previousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   // Navigate to appropriate page when step changes
   useEffect(() => {
     const currentTourStep = tourSteps[currentStep];
