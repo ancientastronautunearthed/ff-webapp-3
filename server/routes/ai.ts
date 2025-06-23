@@ -21,19 +21,47 @@ aiRoutes.post('/analyze-health-patterns', async (req, res) => {
       analysisType: 'health_patterns'
     };
 
-    // Call Google AI for health analysis
-    const prompt = `Analyze the following health data for Morgellons disease patterns:
+    // Enhanced prompt for comprehensive AI analysis
+    const prompt = `You are a specialized health AI assistant analyzing Morgellons disease patterns. Analyze this real patient data:
+
+    SYMPTOM DATA (${symptoms.length} entries):
+    ${symptoms.map(s => `- Severity: ${s.severity}/10, Location: ${s.location}, Factors: ${s.environmentalFactors?.join(', ') || 'None'}`).join('\n')}
     
-    Symptoms (${symptoms.length} entries): Recent severity levels, environmental factors, and patterns
-    Journal entries (${journals.length} entries): Mood and observations
-    Daily check-ins (${checkins.length} entries): Overall wellbeing and sleep patterns
+    JOURNAL DATA (${journals.length} entries):
+    ${journals.map(j => `- Mood: ${j.mood || 'Not specified'}, Notes: ${j.content?.substring(0, 100) || 'No content'}`).join('\n')}
     
-    Provide 2-3 actionable health insights focusing on:
-    1. Pattern recognition in symptoms
-    2. Environmental or lifestyle correlations
-    3. Positive trends or concerning changes
+    CHECK-IN DATA (${checkins.length} entries):
+    ${checkins.map(c => `- Wellbeing: ${c.overallWellbeing}/10, Sleep: ${c.sleepQuality}/10, Pain: ${c.painLevel}/10`).join('\n')}
+
+    Provide comprehensive analysis in JSON format:
+    {
+      "insights": [
+        {
+          "type": "prediction|correlation|achievement|tip|warning",
+          "title": "Clear insight title",
+          "description": "Specific actionable description based on data",
+          "confidence": 70-95,
+          "actionable": true/false,
+          "priority": "high|medium|low",
+          "data": {"supporting_data": "values"}
+        }
+      ],
+      "patterns": [
+        {
+          "pattern": "Specific pattern found",
+          "frequency": percentage,
+          "correlation": "What correlates with this pattern",
+          "recommendation": "Specific recommendation"
+        }
+      ],
+      "prediction": {
+        "todayRisk": "low|medium|high",
+        "riskFactors": ["factor1", "factor2"],
+        "recommendations": ["action1", "action2"]
+      }
+    }
     
-    Format as JSON with: insights array containing {type, title, description, actionable, priority, confidence}`;
+    Focus only on patterns visible in the actual data provided. Be specific and actionable.`;
 
     const aiResult = await generate({
       model: googleAI('gemini-1.5-flash'),
@@ -44,31 +72,47 @@ aiRoutes.post('/analyze-health-patterns', async (req, res) => {
       }
     });
 
-    // Parse AI response
-    let parsedInsights = [];
+    // Parse AI response - only return real AI analysis
+    let aiAnalysis = null;
     try {
       const aiText = aiResult.text();
+      console.log('AI Response:', aiText);
+      
       // Try to extract JSON from AI response
       const jsonMatch = aiText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        parsedInsights = parsed.insights || [];
+        aiAnalysis = JSON.parse(jsonMatch[0]);
       }
     } catch (parseError) {
-      console.log('AI response parsing failed, using fallback');
+      console.error('AI response parsing failed:', parseError);
     }
 
-    // Return structured response
-    res.json({
-      success: true,
-      insights: parsedInsights.length > 0 ? parsedInsights : generateFallbackAnalysis(req.body),
-      patterns: [],
-      prediction: null,
-      recommendations: [],
-      confidence: parsedInsights.length > 0 ? 85 : 60,
-      analysisDate: new Date().toISOString(),
-      aiGenerated: parsedInsights.length > 0
-    });
+    // Only return results if we have valid AI analysis or real data
+    if (aiAnalysis && (aiAnalysis.insights || aiAnalysis.patterns)) {
+      res.json({
+        success: true,
+        insights: aiAnalysis.insights || [],
+        patterns: aiAnalysis.patterns || [],
+        prediction: aiAnalysis.prediction || null,
+        confidence: 85,
+        analysisDate: new Date().toISOString(),
+        aiGenerated: true,
+        dataPoints: symptoms.length + journals.length + checkins.length
+      });
+    } else {
+      // Return empty analysis if no real insights can be generated
+      res.json({
+        success: false,
+        message: 'Insufficient data for AI analysis or AI service unavailable',
+        insights: [],
+        patterns: [],
+        prediction: null,
+        confidence: 0,
+        analysisDate: new Date().toISOString(),
+        aiGenerated: false,
+        dataPoints: symptoms.length + journals.length + checkins.length
+      });
+    }
 
   } catch (error) {
     console.error('AI health analysis error:', error);
