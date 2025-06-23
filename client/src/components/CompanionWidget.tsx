@@ -65,8 +65,10 @@ export const CompanionWidget = () => {
     loadCompanionData();
   }, [user]);
 
-  // Show creation prompt if user has no companion data
-  if (!companionImage && !companionConfig) {
+  // Always show companion widget - either with data or creation prompt
+  const hasCompanionData = companionImage || companionConfig;
+  
+  if (!hasCompanionData) {
     console.log('CompanionWidget: No companion data found, showing creation prompt');
     return (
       <Card className="w-full max-w-sm">

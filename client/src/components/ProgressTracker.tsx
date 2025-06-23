@@ -178,81 +178,58 @@ export const ProgressTracker = () => {
           </CardContent>
         </Card>
 
-        {/* Demo Point Actions (for testing) */}
+        {/* Point earning information - NO DEMO BUTTONS */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Zap className="w-5 h-5 mr-2" />
-              Earn Points (Demo Actions)
+              <Target className="w-5 h-5 mr-2" />
+              How to Earn Points
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <Button 
-                variant="outline" 
-                onClick={() => addDemoPoints("Daily Check-in", POINT_VALUES.DAILY_CHECKIN, "health_tracking")}
-                className="text-left justify-start"
-              >
-                <div>
-                  <div className="font-medium">Daily Check-in</div>
-                  <div className="text-sm text-gray-500">+{POINT_VALUES.DAILY_CHECKIN} points</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <h4 className="font-medium text-blue-600">Health Tracking</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Daily Check-in</span>
+                    <span className="text-blue-600">+{POINT_VALUES.DAILY_CHECKIN} pts</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Symptom Entry</span>
+                    <span className="text-blue-600">+{POINT_VALUES.SYMPTOM_ENTRY} pts</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Journal Entry</span>
+                    <span className="text-blue-600">+{POINT_VALUES.JOURNAL_ENTRY} pts</span>
+                  </div>
                 </div>
-              </Button>
+              </div>
               
-              <Button 
-                variant="outline"
-                onClick={() => addDemoPoints("Symptom Entry", POINT_VALUES.SYMPTOM_ENTRY, "health_tracking")}
-                className="text-left justify-start"
-              >
-                <div>
-                  <div className="font-medium">Log Symptoms</div>
-                  <div className="text-sm text-gray-500">+{POINT_VALUES.SYMPTOM_ENTRY} points</div>
+              <div className="space-y-2">
+                <h4 className="font-medium text-purple-600">Community & Research</h4>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Forum Post</span>
+                    <span className="text-purple-600">+{POINT_VALUES.FORUM_POST} pts</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Research Survey</span>
+                    <span className="text-purple-600">+{POINT_VALUES.SURVEY_COMPLETION} pts</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Data Sharing</span>
+                    <span className="text-purple-600">+{POINT_VALUES.DATA_SHARING} pts</span>
+                  </div>
                 </div>
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={() => addDemoPoints("Journal Entry", POINT_VALUES.JOURNAL_ENTRY, "health_tracking")}
-                className="text-left justify-start"
-              >
-                <div>
-                  <div className="font-medium">Write Journal</div>
-                  <div className="text-sm text-gray-500">+{POINT_VALUES.JOURNAL_ENTRY} points</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={() => addDemoPoints("Forum Post", POINT_VALUES.FORUM_POST, "community")}
-                className="text-left justify-start"
-              >
-                <div>
-                  <div className="font-medium">Create Post</div>
-                  <div className="text-sm text-gray-500">+{POINT_VALUES.FORUM_POST} points</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={() => addDemoPoints("Survey Complete", POINT_VALUES.SURVEY_COMPLETION, "research")}
-                className="text-left justify-start"
-              >
-                <div>
-                  <div className="font-medium">Complete Survey</div>
-                  <div className="text-sm text-gray-500">+{POINT_VALUES.SURVEY_COMPLETION} points</div>
-                </div>
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={() => addDemoPoints("Monthly Streak", POINT_VALUES.MONTHLY_STREAK, "engagement")}
-                className="text-left justify-start"
-              >
-                <div>
-                  <div className="font-medium">Monthly Streak</div>
-                  <div className="text-sm text-gray-500">+{POINT_VALUES.MONTHLY_STREAK} points</div>
-                </div>
-              </Button>
+              </div>
+            </div>
+            
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                Points are automatically awarded when you complete these activities in the app. 
+                Track your health, engage with the community, and contribute to research to level up your AI companion.
+              </p>
             </div>
           </CardContent>
         </Card>
