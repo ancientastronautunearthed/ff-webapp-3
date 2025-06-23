@@ -165,7 +165,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-4 gap-6 mb-8">
+      <div className="grid md:grid-cols-4 gap-6 mb-8" data-tour="stats-cards">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
