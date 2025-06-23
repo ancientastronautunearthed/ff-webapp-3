@@ -124,6 +124,10 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Created patient-centric UI with extensive preset options for easy data entry
 - ✓ Added data visualization with real symptom correlation analysis
 - ✓ Integrated React Query for efficient data management and caching
+- ✓ Added Calendar Integration with monthly view and yearly heatmap
+- ✓ Visual calendar showing symptom entries and journal entries by date
+- ✓ Symptom intensity heatmap for yearly overview
+- ✓ Quick date navigation and entry creation from calendar
 
 ## User Preferences
 

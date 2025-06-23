@@ -14,6 +14,7 @@ import { ProviderReports } from "@/components/ProviderReports";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
+import CalendarView from "@/pages/CalendarView";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -48,6 +49,7 @@ function AppContent() {
         <Route path="/insights" component={DataVisualization} />
         <Route path="/research" component={ResearchOptIn} />
         <Route path="/reports" component={ProviderReports} />
+        <Route path="/calendar" component={CalendarView} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
