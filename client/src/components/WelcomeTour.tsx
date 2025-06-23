@@ -36,31 +36,10 @@ interface WelcomeTourProps {
 }
 
 export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
-  // Initialize from localStorage or start at 0
-  const [currentStep, setCurrentStep] = useState(() => {
-    const savedStep = localStorage.getItem('tourProgress');
-    return savedStep ? parseInt(savedStep, 10) : 0;
-  });
+  const [currentStep, setCurrentStep] = useState(0);
   const [location, navigate] = useLocation();
-  const [isResuming, setIsResuming] = useState(() => {
-    return localStorage.getItem('tourProgress') !== null;
-  });
   
   console.log('WelcomeTour rendered with currentStep:', currentStep);
-
-  // Handle tour pause/resume functionality
-  const handlePauseTour = () => {
-    localStorage.setItem('tourPaused', 'true');
-    localStorage.setItem('tourProgress', currentStep.toString());
-    onSkip(); // Use existing skip functionality to close tour
-  };
-
-  const handleRestartTour = () => {
-    localStorage.removeItem('tourProgress');
-    localStorage.removeItem('tourPaused');
-    setCurrentStep(0);
-    setIsResuming(false);
-  };
 
   const tourSteps: TourStep[] = [
     {
@@ -249,12 +228,8 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     if (currentTourStep.route && location !== currentTourStep.route) {
       console.log('Navigating to:', currentTourStep.route);
       navigate(currentTourStep.route);
-      // Force a slight delay to ensure page navigation completes
-      setTimeout(() => {
-        console.log('Navigation completed to:', currentTourStep.route);
-      }, 100);
     }
-  }, [currentStep, navigate]);
+  }, [currentStep, navigate, location]);
 
   // Add highlighting effects for specific elements with longer delay
   useEffect(() => {
