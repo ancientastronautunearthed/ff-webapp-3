@@ -10,7 +10,7 @@ import {
   where
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Layout } from '@/components/Layout';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -200,7 +200,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Layout>
+    <>
       {showTour && (
         <WelcomeTour 
           onComplete={() => {
@@ -559,6 +559,6 @@ export default function Dashboard() {
         }}
       />
       </div>
-    </Layout>
+    </>
   );
 }
