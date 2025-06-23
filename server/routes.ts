@@ -24,10 +24,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {
     try {
-      // Mock user profile data
+      // Return profile with onboarding complete flag
       const mockProfile = {
         id: 'user_current',
         email: 'john.doe@example.com',
+        onboardingComplete: true, // Always return true after profile creation
         firstName: 'John',
         lastName: 'Doe',
         dateOfBirth: '1985-06-15',
