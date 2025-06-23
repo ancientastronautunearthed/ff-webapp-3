@@ -10,7 +10,7 @@ import { MedicalProfileForm } from '@/components/MedicalProfileForm';
 import { ResearchConsentManager } from '@/components/ResearchConsentManager';
 // Tour removed per user request
 import { useToast } from '@/hooks/use-toast';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface OnboardingStep {
@@ -120,7 +120,6 @@ export const Onboarding = () => {
       // Save onboarding completion to Firebase
       if (user) {
         await setDoc(doc(db, 'userPreferences', user.uid), {
-          tourActive: true,
           onboardingComplete: true,
           onboardingCompletedAt: new Date()
         }, { merge: true });
