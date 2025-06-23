@@ -90,7 +90,7 @@ export const Onboarding = () => {
     }
   };
 
-  const handleMedicalProfileComplete = (data: any) => {
+  const handleMedicalProfileComplete = async (data: any) => {
     console.log('Medical profile completed with data points:', Object.keys(data).length);
     console.log('Research consent status:', {
       researchConsent: data.researchConsent,
@@ -108,24 +108,71 @@ export const Onboarding = () => {
       return;
     }
     
-    setCompletedSteps(prev => new Set([...prev, 'profile']));
-    
-    toast({
-      title: "Medical Profile & Research Consent Complete!",
-      description: "Your comprehensive health information and research participation preferences have been saved. Starting interactive tour...",
-    });
-
-    // Transition to tour phase after brief delay to show completion message
-    setTimeout(async () => {
-      // Save onboarding completion to Firebase
+    try {
+      // Save medical profile data to Firebase
       if (user) {
+        await setDoc(doc(db, 'users', user.uid), {
+          // Basic info
+          firstName: data.firstName,
+          lastName: data.lastName,
+          age: data.age,
+          gender: data.gender,
+          state: data.state,
+          ethnicity: data.ethnicity,
+          
+          // Medical info
+          currentSymptomSeverity: data.currentSymptomSeverity,
+          symptomOnsetYear: data.symptomOnsetYear,
+          initialSymptoms: data.initialSymptoms || [],
+          currentDiagnoses: data.currentDiagnoses || [],
+          allergies: data.allergies || [],
+          medications: data.medications || [],
+          
+          // Lifestyle
+          smoking: data.smoking,
+          alcohol: data.alcohol,
+          exercise: data.exercise,
+          stressLevel: data.stressLevel,
+          sleepQuality: data.sleepQuality,
+          
+          // Research consent
+          researchConsent: data.researchConsent,
+          anonymousDataSharing: data.anonymousDataSharing,
+          contactForStudies: data.contactForStudies,
+          
+          // System fields
+          onboardingComplete: true,
+          profileCompletedAt: new Date(),
+          updatedAt: new Date()
+        }, { merge: true });
+        
+        // Also save to userPreferences for onboarding tracking
         await setDoc(doc(db, 'userPreferences', user.uid), {
           onboardingComplete: true,
           onboardingCompletedAt: new Date()
         }, { merge: true });
       }
-      window.location.href = '/dashboard'; // Navigate to dashboard and start tour
-    }, 1500);
+      
+      setCompletedSteps(prev => new Set([...prev, 'profile']));
+      
+      toast({
+        title: "Profile Complete!",
+        description: "Your medical profile has been saved. Welcome to Fiber Friends!",
+      });
+      
+      // Navigate to dashboard immediately
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error saving medical profile:', error);
+      toast({
+        title: "Error Saving Profile",
+        description: "There was an issue saving your profile. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleMedicalProfileSkip = () => {
