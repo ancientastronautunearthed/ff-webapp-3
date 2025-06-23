@@ -30,7 +30,8 @@ import {
   MoreVertical,
   Activity,
   TrendingUp,
-  Stethoscope
+  Stethoscope,
+  Trophy
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, getDoc } from 'firebase/firestore';

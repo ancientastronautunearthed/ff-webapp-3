@@ -43,7 +43,7 @@ function AppContent() {
   const { user, loading } = useAuth();
   const [location] = useLocation();
   
-  // Always declare all hooks at the top level
+  // Always declare all hooks at the top level - NEVER CONDITIONAL
   const [userRole, setUserRole] = useState<string | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -126,6 +126,8 @@ function AppContent() {
     return <Onboarding />;
   }
 
+
+
   return (
     <Layout>
       <Switch>
@@ -159,8 +161,8 @@ function AppContent() {
         <Route component={NotFound} />
       </Switch>
       
-      {/* Tour overlay */}
-      <WelcomeTour />
+      {/* Check if tour is active and show tour overlay */}
+      {/* Tour removed - integrated into dashboard onboarding flow */}
     </Layout>
   );
 }
@@ -171,10 +173,8 @@ function App() {
       <AuthProvider>
         <CompanionProgressProvider>
           <TooltipProvider>
-            <div className="min-h-screen bg-slate-50">
-              <AppContent />
-              <Toaster />
-            </div>
+            <Toaster />
+            <AppContent />
           </TooltipProvider>
         </CompanionProgressProvider>
       </AuthProvider>
