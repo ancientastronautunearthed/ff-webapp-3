@@ -91,14 +91,10 @@ export const Onboarding = () => {
   };
 
   const handleMedicalProfileComplete = async (data: any) => {
-    console.log('Medical profile completed with data points:', Object.keys(data).length);
-    console.log('Research consent status:', {
-      researchConsent: data.researchConsent,
-      anonymousDataSharing: data.anonymousDataSharing,
-      contactForStudies: data.contactForStudies
-    });
+    console.log('=== ONBOARDING COMPLETION STARTED ===');
+    console.log('Medical profile data points:', Object.keys(data).length);
     
-    // Validate research consent was provided
+    // Validate research consent
     if (!data.researchConsent || !data.anonymousDataSharing) {
       toast({
         title: "Research Consent Required",
@@ -109,62 +105,53 @@ export const Onboarding = () => {
     }
     
     try {
-      // Save medical profile data to Firebase (filter out undefined values)
-      if (user) {
-        const profileData = {
-          // Basic info
-          firstName: data.firstName,
-          lastName: data.lastName,
-          age: data.age,
-          gender: data.gender,
-          state: data.state,
-          ethnicity: data.ethnicity,
-          
-          // Medical info
-          currentSymptomSeverity: data.currentSymptomSeverity,
-          symptomOnsetYear: data.symptomOnsetYear,
-          initialSymptoms: data.initialSymptoms || [],
-          currentDiagnoses: data.currentDiagnoses || [],
-          allergies: data.allergies || [],
-          medications: data.medications || [],
-          
-          // Lifestyle
-          smoking: data.smoking,
-          alcohol: data.alcohol,
-          exercise: data.exercise,
-          stressLevel: data.stressLevel,
-          sleepQuality: data.sleepQuality,
-          
-          // Research consent
-          researchConsent: data.researchConsent,
-          anonymousDataSharing: data.anonymousDataSharing,
-          contactForStudies: data.contactForStudies,
-          
-          // System fields
-          onboardingComplete: true,
-          profileCompletedAt: new Date(),
-          updatedAt: new Date()
-        };
+      if (!user) {
+        console.error('No user found during profile completion');
+        return;
+      }
 
-        // Filter out undefined values to prevent Firebase errors
-        const cleanedData = Object.fromEntries(
-          Object.entries(profileData).filter(([_, value]) => value !== undefined)
-        );
+      // Prepare cleaned data
+      const profileData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        age: data.age,
+        gender: data.gender,
+        state: data.state,
+        ethnicity: data.ethnicity,
+        currentSymptomSeverity: data.currentSymptomSeverity,
+        symptomOnsetYear: data.symptomOnsetYear,
+        initialSymptoms: data.initialSymptoms || [],
+        currentDiagnoses: data.currentDiagnoses || [],
+        allergies: data.allergies || [],
+        medications: data.medications || [],
+        smoking: data.smoking,
+        alcohol: data.alcohol,
+        exercise: data.exercise,
+        stressLevel: data.stressLevel,
+        sleepQuality: data.sleepQuality,
+        researchConsent: data.researchConsent,
+        anonymousDataSharing: data.anonymousDataSharing,
+        contactForStudies: data.contactForStudies,
+        onboardingComplete: true,
+        profileCompletedAt: new Date(),
+        updatedAt: new Date()
+      };
 
-        console.log('Saving cleaned profile data:', cleanedData);
-        
-        await setDoc(doc(db, 'users', user.uid), cleanedData, { merge: true });
-        console.log('User profile saved successfully');
-        
-        // Also save to userPreferences for onboarding tracking
-        await setDoc(doc(db, 'userPreferences', user.uid), {
+      // Filter undefined values
+      const cleanedData = Object.fromEntries(
+        Object.entries(profileData).filter(([_, value]) => value !== undefined)
+      );
+
+      console.log('Saving to Firebase...');
+      
+      // Save all data in parallel
+      await Promise.all([
+        setDoc(doc(db, 'users', user.uid), cleanedData, { merge: true }),
+        setDoc(doc(db, 'userPreferences', user.uid), {
           onboardingComplete: true,
           onboardingCompletedAt: new Date()
-        }, { merge: true });
-        console.log('User preferences saved successfully');
-        
-        // Initialize companion progress
-        await setDoc(doc(db, 'companionProgress', user.uid), {
+        }, { merge: true }),
+        setDoc(doc(db, 'companionProgress', user.uid), {
           userId: user.uid,
           currentTier: 1,
           totalPoints: 0,
@@ -178,28 +165,25 @@ export const Onboarding = () => {
             { type: 'journal_entry', current: 0, longest: 0 }
           ],
           lastUpdated: new Date()
-        }, { merge: true });
-        console.log('Companion progress initialized');
-      }
-      
-      setCompletedSteps(prev => new Set([...prev, 'profile']));
+        }, { merge: true })
+      ]);
+
+      console.log('=== ALL DATA SAVED SUCCESSFULLY ===');
       
       toast({
-        title: "Profile Complete!",
-        description: "Your medical profile has been saved. Welcome to Fiber Friends!",
+        title: "Welcome to Fiber Friends!",
+        description: "Profile complete. Redirecting to your dashboard...",
       });
       
-      // Navigate to dashboard after brief delay
-      setTimeout(() => {
-        console.log('Navigating to dashboard...');
-        window.location.replace('/dashboard');
-      }, 2000);
+      // Force immediate navigation
+      console.log('=== REDIRECTING TO DASHBOARD ===');
+      window.location.href = '/dashboard';
       
     } catch (error) {
-      console.error('Error saving medical profile:', error);
+      console.error('=== ERROR DURING PROFILE COMPLETION ===', error);
       toast({
         title: "Error Saving Profile",
-        description: "There was an issue saving your profile. Please try again.",
+        description: "Please try again.",
         variant: "destructive",
       });
     }

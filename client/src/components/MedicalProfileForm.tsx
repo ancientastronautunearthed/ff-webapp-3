@@ -796,9 +796,12 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                   disabled={!form.watch('researchConsent') || !form.watch('anonymousDataSharing')}
                   className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                   onClick={(e) => {
-                    console.log('Submit button clicked, research consent:', form.watch('researchConsent'), 'data sharing:', form.watch('anonymousDataSharing'));
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('=== SUBMIT BUTTON CLICKED ===');
+                    
                     if (!form.watch('researchConsent') || !form.watch('anonymousDataSharing')) {
-                      e.preventDefault();
                       toast({
                         title: "Research Consent Required",
                         description: "Please check both research consent checkboxes to continue.",
@@ -807,8 +810,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                       return;
                     }
                     
-                    // Complete profile directly
-                    e.preventDefault();
+                    console.log('=== CALLING HANDLE SUBMIT ===');
                     handleSubmit();
                   }}
                 >
