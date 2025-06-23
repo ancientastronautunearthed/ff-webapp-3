@@ -9,8 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { BookOpen, Upload, Lock, Save, Camera, Calendar, Link2, History, Eye } from 'lucide-react';
+import { BookOpen, Upload, Lock, Save, Camera, Calendar, Link2, History, Eye, X, ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const journalSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -26,6 +27,8 @@ import { useJournalEntries } from '@/hooks/useJournalData';
 export const DigitalMatchbox = () => {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [showAllEntries, setShowAllEntries] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<any>(null);
   const { toast } = useToast();
   const { data: journalEntries, isLoading: entriesLoading } = useJournalEntries();
 
@@ -327,6 +330,7 @@ export const DigitalMatchbox = () => {
                         variant="ghost"
                         size="sm"
                         className="text-primary-600 hover:text-primary-700"
+                        onClick={() => setSelectedEntry(entry)}
                       >
                         <Eye className="mr-1 h-3 w-3" />
                         View Full Entry
@@ -353,6 +357,116 @@ export const DigitalMatchbox = () => {
             </Button>
           </div>
         </div>
+
+        {/* All Entries Modal */}
+        <Dialog open={showAllEntries} onOpenChange={setShowAllEntries}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>All Journal Entries</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {journalEntries && journalEntries.length > 0 ? (
+                journalEntries.map((entry) => (
+                  <Card key={entry.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="font-semibold text-gray-900">{entry.title}</h3>
+                        <span className="text-sm text-gray-500">
+                          {new Date(entry.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 mb-4">{entry.content}</p>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          {entry.mediaUrls && entry.mediaUrls.length > 0 && (
+                            <span className="flex items-center">
+                              <Camera className="mr-1 h-3 w-3" />
+                              {entry.mediaUrls.length} {entry.mediaUrls.length === 1 ? 'photo' : 'photos'}
+                            </span>
+                          )}
+                          {entry.linkedSymptomEntry && (
+                            <span className="flex items-center">
+                              <Link2 className="mr-1 h-3 w-3" />
+                              Linked to symptoms
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedEntry(entry);
+                            setShowAllEntries(false);
+                          }}
+                        >
+                          <Eye className="mr-1 h-3 w-3" />
+                          View Details
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No journal entries found.</p>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Entry Detail Modal */}
+        <Dialog open={!!selectedEntry} onOpenChange={() => setSelectedEntry(null)}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{selectedEntry?.title}</DialogTitle>
+            </DialogHeader>
+            {selectedEntry && (
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Date</Label>
+                  <p className="text-gray-900 mt-1">
+                    {new Date(selectedEntry.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">Content</Label>
+                  <p className="text-gray-900 mt-1 whitespace-pre-wrap">
+                    {selectedEntry.content}
+                  </p>
+                </div>
+
+                {selectedEntry.mediaUrls && selectedEntry.mediaUrls.length > 0 && (
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Photos</Label>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      {selectedEntry.mediaUrls.map((url: string, index: number) => (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Entry photo ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-lg border"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {selectedEntry.linkedSymptomEntry && (
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700">Linked Symptom Entry</Label>
+                    <div className="mt-1 p-3 bg-blue-50 rounded-lg flex items-center">
+                      <Link2 className="h-4 w-4 text-blue-600 mr-2" />
+                      <span className="text-blue-800">Connected to symptom tracking</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
