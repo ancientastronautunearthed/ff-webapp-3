@@ -16,7 +16,8 @@ import {
   AlertCircle,
   Sparkles,
   Target,
-  Timer
+  Timer,
+  Trophy
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -320,7 +321,7 @@ export const SmartDailyCheckin = () => {
               </p>
             </div>
             <Badge variant="default" className="px-4 py-2">
-              <Target className="h-4 w-4 mr-2" />
+              <Trophy className="h-4 w-4 mr-2" />
               {currentStreak} Day Streak
             </Badge>
           </div>

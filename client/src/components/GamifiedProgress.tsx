@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Trophy, 
-  Fire, 
+  Flame, 
   Target, 
   Users, 
   Calendar,
@@ -119,7 +119,7 @@ export const GamifiedProgress = () => {
         title: 'Week Warrior',
         description: 'Log symptoms for 7 consecutive days',
         category: 'tracking',
-        icon: Fire,
+        icon: Flame,
         earned: true,
         progress: 7,
         maxProgress: 7,
@@ -397,7 +397,7 @@ export const GamifiedProgress = () => {
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-orange-100 rounded-full">
-                        <Fire className="h-5 w-5 text-orange-600" />
+                        <Flame className="h-5 w-5 text-orange-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">{streak.title}</h3>

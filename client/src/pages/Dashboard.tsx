@@ -175,6 +175,17 @@ export default function Dashboard() {
         </Button>
       </div>
 
+      {/* Smart Daily Check-in - Top Priority */}
+      <div className="mb-8">
+        <SmartDailyCheckin />
+      </div>
+
+      {/* AI Health Coach and Gamification */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <AIHealthCoach />
+        <GamifiedProgress />
+      </div>
+
       {/* Quick Stats */}
       <div className="grid md:grid-cols-4 gap-6 mb-8" data-tour="stats-cards">
         <Card>
