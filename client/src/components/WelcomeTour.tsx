@@ -291,7 +291,12 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     document.body.classList.remove('tour-active');
   };
 
-  const nextStep = () => {
+  const nextStep = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (currentStep < tourSteps.length - 1) {
       removeHighlights();
       setCurrentStep(currentStep + 1);
@@ -300,7 +305,12 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     }
   };
 
-  const prevStep = () => {
+  const prevStep = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (currentStep > 0) {
       removeHighlights();
       setCurrentStep(currentStep - 1);
@@ -313,7 +323,12 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     onComplete();
   };
 
-  const skipTour = () => {
+  const skipTour = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     cleanupTour();
     setIsVisible(false);
     onSkip();
@@ -423,27 +438,35 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
               </div>
             )}
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-t pt-4">
               <Button
                 variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 0}
-                className="flex items-center space-x-2"
+                className="tour-button flex items-center space-x-2 bg-white border-2 border-gray-300 hover:bg-gray-50 text-gray-700 font-medium px-4 py-2"
+                type="button"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <span>Previous</span>
               </Button>
 
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-gray-500 font-medium">
                   {currentStep + 1} of {tourSteps.length}
                 </span>
-                <Button variant="ghost" onClick={skipTour} size="sm">
+                <Button 
+                  variant="ghost" 
+                  onClick={skipTour} 
+                  size="sm"
+                  className="tour-button text-gray-600 hover:text-gray-800 hover:bg-gray-100 px-3 py-2"
+                  type="button"
+                >
                   Skip Tour
                 </Button>
                 <Button
                   onClick={nextStep}
-                  className="flex items-center space-x-2 bg-primary-500 hover:bg-primary-600"
+                  className="tour-button flex items-center space-x-2 bg-primary-600 hover:bg-primary-700 text-white font-medium px-6 py-2 border-2 border-primary-600 shadow-lg"
+                  type="button"
                 >
                   <span>{currentStep === tourSteps.length - 1 ? 'Complete Tour' : 'Next'}</span>
                   {currentStep === tourSteps.length - 1 ? <CheckCircle className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
@@ -477,7 +500,13 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
         
         /* Add padding to body when tour is active to prevent content overlap */
         body.tour-active {
-          padding-bottom: 350px;
+          padding-bottom: 320px;
+        }
+        
+        /* Ensure tour buttons are always visible and clickable */
+        .tour-button {
+          z-index: 60 !important;
+          position: relative !important;
         }
       `}</style>
     </>
