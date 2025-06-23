@@ -30,6 +30,7 @@ import DoctorDashboard from "@/pages/DoctorDashboard";
 import DoctorDemo from "@/pages/DoctorDemo";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
+import { CommunityForum } from "@/components/CommunityForum";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -82,7 +83,7 @@ function AppContent() {
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/tracker" component={SymptomTracker} />
         <Route path="/journal" component={DigitalMatchbox} />
-        <Route path="/community" component={Community} />
+        <Route path="/community" component={CommunityForum} />
         <Route path="/insights" component={DataVisualization} />
         <Route path="/research-opt-in" component={ResearchOptIn} />
         <Route path="/reports" component={ProviderReports} />
