@@ -24,7 +24,7 @@ import { CompanionTierSystem } from './CompanionTierSystem';
 import { CompanionFunctionality } from './CompanionFunctionality';
 import { ProgressTracker } from './ProgressTracker';
 import { DynamicFunctionGating } from './DynamicFunctionGating';
-import { CompanionDemo } from './CompanionDemo';
+
 
 export const CompanionDashboard = () => {
   const { user } = useAuth();

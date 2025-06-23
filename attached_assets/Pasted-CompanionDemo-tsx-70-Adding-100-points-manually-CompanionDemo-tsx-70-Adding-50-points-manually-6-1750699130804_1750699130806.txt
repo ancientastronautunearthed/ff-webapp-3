@@ -1,0 +1,1743 @@
+CompanionDemo.tsx:70 ➕ Adding 100 points manually
+CompanionDemo.tsx:70 ➕ Adding 50 points manually
+6CompanionDemo.tsx:70 ➕ Adding 250 points manually
+CompanionDemo.tsx:35 🔄 Starting demo - resetting to Level 1
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:36
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=VoohzmiNN52kR-CyWf40pmBYrdXeC9Rvy-kuCy8AL2g&SID=OActaWMhgXtL0qfiPdUD2w&RID=48523&TYPE=terminate&zx=kvofandakw5 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:36
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 0 for Level 1
+CompanionDemo.tsx:51 ✅ Level 1 unlocked functions: (2) ['Basic Chat', 'Symptom Logging']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=UM5j4qt8rj_oW_90J0wsPKEJttlTiiv81l91TthWNBE&SID=zhmPWftrUyeH3RvoPxljLw&RID=42698&TYPE=terminate&zx=x3gige77o1j6 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 100 for Level 2
+CompanionDemo.tsx:51 ✅ Level 2 unlocked functions: ['Daily Check-ins']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=kawVEH5Nw3kb0Oh4sr91AoSTWXvHQi2nxiLyMF8w6V0&SID=RMKIWEakfB_Wl71Np_L1wg&RID=34211&TYPE=terminate&zx=dz207aodqm12 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 300 for Level 3
+CompanionDemo.tsx:51 ✅ Level 3 unlocked functions: ['Meal Suggestions']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=o6m4jqTuH0vdEr-CaBcvBjyx4CK1enVDBHeFxU4TLRs&SID=zF4zycc6VLiMMxQxaUJEqQ&RID=57649&TYPE=terminate&zx=h5ezf2avnkld 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 600 for Level 4
+CompanionDemo.tsx:51 ✅ Level 4 unlocked functions: ['Pattern Analysis']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=Pv9HO9tIv12kHRNjyqa3f2zaHcnS9ZUHoLh4OkiNPJs&SID=_Q3viXyRMDFD_KD3_8QOvw&RID=71093&TYPE=terminate&zx=5o71a4srijlc 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 1000 for Level 5
+CompanionDemo.tsx:51 ✅ Level 5 unlocked functions: ['Supplement Recommendations']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=qGEExsT9C7BWAqY11FwIb_mVQsH6m08-BEAakHujMbA&SID=kFztB4xnz9OGx3MQvklIMA&RID=31719&TYPE=terminate&zx=y55j3kt6rylp 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDashboard.tsx:40 Refused to connect to 'https://securetoken.googleapis.com/v1/token?key=AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk' because it violates the following Content Security Policy directive: "connect-src 'self' https://firestore.googleapis.com https://firebase.googleapis.com https://identitytoolkit.googleapis.com https://accounts.google.com https://oauth2.googleapis.com".
+
+(anonymous) @ token.ts:98
+await in (anonymous)
+_performFetchWithErrorHandling @ index.ts:206
+requestStsToken @ token.ts:68
+refresh @ token_manager.ts:105
+getToken @ token_manager.ts:93
+getIdToken @ user_impl.ts:105
+iteration @ proactive_refresh.ts:93
+(anonymous) @ proactive_refresh.ts:87
+setTimeout
+schedule @ proactive_refresh.ts:86
+iteration @ proactive_refresh.ts:100
+await in iteration
+(anonymous) @ proactive_refresh.ts:87
+setTimeout
+schedule @ proactive_refresh.ts:86
+_start @ proactive_refresh.ts:47
+_startProactiveRefresh @ user_impl.ts:176
+_startProactiveRefresh @ auth_impl.ts:698
+updateProactiveRefresh @ firebase_internal.ts:90
+addAuthTokenListener @ firebase_internal.ts:66
+__PRIVATE_registerAuth @ credentials.ts:305
+(anonymous) @ credentials.ts:310
+onInit @ provider.ts:280
+start @ credentials.ts:310
+FirestoreClient @ firestore_client.ts:149
+__PRIVATE_configureFirestore @ database.ts:318
+ensureFirestoreConfigured @ database.ts:288
+getDoc @ reference_impl.ts:118
+loadCompanionData @ CompanionDashboard.tsx:40
+(anonymous) @ CompanionDashboard.tsx:56
+commitHookEffectListMount @ react-dom.development.js:23189
+commitPassiveMountOnFiber @ react-dom.development.js:24965
+commitPassiveMountEffects_complete @ react-dom.development.js:24930
+commitPassiveMountEffects_begin @ react-dom.development.js:24917
+commitPassiveMountEffects @ react-dom.development.js:24905
+flushPassiveEffectsImpl @ react-dom.development.js:27078
+flushPassiveEffects @ react-dom.development.js:27023
+performSyncWorkOnRoot @ react-dom.development.js:26115
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26998
+commitRoot @ react-dom.development.js:26721
+finishConcurrentRender @ react-dom.development.js:26020
+performConcurrentWorkOnRoot @ react-dom.development.js:25848
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533Understand this error
+CompanionDashboard.tsx:40 Fetch API cannot load https://securetoken.googleapis.com/v1/token?key=AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk. Refused to connect because it violates the document's Content Security Policy.
+(anonymous) @ token.ts:98
+await in (anonymous)
+_performFetchWithErrorHandling @ index.ts:206
+requestStsToken @ token.ts:68
+refresh @ token_manager.ts:105
+getToken @ token_manager.ts:93
+getIdToken @ user_impl.ts:105
+iteration @ proactive_refresh.ts:93
+(anonymous) @ proactive_refresh.ts:87
+setTimeout
+schedule @ proactive_refresh.ts:86
+iteration @ proactive_refresh.ts:100
+await in iteration
+(anonymous) @ proactive_refresh.ts:87
+setTimeout
+schedule @ proactive_refresh.ts:86
+_start @ proactive_refresh.ts:47
+_startProactiveRefresh @ user_impl.ts:176
+_startProactiveRefresh @ auth_impl.ts:698
+updateProactiveRefresh @ firebase_internal.ts:90
+addAuthTokenListener @ firebase_internal.ts:66
+__PRIVATE_registerAuth @ credentials.ts:305
+(anonymous) @ credentials.ts:310
+onInit @ provider.ts:280
+start @ credentials.ts:310
+FirestoreClient @ firestore_client.ts:149
+__PRIVATE_configureFirestore @ database.ts:318
+ensureFirestoreConfigured @ database.ts:288
+getDoc @ reference_impl.ts:118
+loadCompanionData @ CompanionDashboard.tsx:40
+(anonymous) @ CompanionDashboard.tsx:56
+commitHookEffectListMount @ react-dom.development.js:23189
+commitPassiveMountOnFiber @ react-dom.development.js:24965
+commitPassiveMountEffects_complete @ react-dom.development.js:24930
+commitPassiveMountEffects_begin @ react-dom.development.js:24917
+commitPassiveMountEffects @ react-dom.development.js:24905
+flushPassiveEffectsImpl @ react-dom.development.js:27078
+flushPassiveEffects @ react-dom.development.js:27023
+performSyncWorkOnRoot @ react-dom.development.js:26115
+flushSyncCallbacks @ react-dom.development.js:12042
+commitRootImpl @ react-dom.development.js:26998
+commitRoot @ react-dom.development.js:26721
+finishConcurrentRender @ react-dom.development.js:26020
+performConcurrentWorkOnRoot @ react-dom.development.js:25848
+workLoop @ scheduler.development.js:266
+flushWork @ scheduler.development.js:239
+performWorkUntilDeadline @ scheduler.development.js:533Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 1500 for Level 6
+CompanionDemo.tsx:51 ✅ Level 6 unlocked functions: ['Symptom Predictions']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=7q1Z5zDQLl0jjBuInAPbo2td5l9KpNYmJu3i2LBJClk&SID=TX8Sgfb_XhXmM0xduLkaWQ&RID=34797&TYPE=terminate&zx=5natxe3vzfaq 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 2200 for Level 7
+CompanionDemo.tsx:51 ✅ Level 7 unlocked functions: ['Treatment Optimization']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=LygeAhNZ7AOPVzwz-BQpTV3-kc10pMy2fBuoyoIU7AY&SID=UJAaD8AvoYE09dcWGX9GLA&RID=60421&TYPE=terminate&zx=qjfw11yq2uef 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 3000 for Level 8
+CompanionDemo.tsx:51 ✅ Level 8 unlocked functions: ['Research Matching']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=0kSKQtmng_BIPZxer24MjInM5MH_HMWFs9PTv-ka2wk&SID=b4ks3Fjz8kMxCLwJMYLX6A&RID=52098&TYPE=terminate&zx=2xygncnad6n7 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 4000 for Level 9
+CompanionDemo.tsx:51 ✅ Level 9 unlocked functions: ['Advanced Analytics']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=oMTLRhf528JkzZSYOoaCXjcgRlVlPX2JY5XmKJgUnEY&SID=97_upOi-wMxmNgw6BYrTIQ&RID=97593&TYPE=terminate&zx=9m7ehxlc8gx 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+Y2.o @ webchannel_blob_es2018.js:83
+Zo @ webchannel_connection.ts:275
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ta @ persistent_stream.ts:884
+__PRIVATE_onWriteHandshakeComplete @ remote_store.ts:771
+J_ @ persistent_stream.ts:823
+(anonymous) @ persistent_stream.ts:539
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:537
+c_ @ stream_bridge.ts:102
+(anonymous) @ webchannel_connection.ts:406
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.ab @ webchannel_blob_es2018.js:75
+(anonymous) @ webchannel_blob_es2018.js:26
+setTimeout
+ub @ webchannel_blob_es2018.js:26
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:44 ⚡ Setting points to 5500 for Level 10
+CompanionDemo.tsx:51 ✅ Level 10 unlocked functions: ['Comprehensive Reports']
+CompanionProgressContext.tsx:380 Error updating companion progress: FirebaseError: Missing or insufficient permissions.
+(anonymous) @ CompanionProgressContext.tsx:380
+Promise.catch
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionProgressContext.tsx:379 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=EaAI_XiwvsQtxWdc85sMKUPUXPFDSEuSKl76kJ3VY08&SID=kGnS6wRdTDuIO8lXm2GcXA&RID=72648&TYPE=terminate&zx=j870uegv46g8 400 (Bad Request)
+gc @ webchannel_blob_es2018.js:69
+Y2.close @ webchannel_blob_es2018.js:82
+(anonymous) @ webchannel_connection.ts:399
+(anonymous) @ webchannel_connection.ts:301
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Z2.ta @ webchannel_blob_es2018.js:84
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:30
+fd @ webchannel_blob_es2018.js:76
+h.Fa @ webchannel_blob_es2018.js:75
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+ec @ webchannel_blob_es2018.js:74
+Rb @ webchannel_blob_es2018.js:39
+M2.Y @ webchannel_blob_es2018.js:33
+M2.ca @ webchannel_blob_es2018.js:30
+ab @ webchannel_blob_es2018.js:25
+F2 @ webchannel_blob_es2018.js:23
+Wc @ webchannel_blob_es2018.js:62
+h.bb @ webchannel_blob_es2018.js:61
+h.Ea @ webchannel_blob_es2018.js:61
+Lc @ webchannel_blob_es2018.js:57
+h.Pa @ webchannel_blob_es2018.js:55
+Promise.then
+Nc @ webchannel_blob_es2018.js:55
+h.Sa @ webchannel_blob_es2018.js:55
+Promise.then
+h.send @ webchannel_blob_es2018.js:52
+h.ea @ webchannel_blob_es2018.js:60
+Jb @ webchannel_blob_es2018.js:29
+Hb @ webchannel_blob_es2018.js:28
+h.Ga @ webchannel_blob_es2018.js:72
+Da @ webchannel_blob_es2018.js:14
+Promise.then
+x2 @ webchannel_blob_es2018.js:14
+fc @ webchannel_blob_es2018.js:70
+h.connect @ webchannel_blob_es2018.js:68
+Y2.m @ webchannel_blob_es2018.js:82
+Zo @ webchannel_connection.ts:267
+send @ stream_bridge.ts:70
+Q_ @ persistent_stream.ts:322
+ia @ persistent_stream.ts:864
+__PRIVATE_onWriteStreamOpen @ remote_store.ts:762
+(anonymous) @ persistent_stream.ts:528
+(anonymous) @ persistent_stream.ts:595
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+(anonymous) @ persistent_stream.ts:593
+(anonymous) @ persistent_stream.ts:508
+a_ @ stream_bridge.ts:86
+(anonymous) @ webchannel_connection.ts:431
+setTimeout
+I_ @ webchannel_connection.ts:426
+H_ @ persistent_stream.ts:801
+z_ @ persistent_stream.ts:503
+(anonymous) @ persistent_stream.ts:477
+Promise.then
+auth @ persistent_stream.ts:467
+start @ persistent_stream.ts:264
+start @ persistent_stream.ts:788
+__PRIVATE_startWriteStream @ remote_store.ts:756
+__PRIVATE_fillWritePipeline @ remote_store.ts:702
+await in __PRIVATE_fillWritePipeline
+__PRIVATE_syncEngineWrite @ sync_engine_impl.ts:542
+await in __PRIVATE_syncEngineWrite
+(anonymous) @ firestore_client.ts:559
+await in (anonymous)
+(anonymous) @ async_queue_impl.ts:136
+(anonymous) @ async_queue_impl.ts:187
+Promise.then
+_c @ async_queue_impl.ts:185
+enqueue @ async_queue_impl.ts:130
+enqueueAndForget @ async_queue_impl.ts:94
+__PRIVATE_firestoreClientWrite @ firestore_client.ts:557
+executeWrite @ firestore_client.ts:562
+setDoc @ reference_impl.ts:342
+setPoints @ CompanionProgressContext.tsx:379
+runTierDemo @ CompanionDemo.tsx:45
+await in runTierDemo
+callCallback2 @ react-dom.development.js:4164
+invokeGuardedCallbackDev @ react-dom.development.js:4213
+invokeGuardedCallback @ react-dom.development.js:4277
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291
+executeDispatch @ react-dom.development.js:9041
+processDispatchQueueItemsInOrder @ react-dom.development.js:9073
+processDispatchQueue @ react-dom.development.js:9086
+dispatchEventsForPlugins @ react-dom.development.js:9097
+(anonymous) @ react-dom.development.js:9288
+batchedUpdates$1 @ react-dom.development.js:26179
+batchedUpdates @ react-dom.development.js:3991
+dispatchEventForPluginEventSystem @ react-dom.development.js:9287
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465
+dispatchEvent @ react-dom.development.js:6457
+dispatchDiscreteEvent @ react-dom.development.js:6430Understand this error
+CompanionDemo.tsx:58 🎉 Demo complete - all tiers unlocked
