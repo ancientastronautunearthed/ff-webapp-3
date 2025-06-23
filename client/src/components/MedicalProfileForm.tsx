@@ -409,11 +409,18 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     <Label htmlFor="state" className="text-sm font-medium text-gray-700 mb-2 block">
                       State/Province *
                     </Label>
-                    <Input
-                      id="state"
-                      placeholder="e.g., California"
-                      {...form.register('state')}
-                    />
+                    <Select onValueChange={(value) => form.setValue('state', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state or province" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {US_STATES.map((state) => (
+                          <SelectItem key={state} value={state}>
+                            {state}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div>
@@ -432,11 +439,18 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                   <Label htmlFor="ethnicity" className="text-sm font-medium text-gray-700 mb-2 block">
                     Ethnicity (Optional)
                   </Label>
-                  <Input
-                    id="ethnicity"
-                    placeholder="e.g., Caucasian, Hispanic, Asian, African American"
-                    {...form.register('ethnicity')}
-                  />
+                  <Select onValueChange={(value) => form.setValue('ethnicity', value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select ethnicity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ETHNICITIES.map((ethnicity) => (
+                        <SelectItem key={ethnicity} value={ethnicity}>
+                          {ethnicity}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
