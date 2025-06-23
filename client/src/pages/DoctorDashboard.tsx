@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -194,10 +195,12 @@ export default function DoctorDashboard() {
                 <CheckCircle className="h-3 w-3 mr-1" />
                 {doctorProfile?.isDemo ? 'Demo Account' : 'Verified Physician'}
               </Badge>
-              <Button variant="outline">
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Ask a Doctor Forum
-              </Button>
+              <Link href="/ask-doctor">
+                <Button variant="outline">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Ask a Doctor Forum
+                </Button>
+              </Link>
               {doctorProfile?.isDemo && (
                 <Badge variant="secondary" className="bg-blue-50 text-blue-700">
                   Demo Mode - Sample Data

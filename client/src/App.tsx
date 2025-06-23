@@ -59,7 +59,8 @@ function AppContent() {
 
   // Check if user is a doctor and redirect to doctor dashboard
   const userRole = localStorage.getItem('userRole');
-  if (userRole === 'doctor') {
+  const isDemoDoctor = localStorage.getItem('demoDoctor') === 'true';
+  if (userRole === 'doctor' && isDemoDoctor) {
     return <DoctorDashboard />;
   }
 
