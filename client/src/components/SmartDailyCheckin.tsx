@@ -57,15 +57,45 @@ export const SmartDailyCheckin = () => {
     }
   }, [user]);
 
-  const checkTodaysStatus = () => {
-    // Check if user has already completed today's check-in
-    const today = new Date().toDateString();
-    const lastCheckin = localStorage.getItem('lastCheckin');
-    setIsComplete(lastCheckin === today);
+  const checkTodaysStatus = async () => {
+    if (!user) return;
     
-    // Get current streak
-    const streak = parseInt(localStorage.getItem('checkinStreak') || '0');
-    setCurrentStreak(streak);
+    try {
+      const { getCheckinsFromFirestore } = await import('@/lib/firestore');
+      const checkins = await getCheckinsFromFirestore(user.uid);
+      
+      // Check if user has already completed today's check-in
+      const today = new Date().toDateString();
+      const todaysCheckin = checkins.find(checkin => 
+        new Date(checkin.date).toDateString() === today
+      );
+      setIsComplete(!!todaysCheckin);
+      
+      // Calculate current streak from Firebase data
+      const sortedCheckins = checkins.sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      
+      let streak = 0;
+      let currentDate = new Date();
+      
+      for (const checkin of sortedCheckins) {
+        const checkinDate = new Date(checkin.date);
+        const dayDiff = Math.floor((currentDate.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (dayDiff === streak) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+      
+      setCurrentStreak(streak);
+    } catch (error) {
+      console.error('Error checking today\'s status:', error);
+      setIsComplete(false);
+      setCurrentStreak(0);
+    }
   };
 
   const generateAdaptiveQuestions = () => {
@@ -122,24 +152,61 @@ export const SmartDailyCheckin = () => {
     setQuestions(adaptiveQuestions);
   };
 
-  const generateSuggestions = () => {
-    const mockSuggestions: CheckinSuggestion[] = [
-      {
-        type: 'pattern',
-        message: 'I notice you tend to have better days when you check in early. Consider making this a morning routine!',
-      },
-      {
-        type: 'warning',
-        message: 'Weather alert: High humidity today may trigger symptoms. Stay hydrated!',
-        action: 'View prevention tips'
-      },
-      {
-        type: 'encouragement',
-        message: 'You\'ve been consistently tracking for 2 weeks! This data is helping identify your patterns.',
+  const generateSuggestions = async () => {
+    if (!user) return;
+    
+    try {
+      const { getCheckinsFromFirestore, getSymptomEntriesFromFirestore } = await import('@/lib/firestore');
+      const [checkins, symptoms] = await Promise.all([
+        getCheckinsFromFirestore(user.uid),
+        getSymptomEntriesFromFirestore(user.uid)
+      ]);
+      
+      const suggestions: CheckinSuggestion[] = [];
+      
+      // Generate AI-powered suggestions based on real data
+      if (checkins.length > 7) {
+        const recentCheckins = checkins.slice(0, 7);
+        const morningCheckins = recentCheckins.filter(c => {
+          const hour = new Date(c.completedAt).getHours();
+          return hour >= 6 && hour <= 12;
+        });
+        
+        if (morningCheckins.length > recentCheckins.length * 0.7) {
+          suggestions.push({
+            type: 'pattern',
+            message: 'You tend to have more consistent tracking when checking in during morning hours.'
+          });
+        }
       }
-    ];
-
-    setSuggestions(mockSuggestions);
+      
+      // Check for symptom patterns
+      if (symptoms.length > 0) {
+        const recentSymptoms = symptoms.slice(0, 10);
+        const avgIntensity = recentSymptoms.reduce((sum, s) => 
+          sum + (s.symptoms?.itchingIntensity || 0), 0) / recentSymptoms.length;
+        
+        if (avgIntensity > 6) {
+          suggestions.push({
+            type: 'warning',
+            message: 'Recent symptom intensity is higher than usual. Consider reviewing your treatment plan.',
+          });
+        }
+      }
+      
+      // Encouragement based on consistency
+      if (currentStreak >= 7) {
+        suggestions.push({
+          type: 'encouragement',
+          message: `Great job maintaining a ${currentStreak}-day tracking streak! This data helps identify your health patterns.`,
+        });
+      }
+      
+      setSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error generating suggestions:', error);
+      setSuggestions([]);
+    }
   };
 
   const handleResponse = (questionId: string, value: any) => {
@@ -165,22 +232,17 @@ export const SmartDailyCheckin = () => {
       const { saveCheckinToFirestore } = await import('@/lib/firestore');
       await saveCheckinToFirestore(checkinData);
 
-      // Update streak
-      const newStreak = currentStreak + 1;
-      setCurrentStreak(newStreak);
-      localStorage.setItem('checkinStreak', newStreak.toString());
-      localStorage.setItem('lastCheckin', new Date().toDateString());
+      // Update streak and award points through Firebase
+      await updateChallengeProgress('daily_checkin', 1);
       
-      // Award points for completion
-      const currentPoints = parseInt(localStorage.getItem('totalPoints') || '340');
-      const pointsEarned = 20; // Points for daily check-in
-      localStorage.setItem('totalPoints', (currentPoints + pointsEarned).toString());
+      // Recalculate streak from updated data
+      await checkTodaysStatus();
       
       setIsComplete(true);
 
       toast({
         title: "Daily Check-in Complete!",
-        description: `Great job! You're on a ${newStreak}-day streak. +${pointsEarned} points earned!`,
+        description: `Great job! You're maintaining your tracking streak. Points earned!`,
       });
 
       // Generate new insights based on responses
@@ -198,18 +260,36 @@ export const SmartDailyCheckin = () => {
     }
   };
 
-  const generateAIFeedback = () => {
-    // AI would analyze responses and provide immediate feedback
-    const feedback = {
-      insight: "Your stress levels seem higher today. Consider some relaxation techniques.",
-      prediction: "Based on your responses, tomorrow might be a better day for outdoor activities.",
-      recommendation: "Your sleep pattern suggests checking in earlier might help track morning symptoms better."
-    };
+  const generateAIFeedback = async () => {
+    if (!user) return;
+    
+    try {
+      // Use Google AI to analyze check-in responses for immediate feedback
+      const response = await fetch('/api/ai/analyze-checkin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          responses,
+          timestamp: new Date().toISOString()
+        }),
+      });
 
-    toast({
-      title: "AI Insight",
-      description: feedback.insight,
-    });
+      if (response.ok) {
+        const analysis = await response.json();
+        if (analysis.insight) {
+          toast({
+            title: "AI Insight",
+            description: analysis.insight,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error generating AI feedback:', error);
+      // No fallback feedback - just continue without showing anything
+    }
   };
 
   const renderQuestion = (question: QuickQuestion) => {

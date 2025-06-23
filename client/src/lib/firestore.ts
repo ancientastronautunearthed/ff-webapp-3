@@ -50,6 +50,30 @@ export async function getUserCheckins(userId: string, limitCount = 10) {
   }
 }
 
+// Alias for SmartDailyCheckin component
+export const getCheckinsFromFirestore = getUserCheckins;
+
+// Get user's symptom entries
+export async function getSymptomEntriesFromFirestore(userId: string, limitCount = 20) {
+  try {
+    const q = query(
+      collection(db, 'symptom_entries'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting symptom entries:', error);
+    return [];
+  }
+}
+
 // Save achievement unlock
 export async function saveAchievementUnlock(userId: string, achievementData: any) {
   try {
