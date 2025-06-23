@@ -24,11 +24,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {
     try {
-      // Return profile with onboarding complete flag
+      // Mock user profile data
       const mockProfile = {
         id: 'user_current',
         email: 'john.doe@example.com',
-        onboardingComplete: true, // Always return true after profile creation
         firstName: 'John',
         lastName: 'Doe',
         dateOfBirth: '1985-06-15',
@@ -149,104 +148,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
-
-  // AI Health Companion endpoints
-  app.post('/api/companion/chat', async (req: Request, res: Response) => {
-    try {
-      const { userId, message } = req.body;
-      
-      if (!userId || !message) {
-        return res.status(400).json({ error: 'User ID and message required' });
-      }
-
-      // Generate AI response using Google AI
-      const { generateCompanionResponse } = await import('./routes/companion');
-      const aiResponse = await generateCompanionResponse(userId, message);
-      
-      res.json(aiResponse);
-    } catch (error) {
-      console.error('Error generating companion response:', error);
-      res.status(500).json({ 
-        message: "I understand you're reaching out, and I want you to know that I'm here for you. Sometimes I have brief moments where I need to process - could you try sharing that with me again?",
-        sentiment: 'supportive'
-      });
-    }
-  });
-
-  app.post('/api/companion/insights', async (req: Request, res: Response) => {
-    try {
-      const { userId } = req.body;
-      
-      if (!userId) {
-        return res.status(400).json({ error: 'User ID required' });
-      }
-
-      // Generate companion insights
-      const { generateCompanionInsights } = await import('./routes/companion');
-      const insights = await generateCompanionInsights(userId);
-      
-      res.json(insights);
-    } catch (error) {
-      console.error('Error generating companion insights:', error);
-      res.json([
-        {
-          type: 'encouragement',
-          message: 'Remember to be gentle with yourself on this health journey.',
-          priority: 'medium'
-        }
-      ]);
-    }
-  });
-
-  // AI Therapy Session endpoints
-  app.post('/api/therapy/session', async (req: Request, res: Response) => {
-    try {
-      const { userId, message, sessionPhase } = req.body;
-      
-      if (!userId || !message) {
-        return res.status(400).json({ error: 'User ID and message required' });
-      }
-
-      // Generate therapy response
-      const { generateTherapyResponse } = await import('./routes/therapy');
-      const therapyResponse = await generateTherapyResponse(userId, message, sessionPhase || 'exploration');
-      
-      res.json(therapyResponse);
-    } catch (error) {
-      console.error('Error generating therapy response:', error);
-      res.status(500).json({ 
-        message: "I understand this might be difficult to share. Sometimes I need a moment to process what you've told me. Could you try expressing that again?",
-        sessionPhase: 'exploration',
-        technique: 'supportive'
-      });
-    }
-  });
-
-  // Voice synthesis endpoint for therapy
-  app.post('/api/therapy/voice', async (req: Request, res: Response) => {
-    try {
-      const { text } = req.body;
-      
-      if (!text) {
-        return res.status(400).json({ error: 'Text required for voice synthesis' });
-      }
-
-      // Generate voice using Google Text-to-Speech
-      const { generateTherapeuticVoice } = await import('./routes/therapy');
-      const audioBuffer = await generateTherapeuticVoice(text);
-      
-      res.set({
-        'Content-Type': 'audio/mp3',
-        'Content-Length': audioBuffer.length,
-        'Cache-Control': 'no-cache'
-      });
-      
-      res.send(audioBuffer);
-    } catch (error) {
-      console.error('Error generating therapeutic voice:', error);
-      res.status(500).json({ error: 'Failed to generate voice response' });
-    }
-  });
 
   return httpServer;
 }

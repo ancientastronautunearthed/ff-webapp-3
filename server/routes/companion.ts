@@ -194,259 +194,70 @@ async function initializeCompanionMemory(userId: string): Promise<CompanionMemor
   };
 }
 
-export async function generateCompanionResponse(userId: string, message: string) {
+async function generateCompanionResponse(userId: string, message: string, memory: CompanionMemory) {
   try {
-    // Get user's recent health data for context
-    const userHealthContext = await getUserHealthContext(userId);
-    
-    // Generate empathetic AI response using Google AI
-    const { analyzeSymptomText } = await import('../ai/simple-ai');
-    
-    const compassionatePrompt = `You are a compassionate AI health companion with a Master's degree in Health Sciences and specialized expertise in Morgellons disease and medical research. You have deep clinical knowledge while maintaining empathy and understanding.
+    // Create context for AI response generation
+    const context = {
+      userMessage: message,
+      patterns: memory.patterns.slice(0, 5), // Most relevant patterns
+      preferences: memory.preferences,
+      recentInsights: memory.insights.slice(-3),
+      learningProgress: memory.learningProgress,
+      conversationHistory: memory.conversationHistory.slice(-2)
+    };
 
-MEDICAL BACKGROUND:
-- Master's in Health Sciences with focus on dermatology, neurology, and infectious diseases
-- Specialized research in Morgellons disease pathophysiology, diagnosis, and treatment protocols
-- Expert knowledge in: fiber analysis, biofilm formation, tick-borne diseases, chronic inflammatory conditions
-- Research experience in: patient-reported outcomes, quality of life studies, treatment efficacy trials
+    const prompt = `You are an AI health companion specialized in Morgellons disease support. You have been learning about this user's health patterns and preferences.
 
-CLINICAL KNOWLEDGE OF MORGELLONS:
-- Understand the complex symptomatology: dermal fibers, crawling sensations, skin lesions, cognitive symptoms
-- Familiar with CDC study findings, Mayo Clinic research, and emerging scientific literature
-- Knowledgeable about diagnostic challenges, treatment approaches, and comorbid conditions
-- Aware of psychodermatological aspects and the importance of comprehensive care
+Context about the user:
+- Learning Progress: ${(memory.learningProgress * 100).toFixed(1)}%
+- Known Patterns: ${memory.patterns.map(p => p.pattern).join(', ')}
+- Preferences: ${memory.preferences.map(p => `${p.category}: ${p.preference}`).join(', ')}
+- Recent Insights: ${memory.insights.slice(-3).join(', ')}
 
 User's message: "${message}"
-Recent health context: ${JSON.stringify(userHealthContext)}
 
-As a medically educated companion, provide:
-1. Evidence-based insights when appropriate
-2. Validation of their experience with medical understanding
-3. Gentle education about their condition when relevant
-4. Research-informed suggestions (always emphasizing professional consultation)
-5. Emotional support grounded in clinical empathy
+Respond as a caring, knowledgeable AI companion who remembers past conversations and can identify patterns. Be empathetic, provide actionable insights when appropriate, and reference relevant patterns you've learned about this user.
 
-Maintain your warm, personal tone while demonstrating your medical knowledge. Reference relevant research or medical concepts when helpful, but keep explanations accessible. Always encourage professional medical care for diagnosis and treatment decisions.`;
+Response format:
+- If you identify a new pattern or insight, mention it
+- If giving recommendations, base them on the user's known patterns
+- Be encouraging and supportive
+- Keep responses conversational but informative
+- If the user asks about trends, reference specific patterns you've observed
 
-    const aiAnalysis = await analyzeSymptomText(compassionatePrompt);
-    
-    // Extract response and determine sentiment
-    const responseText = aiAnalysis.summary || generateFallbackCompassionateResponse(message);
-    const sentiment = determineSentiment(message, responseText);
-    const suggestions = generateSuggestions(message, userHealthContext);
+Respond in a warm, personal tone that shows you remember and care about this user's journey.`;
 
-    return {
-      message: responseText,
-      sentiment,
-      suggestions,
-      timestamp: new Date().toISOString()
-    };
-  } catch (error) {
-    console.error('Error generating companion response:', error);
-    return generateFallbackCompassionateResponse(message);
-  }
-}
-
-export async function generateCompanionInsights(userId: string) {
-  try {
-    const userHealthContext = await getUserHealthContext(userId);
-    
-    const insights = [];
-    
-    // Clinical pattern analysis
-    if (userHealthContext.recentSymptoms?.length > 0) {
-      const symptomTypes = userHealthContext.recentSymptoms.map(s => s.symptoms || []).flat();
-      const hasNeurological = symptomTypes.some(s => s.includes('crawling') || s.includes('tingling') || s.includes('burning'));
-      const hasDermal = symptomTypes.some(s => s.includes('lesions') || s.includes('fibers') || s.includes('itching'));
-      
-      if (hasNeurological && hasDermal) {
-        insights.push({
-          type: 'pattern',
-          message: `Your symptom profile shows both neurological and dermatological components, which aligns with Morgellons research. This pattern supports the need for multidisciplinary medical evaluation.`,
-          priority: 'high'
-        });
-      }
-    }
-    
-    // Research-informed observations
-    if (userHealthContext.journalEntries?.length > 0) {
-      insights.push({
-        type: 'tip',
-        message: `Your detailed documentation is valuable research data. Consider organizing your observations by symptom type, timing, and potential triggers - this systematic approach aids clinical assessment.`,
-        priority: 'medium'
-      });
-    }
-    
-    // Evidence-based wellness guidance
-    insights.push({
-      type: 'reminder',
-      message: `Research suggests that stress reduction, adequate sleep, and anti-inflammatory nutrition may help manage symptom severity. These aren't cures, but supportive measures.`,
-      priority: 'medium'
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
     });
-    
-    // Medical advocacy insight
-    if (userHealthContext.hasRecentActivity) {
-      insights.push({
-        type: 'encouragement',
-        message: `Your systematic tracking demonstrates the scientific approach needed in Morgellons research. You're contributing to the understanding of this condition.`,
-        priority: 'low'
-      });
-    }
-    
-    return insights;
+
+    const responseText = response.text || "I'm here to help you with your health journey.";
+
+    // Determine response type based on content
+    let responseType = 'encouragement';
+    if (responseText.includes('pattern') || responseText.includes('notice')) responseType = 'pattern';
+    if (responseText.includes('recommend') || responseText.includes('suggest')) responseType = 'recommendation';
+    if (responseText.includes('insight') || responseText.includes('analyze')) responseType = 'insight';
+    if (responseText.includes('concern') || responseText.includes('worried')) responseType = 'concern';
+
+    return {
+      content: responseText,
+      type: responseType,
+      confidence: 0.8,
+      relatedData: memory.patterns.slice(0, 3).map(p => p.pattern),
+      newInsights: await identifyNewInsights(message, responseText, memory)
+    };
+
   } catch (error) {
-    console.error('Error generating insights:', error);
-    return [
-      {
-        type: 'encouragement',
-        message: 'From a research perspective, every patient\'s documented experience contributes to our growing understanding of Morgellons disease. Your journey matters to the broader medical community.',
-        priority: 'medium'
-      }
-    ];
-  }
-}
-
-async function getUserHealthContext(userId: string) {
-  try {
-    // Get recent symptom entries and journal entries from Firebase
-    const { getDocs, collection, query, where, orderBy, limit } = await import('firebase/firestore');
-    const { adminDb } = await import('../firebase-admin');
-    
-    const recentSymptoms = [];
-    const recentJournals = [];
-    
-    // Get last 5 symptom entries
-    const symptomsRef = collection(adminDb, 'symptomEntries');
-    const symptomsQuery = query(
-      symptomsRef, 
-      where('userId', '==', userId),
-      orderBy('date', 'desc'),
-      limit(5)
-    );
-    const symptomsSnapshot = await getDocs(symptomsQuery);
-    symptomsSnapshot.forEach(doc => recentSymptoms.push(doc.data()));
-    
-    // Get last 3 journal entries
-    const journalsRef = collection(adminDb, 'journalEntries');
-    const journalsQuery = query(
-      journalsRef,
-      where('userId', '==', userId), 
-      orderBy('date', 'desc'),
-      limit(3)
-    );
-    const journalsSnapshot = await getDocs(journalsQuery);
-    journalsSnapshot.forEach(doc => recentJournals.push(doc.data()));
-    
+    console.error('Error generating response:', error);
     return {
-      recentSymptoms,
-      journalEntries: recentJournals,
-      hasRecentActivity: recentSymptoms.length > 0 || recentJournals.length > 0
-    };
-  } catch (error) {
-    console.error('Error getting user health context:', error);
-    return { recentSymptoms: [], journalEntries: [], hasRecentActivity: false };
-  }
-}
-
-function generateFallbackCompassionateResponse(message: string) {
-  const lowerMessage = message.toLowerCase();
-  
-  if (lowerMessage.includes('fibers') || lowerMessage.includes('filaments')) {
-    return {
-      message: "I understand your concern about fibers. From my research background, I know that Morgellons patients consistently report finding unusual fibers or filaments. Recent studies have examined these materials using spectroscopy and microscopy. While research continues, your observations are important data points that should be documented for your healthcare provider.",
-      sentiment: 'supportive',
-      suggestions: ['Have you been able to document the fibers?', 'What characteristics have you noticed?']
+      content: "I'm having trouble processing that right now. Could you try asking in a different way?",
+      type: 'encouragement',
+      confidence: 0.5,
+      relatedData: []
     };
   }
-  
-  if (lowerMessage.includes('crawling') || lowerMessage.includes('sensations')) {
-    return {
-      message: "The crawling sensations you're describing are well-documented in Morgellons literature. These tactile hallucinations or formication can be incredibly distressing. Research suggests they may be related to peripheral neuropathy or central sensitization. There are management strategies that some patients find helpful, though individual responses vary.",
-      sentiment: 'supportive',
-      suggestions: ['When do these sensations tend to worsen?', 'Have you noticed any patterns or triggers?']
-    };
-  }
-  
-  if (lowerMessage.includes('pain') || lowerMessage.includes('hurt')) {
-    return {
-      message: "I hear that you're experiencing pain. In my understanding of Morgellons, pain can be multifaceted - neuropathic, inflammatory, or related to skin lesions. Chronic pain conditions often involve central sensitization, where the nervous system becomes hypersensitive. Have you been able to characterize the type of pain you're experiencing?",
-      sentiment: 'supportive',
-      suggestions: ['Can you describe the pain quality?', 'What helps manage your pain levels?']
-    };
-  }
-  
-  if (lowerMessage.includes('tired') || lowerMessage.includes('exhausted') || lowerMessage.includes('fatigue')) {
-    return {
-      message: "Fatigue is a significant component of Morgellons that often gets overlooked. Research shows that chronic inflammatory conditions can disrupt sleep architecture and energy metabolism. This isn't just 'being tired' - it's a complex physiological process that affects cellular function and recovery.",
-      sentiment: 'supportive',
-      suggestions: ['How is your sleep quality?', 'Have you noticed fatigue patterns?']
-    };
-  }
-  
-  if (lowerMessage.includes('brain fog') || lowerMessage.includes('cognitive') || lowerMessage.includes('memory')) {
-    return {
-      message: "Cognitive symptoms in Morgellons are increasingly recognized in research. What patients describe as 'brain fog' may involve neuroinflammation, affecting attention, memory, and executive function. These symptoms are real and measurable, not imaginary.",
-      sentiment: 'supportive',
-      suggestions: ['Which cognitive tasks feel most affected?', 'Have you noticed any helpful strategies?']
-    };
-  }
-  
-  if (lowerMessage.includes('frustrated') || lowerMessage.includes('angry') || lowerMessage.includes('dismissed')) {
-    return {
-      message: "Your frustration is completely understandable. The medical community's historical response to Morgellons has been challenging for patients. Research is evolving, and more healthcare providers are recognizing this as a legitimate medical condition requiring comprehensive care rather than psychiatric referral alone.",
-      sentiment: 'supportive',
-      suggestions: ['Have you found any supportive healthcare providers?', 'What would help you feel more heard?']
-    };
-  }
-  
-  return {
-    message: "Thank you for sharing with me. As someone with medical training focused on Morgellons research, I want you to know that your experiences are valid and deserve careful attention. The complexity of this condition requires a multidisciplinary approach, and I'm here to support you in understanding and managing your health journey.",
-    sentiment: 'supportive',
-    suggestions: ['Tell me more about your current symptoms', 'What aspects of your condition concern you most?']
-  };
-}
-
-function determineSentiment(userMessage: string, aiResponse: string): string {
-  const lowerMessage = userMessage.toLowerCase();
-  
-  if (lowerMessage.includes('pain') || lowerMessage.includes('hurt') || 
-      lowerMessage.includes('bad') || lowerMessage.includes('worse')) {
-    return 'concerned';
-  }
-  
-  if (lowerMessage.includes('better') || lowerMessage.includes('good') || 
-      lowerMessage.includes('improved') || lowerMessage.includes('happy')) {
-    return 'positive';
-  }
-  
-  return 'supportive';
-}
-
-function generateSuggestions(userMessage: string, healthContext: any): string[] {
-  const lowerMessage = userMessage.toLowerCase();
-  const suggestions = [];
-  
-  if (lowerMessage.includes('fibers') || lowerMessage.includes('filaments')) {
-    suggestions.push('Document fiber characteristics for medical records', 'Have you tried gentle specimen collection?');
-  } else if (lowerMessage.includes('crawling') || lowerMessage.includes('sensations')) {
-    suggestions.push('Track sensation patterns and triggers', 'Consider topical soothing measures');
-  } else if (lowerMessage.includes('pain')) {
-    suggestions.push('Characterize pain type (burning, stabbing, aching)', 'Document pain triggers and relievers');
-  } else if (lowerMessage.includes('brain fog') || lowerMessage.includes('cognitive')) {
-    suggestions.push('Track cognitive symptoms vs. other factors', 'Consider stress reduction techniques');
-  } else if (lowerMessage.includes('sleep')) {
-    suggestions.push('Document sleep quality patterns', 'Discuss sleep hygiene strategies');
-  } else if (lowerMessage.includes('treatment') || lowerMessage.includes('medication')) {
-    suggestions.push('Research evidence-based treatment options', 'Prepare questions for your healthcare provider');
-  } else if (lowerMessage.includes('doctor') || lowerMessage.includes('provider')) {
-    suggestions.push('Prepare organized symptom documentation', 'Research Morgellons-knowledgeable providers');
-  } else if (lowerMessage.includes('research') || lowerMessage.includes('study')) {
-    suggestions.push('Explore recent Morgellons research publications', 'Consider participating in research studies');
-  } else {
-    suggestions.push('Tell me about your primary concerns', 'How can we approach this systematically?');
-  }
-  
-  return suggestions.slice(0, 2); // Limit to 2 suggestions
 }
 
 async function updateCompanionLearning(userId: string, userMessage: string, response: any, memory: CompanionMemory): Promise<CompanionMemory> {

@@ -125,9 +125,7 @@ export const AIHealthCoach = () => {
       
     } catch (error) {
       console.error('Error loading health data:', error);
-      setInsights([]);
-      setStreaks([]);
-      setTodaysPrediction(null);
+      generateFallbackInsights();
     } finally {
       setLoading(false);
     }
@@ -232,7 +230,19 @@ export const AIHealthCoach = () => {
     setInsights(localInsights);
   };
 
-  // No fallback insights - only show real data or empty state
+  const generateFallbackInsights = () => {
+    setInsights([
+      {
+        id: 'welcome',
+        type: 'tip',
+        title: 'Welcome to AI Health Coach',
+        description: 'Start tracking symptoms and completing daily check-ins to receive personalized AI insights.',
+        confidence: 100,
+        actionable: true,
+        priority: 'high'
+      }
+    ]);
+  };
 
   const calculateStreaks = (checkins: any[]) => {
     if (checkins.length === 0) {

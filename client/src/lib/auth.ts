@@ -33,11 +33,7 @@ export const signInWithGoogle = async (): Promise<FirebaseUser> => {
 
 export const logOut = async (): Promise<void> => {
   await signOut(auth);
-  // Clear any local storage data
-  localStorage.clear();
 };
-
-export const logout = logOut; // Alias for consistency
 
 export const onAuthChange = (callback: (user: FirebaseUser | null) => void) => {
   return onAuthStateChanged(auth, callback);

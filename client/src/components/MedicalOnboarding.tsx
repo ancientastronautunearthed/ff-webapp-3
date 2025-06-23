@@ -198,11 +198,8 @@ export const MedicalOnboarding = ({ onComplete, onSkip }: MedicalOnboardingProps
     setLoading(true);
     try {
       // Mark medical profile as complete
-      // Save completion status to Firebase
-      await setDoc(doc(db, 'userPreferences', user.uid), {
-        medicalProfileComplete: true,
-        medicalProfileCompletedAt: new Date()
-      }, { merge: true });
+      localStorage.setItem('medicalProfileComplete', 'true');
+      localStorage.setItem('medicalProfileData', JSON.stringify(data));
       
       onComplete(data);
       toast({

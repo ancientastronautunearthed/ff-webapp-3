@@ -442,22 +442,15 @@ export const GamifiedProgress = () => {
     }
   };
 
-  const joinChallenge = async (challengeId: string) => {
+  const joinChallenge = (challengeId: string) => {
     const challenge = challenges.find(c => c.id === challengeId);
-    if (!challenge || !user) return;
+    if (!challenge) return;
 
-    // Mark challenge as joined in Firebase
-    try {
-      await setDoc(doc(db, 'userChallenges', `${user.uid}_${challengeId}`), {
-        userId: user.uid,
-        challengeId,
-        joinedAt: new Date(),
-        progress: 0,
-        completed: false
-      });
-    } catch (error) {
-      console.error('Error joining challenge:', error);
-      return;
+    // Mark challenge as joined in localStorage
+    const joinedChallenges = JSON.parse(localStorage.getItem('joinedChallenges') || '[]');
+    if (!joinedChallenges.includes(challengeId)) {
+      joinedChallenges.push(challengeId);
+      localStorage.setItem('joinedChallenges', JSON.stringify(joinedChallenges));
     }
 
     toast({

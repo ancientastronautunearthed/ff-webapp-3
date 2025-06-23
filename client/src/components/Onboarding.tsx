@@ -8,9 +8,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { MedicalOnboarding } from '@/components/MedicalOnboarding';
 import { MedicalProfileForm } from '@/components/MedicalProfileForm';
 import { ResearchConsentManager } from '@/components/ResearchConsentManager';
-// Tour removed per user request
+import { WelcomeTour } from '@/components/WelcomeTour';
 import { useToast } from '@/hooks/use-toast';
-import { doc, updateDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 interface OnboardingStep {
@@ -90,11 +90,15 @@ export const Onboarding = () => {
     }
   };
 
-  const handleMedicalProfileComplete = async (data: any) => {
-    console.log('=== ONBOARDING COMPLETION STARTED ===');
-    console.log('Medical profile data points:', Object.keys(data).length);
+  const handleMedicalProfileComplete = (data: any) => {
+    console.log('Medical profile completed with data points:', Object.keys(data).length);
+    console.log('Research consent status:', {
+      researchConsent: data.researchConsent,
+      anonymousDataSharing: data.anonymousDataSharing,
+      contactForStudies: data.contactForStudies
+    });
     
-    // Validate research consent
+    // Validate research consent was provided
     if (!data.researchConsent || !data.anonymousDataSharing) {
       toast({
         title: "Research Consent Required",
@@ -104,88 +108,19 @@ export const Onboarding = () => {
       return;
     }
     
-    try {
-      if (!user) {
-        console.error('No user found during profile completion');
-        toast({
-          title: "Authentication Error",
-          description: "Please refresh and try again.",
-          variant: "destructive",
-        });
-        return;
-      }
+    setCompletedSteps(prev => new Set([...prev, 'profile']));
+    
+    toast({
+      title: "Medical Profile & Research Consent Complete!",
+      description: "Your comprehensive health information and research participation preferences have been saved. Starting interactive tour...",
+    });
 
-      console.log('User authenticated:', user.uid);
-      
-      // Prepare cleaned data for backend API call (bypass Firebase permissions)
-      const profileData = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        age: data.age,
-        gender: data.gender,
-        state: data.state,
-        ethnicity: data.ethnicity,
-        currentSymptomSeverity: data.currentSymptomSeverity,
-        symptomOnsetYear: data.symptomOnsetYear,
-        initialSymptoms: data.initialSymptoms || [],
-        currentDiagnoses: data.currentDiagnoses || [],
-        allergies: data.allergies || [],
-        medications: data.medications || [],
-        smoking: data.smoking,
-        alcohol: data.alcohol,
-        exercise: data.exercise,
-        stressLevel: data.stressLevel,
-        sleepQuality: data.sleepQuality,
-        researchConsent: data.researchConsent,
-        anonymousDataSharing: data.anonymousDataSharing,
-        contactForStudies: data.contactForStudies,
-        onboardingComplete: true
-      };
-
-      // Filter undefined values
-      const cleanedData = Object.fromEntries(
-        Object.entries(profileData).filter(([_, value]) => value !== undefined)
-      );
-
-      console.log('Saving to backend API...');
-      
-      // Save via backend API instead of direct Firebase
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(cleanedData)
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      console.log('=== PROFILE SAVED VIA API ===');
-      
-      toast({
-        title: "Welcome to Fiber Friends!",
-        description: "Profile complete. Redirecting to your dashboard...",
-      });
-      
-      // Force immediate navigation with state update
-      console.log('=== REDIRECTING TO DASHBOARD ===');
-      
-      // Store completion status locally to ensure redirect works
-      localStorage.setItem('profileCompleted', 'true');
-      
-      // Use replace to avoid back button issues
-      window.location.replace('/dashboard');
-      
-    } catch (error) {
-      console.error('=== ERROR DURING PROFILE COMPLETION ===', error);
-      toast({
-        title: "Error Saving Profile",
-        description: "Please try again.",
-        variant: "destructive",
-      });
-    }
+    // Transition to tour phase after brief delay to show completion message
+    setTimeout(() => {
+      localStorage.setItem('tourActive', 'true');
+      localStorage.setItem('onboardingComplete', 'true');
+      window.location.href = '/dashboard'; // Navigate to dashboard and start tour
+    }, 1500);
   };
 
   const handleMedicalProfileSkip = () => {
@@ -199,14 +134,10 @@ export const Onboarding = () => {
     setCurrentPhase('welcome');
   };
 
-  const handleTourComplete = async () => {
-    if (user) {
-      await setDoc(doc(db, 'userPreferences', user.uid), {
-        onboardingComplete: true,
-        onboardingCompletedAt: new Date()
-      }, { merge: true });
-    }
+  const handleTourComplete = () => {
+    localStorage.setItem('onboardingComplete', 'true');
     setCurrentPhase('complete');
+    console.log('Onboarding complete - medical data captured for research');
     
     toast({
       title: "Welcome to Fiber Friends!",
@@ -214,19 +145,14 @@ export const Onboarding = () => {
     });
   };
 
-  const handleTourSkip = async () => {
-    if (user) {
-      await setDoc(doc(db, 'userPreferences', user.uid), {
-        onboardingComplete: true,
-        onboardingSkippedAt: new Date()
-      }, { merge: true });
-    }
+  const handleTourSkip = () => {
+    localStorage.setItem('onboardingComplete', 'true');
     setCurrentPhase('complete');
+    console.log('Tour skipped - medical data still captured for research');
   };
 
   if (currentPhase === 'tour') {
-    // Tour removed - go directly to completion
-    return null;
+    return <WelcomeTour onComplete={handleTourComplete} onSkip={handleTourSkip} />;
   }
 
   if (currentPhase === 'medical-profile') {
@@ -264,13 +190,8 @@ export const Onboarding = () => {
               Your onboarding is complete. You can now start tracking your symptoms, 
               journaling, and connecting with the community.
             </p>
-            <Button onClick={async () => { 
-              if (user) {
-                await setDoc(doc(db, 'userPreferences', user.uid), {
-                  onboardingComplete: true,
-                  onboardingCompletedAt: new Date()
-                }, { merge: true });
-              }
+            <Button onClick={() => { 
+              localStorage.setItem('onboardingComplete', 'true');
               window.location.href = '/dashboard';
             }} className="bg-blue-600 hover:bg-blue-700">
               Go to Dashboard

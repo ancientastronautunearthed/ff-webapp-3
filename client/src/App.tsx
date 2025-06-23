@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { CompanionProgressProvider } from "@/contexts/CompanionProgressContext";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Layout } from "@/components/Layout";
-import { SimpleLayout } from "@/components/SimpleLayout";
 import { SymptomTracker } from "@/components/SymptomTracker";
 import { DigitalMatchbox } from "@/components/DigitalMatchbox";
 import { Community } from "@/components/Community";
@@ -20,8 +19,6 @@ import { ResearchConsentManager } from "@/components/ResearchConsentManager";
 import { ResearchDashboardEnhanced } from "@/components/ResearchDashboardEnhanced";
 import { MedicalOnboarding } from "@/components/MedicalOnboarding";
 import Dashboard from "@/pages/Dashboard";
-import SimpleDashboard from "@/pages/SimpleDashboard";
-import SimpleDoctorDashboard from "@/pages/SimpleDoctorDashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import CalendarView from "@/pages/CalendarView";
@@ -37,43 +34,12 @@ import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
 import { CompanionDashboard } from "@/components/CompanionDashboard";
-import { AIHealthCompanion } from "@/components/AIHealthCompanion";
-import { AITherapySession } from "@/components/AITherapySession";
 import { UserSettings } from "@/pages/UserSettings";
 
 function AppContent() {
   const { user, loading } = useAuth();
   const [location] = useLocation();
-  
-  // ALL hooks must be called before any conditional returns to maintain consistent hook order
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
-  
-  useEffect(() => {
-    if (user) {
-      checkUserData();
-    }
-  }, [user]);
 
-  const checkUserData = async () => {
-    if (!user) return;
-    
-    try {
-      // Skip onboarding for now and go straight to dashboard
-      setUserRole('patient');
-      setHasCompletedOnboarding(true); // Skip onboarding to test dashboard
-      setDataLoaded(true);
-    } catch (error) {
-      console.error('Error checking user data:', error);
-      // Default to patient role and skip onboarding
-      setUserRole('patient');
-      setHasCompletedOnboarding(true);
-      setDataLoaded(true);
-    }
-  };
-
-  // Handle all conditional rendering logic in a single block
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -90,26 +56,24 @@ function AppContent() {
   }
 
   if (!user) {
+    // Check if accessing doctor portal
     if (location.startsWith('/doctor')) {
       return <DoctorLogin />;
     }
     return <Login />;
   }
 
-  if (!dataLoaded) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Loading user data...</h2>
-        </div>
-      </div>
-    );
+  // Check if user is a doctor and redirect to doctor dashboard
+  const userRole = localStorage.getItem('userRole');
+  const isDemoDoctor = localStorage.getItem('demoDoctor') === 'true';
+  if (userRole === 'doctor' && isDemoDoctor) {
+    return <DoctorDashboard />;
   }
 
-  if (userRole === 'doctor') {
-    return <SimpleDoctorDashboard />;
-  }
+  // Check if user has completed onboarding
+  const hasCompletedOnboarding = localStorage.getItem('onboardingComplete') === 'true';
   
+  // Force new users through comprehensive medical onboarding (except when explicitly accessing onboarding routes)
   if (!hasCompletedOnboarding && !location.startsWith('/onboarding') && !location.startsWith('/medical-onboarding') && !location.startsWith('/research-consent')) {
     return <Onboarding />;
   }
@@ -117,14 +81,12 @@ function AppContent() {
 
 
   return (
-    <SimpleLayout>
+    <Layout>
       <Switch>
-        <Route path="/" component={SimpleDashboard} />
-        <Route path="/dashboard" component={SimpleDashboard} />
+        <Route path="/" component={Dashboard} />
+        <Route path="/dashboard" component={Dashboard} />
         <Route path="/tracker" component={SymptomTracker} />
         <Route path="/journal" component={DigitalMatchbox} />
-        <Route path="/companion-chat" component={AIHealthCompanion} />
-        <Route path="/therapy-session" component={AITherapySession} />
         <Route path="/community" component={CommunityForum} />
         <Route path="/insights" component={DataVisualization} />
         <Route path="/research-opt-in" component={ResearchOptIn} />
@@ -151,8 +113,12 @@ function AppContent() {
       </Switch>
       
       {/* Check if tour is active and show tour overlay */}
-      {/* Tour removed - integrated into dashboard onboarding flow */}
-    </SimpleLayout>
+      {localStorage.getItem('tourActive') === 'true' && <WelcomeTour onComplete={() => {
+        localStorage.removeItem('tourActive');
+      }} onSkip={() => {
+        localStorage.removeItem('tourActive');
+      }} />}
+    </Layout>
   );
 }
 

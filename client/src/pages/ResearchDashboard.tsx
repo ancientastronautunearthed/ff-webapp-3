@@ -79,7 +79,7 @@ export default function ResearchDashboard() {
     }
   };
 
-  // Load real research data from Firebase aggregated collections
+  // Mock data for demonstration (replace with real API data)
   const mockSymptomCorrelations = [
     { factor: 'Weather Changes', correlation: 0.82, sampleSize: 245, pValue: 0.001 },
     { factor: 'High Stress', correlation: 0.76, sampleSize: 298, pValue: 0.002 },

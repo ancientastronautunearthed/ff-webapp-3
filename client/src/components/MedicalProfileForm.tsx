@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-// Companion creator removed per user request
+import { CompanionCreatorStep } from './CompanionCreatorStep';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,7 +87,8 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
-  // All companion variables removed
+  const [showCompanionCreator, setShowCompanionCreator] = useState(false);
+  const [companionData, setCompanionData] = useState<{imageUrl: string, config: any} | null>(null);
   const { toast } = useToast();
 
   // States/Provinces dropdown options (US, Canada, Mexico)
@@ -130,20 +131,65 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
     'Other'
   ];
 
-  console.log('MedicalProfileForm state:', { currentStep });
+  console.log('MedicalProfileForm state:', { currentStep, showCompanionCreator });
 
   const { user } = useAuth();
   
-  // Form submission handler
-  const handleSubmit = async () => {
-    const formData = form.getValues();
-    console.log('MedicalProfileForm: Calling onComplete with data');
+  // Define companion creator handlers first
+  const handleCompanionCreated = async (imageUrl: string, config: any) => {
+    console.log('Companion created:', { imageUrl, config });
+    setCompanionData({ imageUrl, config });
+    
+    // Save companion data to Firebase
     try {
-      await onComplete(formData as MedicalProfileData);
-      console.log('MedicalProfileForm: onComplete finished successfully');
+      if (user?.uid) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          companionImage: imageUrl,
+          companionConfig: config,
+          hasCompanion: true,
+          companionCreatedAt: new Date()
+        });
+        
+        console.log('Companion data saved to Firebase:', { imageUrl, config });
+      }
     } catch (error) {
-      console.error('MedicalProfileForm: Error in onComplete:', error);
+      console.error('Error saving companion data:', error);
     }
+    
+    toast({
+      title: "Profile & Companion Complete!",
+      description: "Your medical profile and AI companion have been created successfully.",
+    });
+    
+    // Get form data and call onComplete
+    const formData = form.getValues();
+    onComplete(formData as MedicalProfileData);;
+  };
+
+  const handleSkipCompanion = async () => {
+    console.log('Companion creation skipped');
+    
+    // Save skip status to Firebase
+    try {
+      if (user?.uid) {
+        await updateDoc(doc(db, 'users', user.uid), {
+          hasCompanion: false,
+          companionSkipped: true,
+          companionSkippedAt: new Date()
+        });
+      }
+    } catch (error) {
+      console.error('Error saving companion skip status:', error);
+    }
+    
+    toast({
+      title: "Profile Complete!",
+      description: "You can create your AI companion later from settings.",
+    });
+    
+    // Get form data and call onComplete
+    const formData = form.getValues();
+    onComplete(formData as MedicalProfileData);
   };
 
   const form = useForm<MedicalProfileData>({
@@ -288,7 +334,16 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
     { number: 5, title: 'Research Consent', icon: ShieldCheck }
   ];
 
-  // Companion creator removed
+  // Show companion creator if flag is set
+  if (showCompanionCreator) {
+    console.log('Rendering CompanionCreatorStep');
+    return (
+      <CompanionCreatorStep
+        onComplete={handleCompanionCreated}
+        onSkip={handleSkipCompanion}
+      />
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -796,12 +851,9 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                   disabled={!form.watch('researchConsent') || !form.watch('anonymousDataSharing')}
                   className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                   onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    console.log('=== SUBMIT BUTTON CLICKED ===');
-                    
+                    console.log('Submit button clicked, research consent:', form.watch('researchConsent'), 'data sharing:', form.watch('anonymousDataSharing'));
                     if (!form.watch('researchConsent') || !form.watch('anonymousDataSharing')) {
+                      e.preventDefault();
                       toast({
                         title: "Research Consent Required",
                         description: "Please check both research consent checkboxes to continue.",
@@ -810,11 +862,12 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                       return;
                     }
                     
-                    console.log('=== CALLING HANDLE SUBMIT ===');
-                    handleSubmit();
+                    // Show companion creator after profile completion
+                    console.log('Setting showCompanionCreator to true');
+                    setShowCompanionCreator(true);
                   }}
                 >
-                  Complete Profile
+                  Complete Profile & Create Companion
                 </Button>
               )}
             </div>
@@ -891,10 +944,10 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                       return;
                     }
                     
-                    handleSubmit();
+                    setShowCompanionCreator(true);
                   }}
                 >
-                  Complete Profile
+                  Complete Profile & Create Companion
                 </Button>
               )}
             </div>

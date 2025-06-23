@@ -50,57 +50,6 @@ export async function getUserCheckins(userId: string, limitCount = 10) {
   }
 }
 
-// Alias for SmartDailyCheckin component
-export const getCheckinsFromFirestore = getUserCheckins;
-
-// Get user's symptom entries
-export async function getSymptomEntriesFromFirestore(userId: string, limitCount = 20) {
-  try {
-    const q = query(
-      collection(db, 'symptom_entries'),
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
-    );
-    
-    const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
-  } catch (error) {
-    console.error('Error getting symptom entries:', error);
-    return [];
-  }
-}
-
-// Update user points in Firebase
-export async function updateUserPoints(userId: string, pointsToAdd: number) {
-  try {
-    const userStatsRef = doc(db, 'userStats', userId);
-    const userStatsDoc = await getDoc(userStatsRef);
-    
-    if (userStatsDoc.exists()) {
-      const currentPoints = userStatsDoc.data().totalPoints || 0;
-      await updateDoc(userStatsRef, {
-        totalPoints: currentPoints + pointsToAdd,
-        lastUpdated: serverTimestamp()
-      });
-      return currentPoints + pointsToAdd;
-    } else {
-      await setDoc(userStatsRef, {
-        totalPoints: pointsToAdd,
-        createdAt: serverTimestamp(),
-        lastUpdated: serverTimestamp()
-      });
-      return pointsToAdd;
-    }
-  } catch (error) {
-    console.error('Error updating user points:', error);
-    throw error;
-  }
-}
-
 // Save achievement unlock
 export async function saveAchievementUnlock(userId: string, achievementData: any) {
   try {
@@ -254,33 +203,21 @@ export async function getDoctorProfile(doctorId: string) {
 export async function getStateUserStatistics(states: string[]) {
   try {
     // In a real implementation, this would query users by state
-    // Query actual user data from Firebase
-    const usersQuery = query(
+    // For now, return mock data based on the provided states
+    const q = query(
       collection(db, 'users'),
-      limit(1000)
+      limit(100) // Sample for now
     );
     
-    const querySnapshot = await getDocs(usersQuery);
-    const users = querySnapshot.docs.map(doc => doc.data());
+    const querySnapshot = await getDocs(q);
     
-    // Calculate real statistics by state
-    return states.map(state => {
-      const stateUsers = users.filter(user => user.state === state);
-      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const activeUsers = stateUsers.filter(user => 
-        user.lastLogin && new Date(user.lastLogin.seconds * 1000) > thirtyDaysAgo
-      );
-      const newUsers = stateUsers.filter(user => 
-        user.createdAt && new Date(user.createdAt.seconds * 1000) > thirtyDaysAgo
-      );
-      
-      return {
-        state,
-        totalUsers: stateUsers.length,
-        activeUsers: activeUsers.length,
-        newThisMonth: newUsers.length
-      };
-    });
+    // Process data by state (mock implementation)
+    return states.map(state => ({
+      state,
+      totalUsers: Math.floor(Math.random() * 1000) + 100,
+      activeUsers: Math.floor(Math.random() * 500) + 50,
+      newThisMonth: Math.floor(Math.random() * 50) + 5
+    }));
   } catch (error) {
     console.error('Error getting state statistics:', error);
     return [];

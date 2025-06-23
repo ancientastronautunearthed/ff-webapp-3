@@ -50,30 +50,20 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { data: symptomEntries } = useSymptomEntries();
   const { data: journalEntries } = useJournalEntries();
-  // Tour removed per user request
+  const [showTour, setShowTour] = useState(false);
   const [showCheckin, setShowCheckin] = useState(false);
   const [checkinCompleted, setCheckinCompleted] = useState(false);
 
 
 
   useEffect(() => {
-    if (user) {
-      checkTourStatus();
-      checkDailyCheckinStatus();
-    }
-  }, [user]);
-
-  const checkTourStatus = async () => {
-    if (!user) return;
+    // Don't auto-show tour, only show when user clicks button
+    const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
+    // Removed auto-show for better UX
     
-    try {
-      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
-      const hasSeenTour = prefsDoc.exists() ? prefsDoc.data().hasSeenDashboardTour : false;
-      // Don't auto-show tour for better UX
-    } catch (error) {
-      console.error('Error checking tour status:', error);
-    }
-  };
+    // Check if daily check-in was completed today
+    checkDailyCheckinStatus();
+  }, []);
 
   const checkDailyCheckinStatus = async () => {
     if (!user) return;
@@ -98,74 +88,33 @@ export default function Dashboard() {
     }
   };
 
-  // Tour functions removed
+  const completeTour = () => {
+    console.log('completeTour called');
+    localStorage.setItem('hasSeenDashboardTour', 'true');
+    setShowTour(false);
+    toast({
+      title: "Welcome to Fiber Friends!",
+      description: "You're all set to start tracking your health journey.",
+    });
+  };
+
+  const skipTour = () => {
+    console.log('skipTour called');
+    localStorage.setItem('hasSeenDashboardTour', 'true');
+    setShowTour(false);
+  };
+
+  const startTour = () => {
+    setShowTour(true);
+  };
 
   // Calculate real stats from Firebase data
-  const [todayStats, setTodayStats] = useState({
-    entriesCompleted: 0,
-    totalEntries: 7,
-    trackingStreak: 0,
-    completionRate: 0
-  });
-
-  useEffect(() => {
-    if (user && symptomEntries && journalEntries) {
-      calculateRealStats();
-    }
-  }, [user, symptomEntries, journalEntries]);
-
-  const calculateRealStats = async () => {
-    if (!user) return;
-
-    try {
-      // Calculate tracking streak from Firebase data
-      const today = new Date();
-      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
-      // Count unique days with entries in last 7 days
-      const recentEntries = [
-        ...(symptomEntries?.filter(entry => new Date(entry.createdAt.toDate()) >= sevenDaysAgo) || []),
-        ...(journalEntries?.filter(entry => new Date(entry.createdAt.toDate()) >= sevenDaysAgo) || [])
-      ];
-      
-      const uniqueDays = new Set(
-        recentEntries.map(entry => 
-          new Date(entry.createdAt.toDate()).toDateString()
-        )
-      );
-      
-      // Calculate current streak
-      let streak = 0;
-      let currentDate = new Date();
-      
-      while (streak < 30) { // Max 30 days to check
-        const dateStr = currentDate.toDateString();
-        const hasEntry = uniqueDays.has(dateStr);
-        
-        if (hasEntry) {
-          streak++;
-          currentDate.setDate(currentDate.getDate() - 1);
-        } else {
-          break;
-        }
-      }
-      
-      setTodayStats({
-        entriesCompleted: uniqueDays.size,
-        totalEntries: 7,
-        trackingStreak: streak,
-        completionRate: Math.round((uniqueDays.size / 7) * 100)
-      });
-      
-    } catch (error) {
-      console.error('Error calculating stats:', error);
-      setTodayStats({
-        entriesCompleted: 0,
-        totalEntries: 7,
-        trackingStreak: 0,
-        completionRate: 0
-      });
-    }
+  const weeklyData = symptomEntries ? getWeeklyStats(symptomEntries) : null;
+  const todayStats = {
+    entriesCompleted: weeklyData?.trackingDays || 0,
+    totalEntries: 7, // Week target
+    trackingStreak: weeklyData?.trackingDays || 0,
+    completionRate: weeklyData?.completionRate || 0
   };
 
   // Load real insights from AI analysis
@@ -257,43 +206,15 @@ export default function Dashboard() {
     }
   ];
 
-  // Real weekly data calculated from Firebase entries
-  const [weeklyOverview, setWeeklyOverview] = useState([]);
-
-  useEffect(() => {
-    if (user && symptomEntries) {
-      calculateWeeklyOverview();
-    }
-  }, [user, symptomEntries]);
-
-  const calculateWeeklyOverview = () => {
-    const today = new Date();
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const weekData = [];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      const dayName = days[date.getDay()];
-      
-      const dayEntries = symptomEntries?.filter(entry => {
-        const entryDate = new Date(entry.createdAt.toDate());
-        return entryDate.toDateString() === date.toDateString();
-      }) || [];
-      
-      const avgSymptoms = dayEntries.length > 0 
-        ? dayEntries.reduce((sum, entry) => sum + (entry.symptoms?.itchingIntensity || 0), 0) / dayEntries.length
-        : 0;
-
-      weekData.push({
-        day: dayName,
-        completed: dayEntries.length > 0,
-        symptoms: avgSymptoms
-      });
-    }
-    
-    setWeeklyOverview(weekData);
-  };
+  const weeklyOverview = [
+    { day: 'Mon', completed: true, symptoms: 4.2 },
+    { day: 'Tue', completed: true, symptoms: 3.8 },
+    { day: 'Wed', completed: true, symptoms: 4.1 },
+    { day: 'Thu', completed: true, symptoms: 3.6 },
+    { day: 'Fri', completed: true, symptoms: 3.9 },
+    { day: 'Sat', completed: false, symptoms: 0 },
+    { day: 'Sun', completed: false, symptoms: 0 }
+  ];
 
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
@@ -304,7 +225,18 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* Tour removed per user request */}
+      {showTour && (
+        <WelcomeTour 
+          onComplete={() => {
+            console.log('Tour onComplete triggered');
+            completeTour();
+          }}
+          onSkip={() => {
+            console.log('Tour onSkip triggered');
+            skipTour();
+          }}
+        />
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Welcome Header */}
       <div className="mb-8 flex items-center justify-between">
@@ -324,7 +256,15 @@ export default function Dashboard() {
             <Target className="h-4 w-4 mr-2" />
             Daily Check-in
           </Button>
-          {/* Tour button removed */}
+          <Button
+            variant="outline"
+            onClick={startTour}
+            className="flex items-center gap-2"
+            data-tour="take-tour-button"
+          >
+            <HelpCircle className="h-4 w-4" />
+            Take Tour
+          </Button>
         </div>
       </div>
 

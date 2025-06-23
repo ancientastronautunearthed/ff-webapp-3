@@ -92,23 +92,26 @@ export const PeerMatchingWidget = () => {
       
       <CardContent className="space-y-4">
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4 text-center">
+        <div className="grid grid-cols-3 gap-2 text-center">
           <div>
             <div className="text-lg font-bold text-purple-600">{totalMatches}</div>
-            <div className="text-xs text-gray-500">Potential Matches</div>
+            <div className="text-xs text-gray-500">Total Matches</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-blue-600">{quickMatches.length}</div>
-            <div className="text-xs text-gray-500">Top Matches</div>
+            <div className="text-lg font-bold text-green-600">8</div>
+            <div className="text-xs text-gray-500">Active Chats</div>
+          </div>
+          <div>
+            <div className="text-lg font-bold text-blue-600">23</div>
+            <div className="text-xs text-gray-500">Connections</div>
           </div>
         </div>
 
         {/* Top Matches Preview */}
-        {quickMatches.length > 0 && (
-          <div className="space-y-3">
-            <h4 className="text-sm font-medium text-gray-900">Top Matches For You</h4>
-            {quickMatches.map((match) => (
-              <div key={match.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-gray-900">Top Matches For You</h4>
+          {quickMatches.map((match) => (
+            <div key={match.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors">
               <div className="relative">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={match.avatar} alt={match.name} />
@@ -139,18 +142,8 @@ export const PeerMatchingWidget = () => {
                 <MessageCircle className="h-4 w-4" />
               </Button>
             </div>
-            ))}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {quickMatches.length === 0 && (
-          <div className="text-center py-6 text-gray-500">
-            <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No matches found yet</p>
-            <p className="text-xs">Complete your profile to find compatible peers</p>
-          </div>
-        )}
+          ))}
+        </div>
 
         {/* Feature Highlights */}
         <div className="bg-purple-50 rounded-lg p-3 space-y-2">
