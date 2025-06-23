@@ -63,55 +63,50 @@ function AppContent() {
     return <Login />;
   }
 
-  // Check if user is a doctor and redirect to doctor dashboard
-  // Check user role from Firebase instead of localStorage
+  // Check user role and onboarding status from Firebase
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   
   useEffect(() => {
     if (user) {
-      checkUserRole();
+      checkUserData();
     }
   }, [user]);
 
-  const checkUserRole = async () => {
+  const checkUserData = async () => {
     if (!user) return;
     
     try {
       const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
       if (prefsDoc.exists()) {
-        setUserRole(prefsDoc.data().userRole || null);
+        const data = prefsDoc.data();
+        setUserRole(data.userRole || null);
+        setHasCompletedOnboarding(data.onboardingComplete || false);
       }
+      setDataLoaded(true);
     } catch (error) {
-      console.error('Error checking user role:', error);
+      console.error('Error checking user data:', error);
       setUserRole(null);
+      setHasCompletedOnboarding(false);
+      setDataLoaded(true);
     }
   };
+
+  // Don't render anything until data is loaded
+  if (!dataLoaded && user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-4">Loading...</h2>
+        </div>
+      </div>
+    );
+  }
+
   if (userRole === 'doctor') {
     return <DoctorDashboard />;
   }
-
-  // Check if user has completed onboarding
-  // Check onboarding completion from Firebase
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  
-  useEffect(() => {
-    if (user) {
-      checkOnboardingStatus();
-    }
-  }, [user]);
-
-  const checkOnboardingStatus = async () => {
-    if (!user) return;
-    
-    try {
-      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
-      const completed = prefsDoc.exists() ? prefsDoc.data().onboardingComplete : false;
-      setHasCompletedOnboarding(completed);
-    } catch (error) {
-      console.error('Error checking onboarding status:', error);
-      setHasCompletedOnboarding(false);
-    }
-  };
   
   // Force new users through comprehensive medical onboarding (except when explicitly accessing onboarding routes)
   if (!hasCompletedOnboarding && !location.startsWith('/onboarding') && !location.startsWith('/medical-onboarding') && !location.startsWith('/research-consent')) {
