@@ -137,3 +137,5 @@ The application uses a comprehensive database schema with the following core ent
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Form requirements: All data entry forms need Submit buttons, not just Save buttons.
+Draft functionality: Users should be able to save entries as drafts before final submission.
