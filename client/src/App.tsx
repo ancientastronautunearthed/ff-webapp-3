@@ -32,6 +32,7 @@ import { PeerMatching } from "@/components/PeerMatching";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
+import { CompanionDashboard } from "@/components/CompanionDashboard";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -103,6 +104,7 @@ function AppContent() {
         <Route path="/doctor/demo" component={DoctorDemo} />
         <Route path="/ask-doctor" component={AskDoctorForum} />
         <Route path="/peer-matching" component={PeerMatching} />
+        <Route path="/companion" component={CompanionDashboard} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
       </Switch>

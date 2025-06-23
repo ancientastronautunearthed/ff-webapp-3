@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { aiRoutes } from "./routes/ai";
 import { aiImageRoutes } from "./routes/ai-image";
+import { companionRoutes } from "./routes/companion";
 import { peerRecommendationsRoutes } from "./routes/peer-recommendations";
 import { researchRoutes } from "./routes/research";
 
@@ -15,6 +16,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.use("/api/ai", aiRoutes);
   app.use("/api/ai", aiImageRoutes);
+  app.use("/api/companion", companionRoutes);
   app.use("/api/peer-recommendations", peerRecommendationsRoutes);
   app.use("/api/research", researchRoutes);
 
