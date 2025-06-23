@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { BookOpen, Upload, Lock, Save, Camera, Calendar, Link2, History, Eye, X, ArrowLeft } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const journalSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -251,19 +251,41 @@ export const DigitalMatchbox = () => {
                   </Select>
                 </div>
 
-                <div className="flex justify-between items-center pt-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Lock className="mr-2 h-4 w-4" />
-                    <span>End-to-end encrypted</span>
-                  </div>
+                {/* Submit Button Section */}
+                <div className="flex justify-end space-x-3 pt-6 border-t">
                   <Button
-                    type="submit"
-                    className="bg-primary-500 hover:bg-primary-600"
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      form.reset();
+                      setSelectedFiles([]);
+                    }}
                     disabled={loading}
                   >
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Entry
+                    Clear Form
                   </Button>
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-primary-600 hover:bg-primary-700"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Submit Entry
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                <div className="flex items-center text-sm text-gray-600 pt-3">
+                  <Lock className="mr-2 h-4 w-4" />
+                  <span>End-to-end encrypted and secure</span>
                 </div>
               </form>
             </CardContent>
@@ -363,6 +385,9 @@ export const DigitalMatchbox = () => {
           <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>All Journal Entries</DialogTitle>
+              <DialogDescription>
+                View and manage all your journal entries from your digital matchbox.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               {journalEntries && journalEntries.length > 0 ? (
@@ -421,6 +446,9 @@ export const DigitalMatchbox = () => {
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{selectedEntry?.title}</DialogTitle>
+              <DialogDescription>
+                Detailed view of your journal entry with all associated media and notes.
+              </DialogDescription>
             </DialogHeader>
             {selectedEntry && (
               <div className="space-y-6">
