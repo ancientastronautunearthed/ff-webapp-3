@@ -15,7 +15,11 @@ import {
   Clock,
   Shield,
   Lightbulb,
-  ArrowLeft
+  ArrowLeft,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { 
   collection, 
@@ -54,7 +58,12 @@ export function AITherapySession() {
   const [sessionActive, setSessionActive] = useState(false);
   const [therapyInsights, setTherapyInsights] = useState<TherapyInsight[]>([]);
   const [sessionPhase, setSessionPhase] = useState<string>('opening');
+  const [isListening, setIsListening] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -95,6 +104,47 @@ export function AITherapySession() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    // Initialize speech recognition
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setCurrentMessage(transcript);
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        toast({
+          title: "Voice Recognition Error",
+          description: "Unable to process voice input. Please try again.",
+          variant: "destructive"
+        });
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, [toast]);
 
   const startSession = async () => {
     if (!user) return;
@@ -177,6 +227,11 @@ export function AITherapySession() {
         if (therapyResponse.insights) {
           setTherapyInsights(therapyResponse.insights);
         }
+
+        // Play voice response if voice is enabled
+        if (voiceEnabled && therapyResponse.message) {
+          playVoiceResponse(therapyResponse.message);
+        }
       } else {
         toast({
           title: "Connection Issue",
@@ -225,6 +280,145 @@ export function AITherapySession() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  };
+
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      try {
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Error starting speech recognition:', error);
+        toast({
+          title: "Voice Input Error",
+          description: "Unable to start voice recognition. Please check your microphone permissions.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+    }
+  };
+
+  const playVoiceResponse = async (text: string) => {
+    if (!voiceEnabled || isPlaying) return;
+
+    try {
+      setIsPlaying(true);
+      
+      const response = await fetch('/api/therapy/voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+
+      if (response.ok) {
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        if (audioRef.current) {
+          audioRef.current.pause();
+        }
+        
+        audioRef.current = new Audio(audioUrl);
+        audioRef.current.onended = () => {
+          setIsPlaying(false);
+          URL.revokeObjectURL(audioUrl);
+        };
+        audioRef.current.onerror = () => {
+          setIsPlaying(false);
+          URL.revokeObjectURL(audioUrl);
+        };
+        
+        await audioRef.current.play();
+      } else if (response.status === 500) {
+        // Fallback to browser speech synthesis
+        setIsPlaying(false);
+        playFallbackVoice(text);
+      } else {
+        setIsPlaying(false);
+        toast({
+          title: "Voice Output Error",
+          description: "Unable to generate voice response.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error playing voice response:', error);
+      setIsPlaying(false);
+      toast({
+        title: "Voice Output Error",
+        description: "Unable to play voice response.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleVoice = () => {
+    setVoiceEnabled(!voiceEnabled);
+    if (isPlaying && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+    
+    toast({
+      title: voiceEnabled ? "Voice Disabled" : "Voice Enabled",
+      description: voiceEnabled 
+        ? "Therapy sessions will now be text-only." 
+        : "You can now speak with your AI therapist using voice.",
+    });
+  };
+
+  const playFallbackVoice = (text: string) => {
+    if ('speechSynthesis' in window) {
+      try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Configure therapeutic voice characteristics
+        utterance.rate = 0.8; // Slower, more thoughtful pace
+        utterance.pitch = 0.8; // Lower, calming pitch
+        utterance.volume = 0.9;
+        
+        // Try to use a suitable voice
+        const voices = speechSynthesis.getVoices();
+        const therapeuticVoice = voices.find(voice => 
+          voice.name.includes('Female') || 
+          voice.name.includes('Karen') || 
+          voice.name.includes('Samantha') ||
+          voice.gender === 'female'
+        );
+        
+        if (therapeuticVoice) {
+          utterance.voice = therapeuticVoice;
+        }
+        
+        setIsPlaying(true);
+        
+        utterance.onend = () => {
+          setIsPlaying(false);
+        };
+        
+        utterance.onerror = () => {
+          setIsPlaying(false);
+          console.error('Speech synthesis error');
+        };
+        
+        speechSynthesis.speak(utterance);
+      } catch (error) {
+        console.error('Fallback voice synthesis error:', error);
+        setIsPlaying(false);
+      }
+    } else {
+      setIsPlaying(false);
+      toast({
+        title: "Voice Not Supported",
+        description: "Voice output is not supported in this browser.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -277,9 +471,19 @@ export function AITherapySession() {
                   </AvatarFallback>
                 </Avatar>
                 AI Therapist
-                <Badge variant={sessionActive ? "default" : "secondary"} className="ml-auto">
-                  {sessionActive ? "Session Active" : "Ready to Start"}
-                </Badge>
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button
+                    onClick={toggleVoice}
+                    variant="outline"
+                    size="sm"
+                    className={voiceEnabled ? "bg-green-50 text-green-700" : ""}
+                  >
+                    {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  </Button>
+                  <Badge variant={sessionActive ? "default" : "secondary"}>
+                    {sessionActive ? "Session Active" : "Ready to Start"}
+                  </Badge>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -362,25 +566,63 @@ export function AITherapySession() {
 
               {/* Message Input */}
               {sessionActive && (
-                <div className="flex gap-2">
-                  <Input
-                    value={currentMessage}
-                    onChange={(e) => setCurrentMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Share your thoughts and feelings..."
-                    disabled={isLoading}
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={sendMessage} 
-                    disabled={!currentMessage.trim() || isLoading}
-                  >
-                    {isLoading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                  </Button>
+                <div className="space-y-3">
+                  {voiceEnabled && (
+                    <div className="flex items-center justify-center p-4 bg-purple-50 rounded-lg">
+                      <div className="flex items-center gap-4">
+                        <Button
+                          onClick={isListening ? stopListening : startListening}
+                          disabled={isLoading || isPlaying}
+                          className={`${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-purple-600 hover:bg-purple-700'}`}
+                        >
+                          {isListening ? (
+                            <>
+                              <MicOff className="h-4 w-4 mr-2" />
+                              Stop Listening
+                            </>
+                          ) : (
+                            <>
+                              <Mic className="h-4 w-4 mr-2" />
+                              Start Speaking
+                            </>
+                          )}
+                        </Button>
+                        {isListening && (
+                          <div className="flex items-center gap-2 text-purple-700">
+                            <div className="animate-pulse h-2 w-2 bg-red-500 rounded-full"></div>
+                            <span className="text-sm">Listening...</span>
+                          </div>
+                        )}
+                        {isPlaying && (
+                          <div className="flex items-center gap-2 text-purple-700">
+                            <div className="animate-pulse h-2 w-2 bg-green-500 rounded-full"></div>
+                            <span className="text-sm">Speaking...</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      value={currentMessage}
+                      onChange={(e) => setCurrentMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder={voiceEnabled ? "Type or speak your thoughts..." : "Share your thoughts and feelings..."}
+                      disabled={isLoading || isListening}
+                      className="flex-1"
+                    />
+                    <Button 
+                      onClick={sendMessage} 
+                      disabled={!currentMessage.trim() || isLoading || isListening}
+                    >
+                      {isLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>

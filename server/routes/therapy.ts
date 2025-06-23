@@ -321,3 +321,49 @@ function generateTherapyInsights(message: string, healthContext: any) {
   
   return insights;
 }
+
+export async function generateTherapeuticVoice(text: string): Promise<Buffer> {
+  try {
+    // Use Google Cloud Text-to-Speech API
+    const response = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.GOOGLE_CLOUD_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        input: { text },
+        voice: {
+          languageCode: 'en-US',
+          name: 'en-US-Journey-F', // Therapeutic, calm female voice
+          ssmlGender: 'FEMALE'
+        },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate: 0.9, // Slightly slower for therapeutic effect
+          pitch: -2.0, // Slightly lower pitch for calming effect
+          volumeGainDb: 0.0
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`TTS API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.audioContent) {
+      throw new Error('No audio content received from TTS API');
+    }
+
+    // Convert base64 audio to buffer
+    return Buffer.from(data.audioContent, 'base64');
+  } catch (error) {
+    console.error('Error generating therapeutic voice:', error);
+    
+    // Fallback: generate simple audio using browser APIs (client-side fallback)
+    // For now, return empty buffer - client will handle gracefully
+    throw new Error('Voice synthesis temporarily unavailable');
+  }
+}

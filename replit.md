@@ -422,6 +422,10 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Added guided therapeutic conversations using CBT, DBT, and person-centered approaches
 - ✓ Implemented session phases, therapeutic techniques, and crisis resource integration
 - ✓ Built confidential therapy interface with appropriate disclaimers and professional referral guidance
+- ✓ Implemented voice capabilities for AI therapist using Google Cloud Text-to-Speech API
+- ✓ Added speech recognition for patient voice input with Web Speech API
+- ✓ Created therapeutic voice characteristics (slower pace, calming pitch, female voice)
+- ✓ Built fallback to browser speech synthesis when cloud API unavailable
 
 ## User Preferences
 

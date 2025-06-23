@@ -222,5 +222,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Voice synthesis endpoint for therapy
+  app.post('/api/therapy/voice', async (req: Request, res: Response) => {
+    try {
+      const { text } = req.body;
+      
+      if (!text) {
+        return res.status(400).json({ error: 'Text required for voice synthesis' });
+      }
+
+      // Generate voice using Google Text-to-Speech
+      const { generateTherapeuticVoice } = await import('./routes/therapy');
+      const audioBuffer = await generateTherapeuticVoice(text);
+      
+      res.set({
+        'Content-Type': 'audio/mp3',
+        'Content-Length': audioBuffer.length,
+        'Cache-Control': 'no-cache'
+      });
+      
+      res.send(audioBuffer);
+    } catch (error) {
+      console.error('Error generating therapeutic voice:', error);
+      res.status(500).json({ error: 'Failed to generate voice response' });
+    }
+  });
+
   return httpServer;
 }
