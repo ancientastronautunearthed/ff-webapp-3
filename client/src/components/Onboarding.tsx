@@ -91,13 +91,29 @@ export const Onboarding = () => {
 
   const handleMedicalProfileComplete = (data: any) => {
     console.log('Medical profile completed with data points:', Object.keys(data).length);
+    console.log('Research consent status:', {
+      researchConsent: data.researchConsent,
+      anonymousDataSharing: data.anonymousDataSharing,
+      contactForStudies: data.contactForStudies
+    });
+    
+    // Validate research consent was provided
+    if (!data.researchConsent || !data.anonymousDataSharing) {
+      toast({
+        title: "Research Consent Required",
+        description: "Please complete the research consent section to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setCompletedSteps(prev => new Set([...prev, 'profile']));
     setCurrentStep(2); // Move to research step
     setCurrentPhase('welcome');
     
     toast({
-      title: "Medical Profile Complete!",
-      description: "Your comprehensive health information has been saved for research analysis.",
+      title: "Medical Profile & Research Consent Complete!",
+      description: "Your comprehensive health information and research participation preferences have been saved.",
     });
   };
 

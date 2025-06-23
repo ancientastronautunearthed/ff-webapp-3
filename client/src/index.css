@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Tour highlighting styles */
+.tour-highlight {
+  position: relative;
+  z-index: 40;
+  animation: pulse-highlight 2s infinite;
+  border: 2px solid theme(colors.blue.500);
+  border-radius: 8px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2);
+  }
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(210, 40%, 8%);

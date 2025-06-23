@@ -228,19 +228,15 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     if (currentTourStep.route && location !== currentTourStep.route) {
       console.log('Navigating to:', currentTourStep.route);
       navigate(currentTourStep.route);
-      // Small delay to ensure page content loads before highlighting
-      setTimeout(() => {
-        console.log('Page navigation completed for tour step');
-      }, 200);
     }
-  }, [currentStep, navigate, location]);
+  }, [currentStep, navigate]);
 
-  // Add highlighting effects for specific elements
+  // Add highlighting effects for specific elements with longer delay
   useEffect(() => {
     const currentTourStep = tourSteps[currentStep];
     console.log('Highlighting useEffect triggered, currentStep:', currentStep, 'highlightElements:', currentTourStep.highlightElements);
     if (currentTourStep.highlightElements) {
-      // Wait for page content to load before adding highlights
+      // Wait longer for page content to fully load
       const timeoutId = setTimeout(() => {
         currentTourStep.highlightElements.forEach(selector => {
           const elements = document.querySelectorAll(selector);
@@ -249,17 +245,14 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
             el.classList.add('tour-highlight');
           });
         });
-      }, 300); // Wait 300ms for page content to render
+      }, 800); // Wait 800ms for page content to fully render
 
       // Cleanup function to remove highlights
       return () => {
         clearTimeout(timeoutId);
         console.log('Cleaning up highlights for step:', currentStep);
-        currentTourStep.highlightElements.forEach(selector => {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach(el => {
-            el.classList.remove('tour-highlight');
-          });
+        document.querySelectorAll('.tour-highlight').forEach(el => {
+          el.classList.remove('tour-highlight');
         });
       };
     }
