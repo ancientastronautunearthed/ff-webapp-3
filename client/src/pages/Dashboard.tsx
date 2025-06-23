@@ -12,6 +12,7 @@ import { AIHealthCoach } from '@/components/AIHealthCoach';
 import { SmartDailyCheckin } from '@/components/SmartDailyCheckin';
 import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { CommunityEngagementWidget } from '@/components/CommunityEngagementWidget';
+import { PeerMatchingWidget } from '@/components/PeerMatchingWidget';
 import { Link } from 'wouter';
 import { 
   Activity, 
@@ -182,10 +183,15 @@ export default function Dashboard() {
       </div>
 
       {/* AI Health Coach and Gamification */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <AIHealthCoach />
         <GamifiedProgress />
+      </div>
+
+      {/* Community Features */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <CommunityEngagementWidget />
+        <PeerMatchingWidget />
       </div>
 
       {/* Quick Stats */}
