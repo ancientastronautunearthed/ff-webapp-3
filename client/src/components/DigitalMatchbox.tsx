@@ -251,8 +251,14 @@ export const DigitalMatchbox = () => {
                   </Select>
                 </div>
 
+                {/* Security Info */}
+                <div className="flex items-center justify-center text-sm text-gray-600 pt-2">
+                  <Lock className="mr-2 h-4 w-4" />
+                  <span>End-to-end encrypted and secure</span>
+                </div>
+
                 {/* Submit Button Section */}
-                <div className="flex justify-end space-x-3 pt-6 border-t">
+                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
                   <Button
                     type="button"
                     variant="outline"
@@ -267,7 +273,7 @@ export const DigitalMatchbox = () => {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="bg-primary-600 hover:bg-primary-700"
+                    className="bg-primary-600 hover:bg-primary-700 min-w-[140px]"
                   >
                     {loading ? (
                       <>
@@ -281,11 +287,6 @@ export const DigitalMatchbox = () => {
                       </>
                     )}
                   </Button>
-                </div>
-
-                <div className="flex items-center justify-center text-sm text-gray-600 pt-3">
-                  <Lock className="mr-2 h-4 w-4" />
-                  <span>End-to-end encrypted and secure</span>
                 </div>
               </form>
             </CardContent>
