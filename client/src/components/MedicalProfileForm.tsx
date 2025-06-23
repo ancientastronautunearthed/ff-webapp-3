@@ -212,7 +212,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
     );
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
+  const nextStep = () => {
+    if (currentStep < 5) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   const steps = [

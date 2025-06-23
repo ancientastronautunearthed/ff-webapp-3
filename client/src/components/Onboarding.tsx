@@ -153,7 +153,7 @@ export const Onboarding = () => {
   }
 
   if (currentPhase === 'medical-profile') {
-    return <MedicalOnboarding onComplete={handleMedicalProfileComplete} onSkip={handleMedicalProfileSkip} />;
+    return <MedicalProfileForm onComplete={handleMedicalProfileComplete} isNewUser={true} />;
   }
 
   if (currentPhase === 'research-consent') {
