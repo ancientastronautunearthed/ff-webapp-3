@@ -1,8 +1,9 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { useAuth } from '@/contexts/AuthContext';
 import { logOut } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Heart, 
@@ -21,8 +22,9 @@ import {
   TrendingUp,
   Stethoscope
 } from 'lucide-react';
-import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface LayoutProps {
   children: ReactNode;
@@ -33,6 +35,28 @@ export const Layout = ({ children }: LayoutProps) => {
   const [location] = useLocation();
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [companionImage, setCompanionImage] = useState<string | null>(null);
+
+  // Load companion image when user is available
+  useEffect(() => {
+    const loadCompanionImage = async () => {
+      if (user?.uid) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData.companionImage) {
+              setCompanionImage(userData.companionImage);
+            }
+          }
+        } catch (error) {
+          console.log('Could not load companion image:', error);
+        }
+      }
+    };
+
+    loadCompanionImage();
+  }, [user]);
 
   const handleLogout = async () => {
     try {
