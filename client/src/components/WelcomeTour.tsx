@@ -1,22 +1,31 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
-  Heart, 
+  X, 
+  ChevronLeft, 
+  ChevronRight, 
+  Activity, 
   BookOpen, 
   Users, 
-  TrendingUp, 
-  FileText, 
+  BarChart3, 
+  FileText,
+  Video,
+  Heart,
   Calendar,
+  Brain,
+  Target,
+  Sparkles,
   CheckCircle,
   ArrowRight,
-  ArrowLeft,
-  Microscope,
-  Activity,
-  X,
-  Video
+  Eye,
+  Lightbulb,
+  MessageCircle,
+  Stethoscope,
+  TrendingUp
 } from 'lucide-react';
 
 interface TourStep {
@@ -37,89 +46,76 @@ interface WelcomeTourProps {
 
 export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [location, navigate] = useLocation();
-  
-  console.log('WelcomeTour rendered with currentStep:', currentStep);
+  const [, setLocation] = useLocation();
+  const [isVisible, setIsVisible] = useState(true);
+  const [highlightedElements, setHighlightedElements] = useState<string[]>([]);
 
   const tourSteps: TourStep[] = [
     {
-      id: 'dashboard',
-      title: 'Your Health Dashboard',
-      description: 'Get an overview of your health journey with visual insights and quick actions.',
-      icon: TrendingUp,
+      id: 'welcome',
+      title: 'Welcome to Fiber Friends',
+      description: 'Your comprehensive health tracking companion designed specifically for Morgellons disease management.',
+      icon: Heart,
       route: '/dashboard',
       features: [
-        'Today\'s progress tracking with visual indicators',
-        'Quick action buttons for symptom tracking',
-        'Weekly overview with completion streaks',
-        'AI-generated health insights and correlations'
+        'Secure symptom tracking with pattern recognition',
+        'Digital journal for documenting your experience', 
+        'Community support from people who understand',
+        'AI-powered insights to identify triggers and patterns',
+        'Telemedicine appointments with experienced doctors',
+        'Gamified progress tracking to encourage daily use'
       ],
       tips: [
-        'Check your dashboard daily for pattern recognition',
-        'Use quick actions for immediate symptom logging',
-        'Review weekly trends to identify patterns'
+        'All your data is encrypted and private',
+        'Start with daily check-ins to build baseline data',
+        'Connect with the community for support and advice',
+        'Use AI insights to discuss patterns with your doctor',
+        'Complete daily tasks to earn points and maintain streaks'
       ],
-      highlightElements: ['[data-tour="quick-actions"]', '[data-tour="stats-cards"]', '[data-tour="weekly-overview"]']
+      highlightElements: ['.welcome-header', '.daily-checkin-button', '.quick-actions', '.daily-task-list']
     },
     {
-      id: 'symptoms',
-      title: 'Symptom Tracker',
-      description: 'Log detailed symptom information with intensity scales and environmental factors.',
-      icon: Heart,
+      id: 'symptoms', 
+      title: 'Symptom Tracking',
+      description: 'Log your daily symptoms with detailed tracking of severity, location, and triggers.',
+      icon: Activity,
       route: '/tracker',
       features: [
-        'Pre-populated symptom categories with clickable selections',
-        'Intensity sliders (1-10) for accurate severity tracking',
-        'Environmental factors: weather, stress, diet, chemicals',
-        'Fiber and lesion documentation with photo support'
+        'Track symptom severity on a 1-10 scale',
+        'Log specific locations affected on your body',
+        'Record environmental factors and potential triggers',
+        'Add notes and observations for each entry',
+        'Use preset options for common symptoms and triggers'
       ],
       tips: [
-        'Use dropdown menus instead of typing for faster entry',
-        'Track environmental factors like weather changes',
-        'Log symptoms at the same time daily for consistency',
-        'Include photos when documenting new lesions or fibers'
+        'Log symptoms at the same time each day for consistency',
+        'Be specific about locations - it helps identify patterns',
+        'Note weather, stress levels, and activities',
+        'Take photos when appropriate to document changes',
+        'Use dropdown menus for faster data entry'
       ],
-      highlightElements: ['[data-tour="symptom-form"]', '[data-tour="intensity-sliders"]', '[data-tour="factor-checkboxes"]']
+      highlightElements: ['.symptom-form', '.severity-slider', '.body-map', '.environmental-factors', '.preset-options']
     },
     {
       id: 'journal',
-      title: 'Digital Matchbox',
-      description: 'Securely document your observations with detailed notes and photos.',
+      title: 'Digital Matchbox Journal',
+      description: 'Document your daily observations, photos, and experiences in a secure digital space.',
       icon: BookOpen,
       route: '/journal',
       features: [
-        'Encrypted photo storage with multiple file support',
-        'Rich text editor for detailed observations',
-        'Link entries to specific symptom logs',
-        'Date and time stamped entries for tracking'
+        'Secure photo uploads with fiber documentation',
+        'Daily observation notes and mood tracking',
+        'Treatment log with effectiveness ratings',
+        'Environmental factor correlation tracking',
+        'Privacy-first design with encrypted storage'
       ],
       tips: [
-        'Use good lighting when photographing fibers or lesions',
-        'Include ruler or coin for size reference in photos',
-        'Write detailed descriptions of texture, color, movement',
-        'Link to symptom entries for comprehensive tracking'
+        'Take photos in good lighting for better documentation',
+        'Write detailed observations - they help identify patterns',
+        'Track treatments and their effectiveness over time',
+        'Note environmental changes that coincide with symptoms'
       ],
-      highlightElements: ['[data-tour="journal-form"]', '[data-tour="photo-upload"]', '[data-tour="entry-linking"]']
-    },
-    {
-      id: 'calendar',
-      title: 'Calendar & Trends',
-      description: 'Visualize your health journey with calendar views and trend analysis.',
-      icon: Calendar,
-      route: '/calendar',
-      features: [
-        'Monthly calendar with color-coded symptom intensity',
-        'Yearly heatmap for long-term pattern recognition',
-        'Quick entry creation from calendar dates',
-        'Visual correlation between environmental factors and symptoms'
-      ],
-      tips: [
-        'Darker colors indicate higher symptom intensity days',
-        'Click any date to add entries or view details',
-        'Use the yearly view to identify seasonal patterns',
-        'Look for clusters of high-intensity days for triggers'
-      ],
-      highlightElements: ['.calendar-view', '.heatmap', '.date-navigation']
+      highlightElements: ['.journal-entry-form', '.photo-upload', '.treatment-log', '.mood-tracker']
     },
     {
       id: 'community',
@@ -142,274 +138,322 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
       highlightElements: ['.forum-categories', '.discussion-threads', '.support-groups']
     },
     {
+      id: 'daily-tasks',
+      title: 'Daily Tasks & Gamification',
+      description: 'Complete daily health tasks to earn points, maintain streaks, and unlock achievements.',
+      icon: Target,
+      route: '/dashboard',
+      features: [
+        'Daily task list with point rewards',
+        'Health tracking streaks with encouragement',
+        'Achievement system for major milestones',
+        'Community challenges and competitions',
+        'Progress visualization and celebration'
+      ],
+      tips: [
+        'Complete your daily check-in first each day',
+        'Maintain streaks for better AI pattern recognition',
+        'Share achievements in the community',
+        'Use gamification to build healthy habits',
+        'Check weekly challenges for bonus points'
+      ],
+      highlightElements: ['.daily-task-list', '.gamified-progress', '.achievement-badges', '.streak-counter']
+    },
+    {
       id: 'telemedicine',
       title: 'Telemedicine Appointments',
-      description: 'Connect with healthcare providers experienced in Morgellons treatment.',
-      icon: Video,
+      description: 'Connect with verified healthcare providers experienced in Morgellons treatment.',
+      icon: Stethoscope,
       route: '/telemedicine',
       features: [
-        'Search providers with Morgellons experience',
-        'Filter by specialty, location, and ratings',
+        'Only verified doctors registered in Fiber Friends',
+        'Filter by specialty, location, and Morgellons experience',
         'Book telehealth or in-person appointments',
-        'View provider credentials and patient reviews'
+        'View provider credentials and patient reviews',
+        'Secure consultation scheduling system'
       ],
       tips: [
         'Filter for providers with Morgellons experience',
         'Read reviews from other patients before booking',
         'Prepare your symptom timeline before appointments',
-        'Consider telehealth for initial consultations'
+        'Consider telehealth for initial consultations',
+        'Share your Fiber Friends data during consultations'
       ],
-      highlightElements: ['.provider-search', '.booking-calendar', '.appointment-types']
+      highlightElements: ['.provider-search', '.booking-calendar', '.appointment-types', '.verified-badge']
     },
     {
-      id: 'insights',
-      title: 'AI Health Insights',
-      description: 'Get intelligent analysis of your data to identify patterns and correlations.',
-      icon: Activity,
-      route: '/ai-insights',
+      id: 'ai-insights',
+      title: 'AI Health Coach & Insights',
+      description: 'Get intelligent analysis of your data with personalized recommendations and predictions.',
+      icon: Brain,
+      route: '/dashboard',
       features: [
-        'Automated pattern recognition in your symptom data',
-        'Environmental correlation analysis (weather, stress, diet)',
-        'Treatment effectiveness tracking over time',
-        'Personalized recommendations based on your patterns'
+        'Real-time AI analysis of your health patterns',
+        'Personalized daily insights and recommendations',
+        'Symptom prediction with confidence levels',
+        'Environmental correlation detection',
+        'Treatment effectiveness tracking',
+        'Smart daily check-ins that adapt to your patterns'
       ],
       tips: [
-        'Review insights weekly to spot new patterns',
+        'Review AI insights daily for actionable recommendations',
         'Share AI findings with your healthcare providers',
         'Use correlation data to identify your triggers',
-        'Track suggested lifestyle changes for effectiveness'
+        'Trust the AI predictions - they improve with more data',
+        'Follow personalized recommendations for better outcomes'
       ],
-      highlightElements: ['.ai-patterns', '.correlation-charts', '.recommendations']
+      highlightElements: ['.ai-health-coach', '.ai-insights', '.correlation-charts', '.recommendations', '.smart-checkin']
     },
     {
-      id: 'reports',
-      title: 'Provider Reports',
-      description: 'Generate professional health summaries to share with your healthcare team.',
-      icon: FileText,
-      route: '/reports',
+      id: 'peer-matching',
+      title: 'Peer Matching & Support',
+      description: 'Connect with other Morgellons patients for mutual support and shared experiences.',
+      icon: Users,
+      route: '/peer-matching',
       features: [
-        'Comprehensive health summaries with symptom trends',
-        'Customizable date ranges for specific periods',
-        'Professional PDF formatting for medical use',
-        'Include photos, notes, and correlation data'
+        'AI-powered compatibility matching',
+        'Preference-based peer recommendations',
+        'Symptom overlap and experience level matching',
+        'Support type preferences (emotional, practical, crisis)',
+        'Interest-based connections beyond health',
+        'Privacy controls and communication preferences'
       ],
       tips: [
-        'Generate reports 2-3 days before appointments',
-        'Include 3-6 months of data for pattern recognition',
-        'Print reports and bring copies to consultations',
-        'Highlight significant changes or new symptoms'
+        'Complete your preferences for better matches',
+        'Be open about your support needs',
+        'Consider mentoring newer community members',
+        'Respect privacy boundaries in all interactions',
+        'Share experiences to help others learn'
       ],
-      highlightElements: ['.report-generator', '.date-range-selector', '.export-options']
+      highlightElements: ['.peer-recommendations', '.compatibility-score', '.connection-requests', '.support-preferences']
     }
   ];
 
+  const currentTourStep = tourSteps[currentStep];
+
+  useEffect(() => {
+    if (currentTourStep && currentTourStep.route) {
+      setLocation(currentTourStep.route);
+      
+      // Add delay for page content to load before highlighting
+      setTimeout(() => {
+        highlightElements(currentTourStep.highlightElements || []);
+      }, 1500);
+    }
+  }, [currentStep, currentTourStep, setLocation]);
+
+  const highlightElements = (selectors: string[]) => {
+    // Remove previous highlights
+    document.querySelectorAll('.tour-highlight').forEach(el => {
+      el.classList.remove('tour-highlight');
+    });
+
+    // Add new highlights with multiple attempts for elements that may load dynamically
+    const tryHighlight = (attempt: number = 0) => {
+      if (attempt > 5) return; // Stop after 5 attempts
+      
+      let foundElements = 0;
+      selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          el.classList.add('tour-highlight');
+          foundElements++;
+        });
+      });
+
+      // If no elements found, try again after a short delay
+      if (foundElements === 0 && attempt < 5) {
+        setTimeout(() => tryHighlight(attempt + 1), 500);
+      }
+    };
+
+    tryHighlight();
+    setHighlightedElements(selectors);
+  };
+
+  const removeHighlights = () => {
+    document.querySelectorAll('.tour-highlight').forEach(el => {
+      el.classList.remove('tour-highlight');
+    });
+    setHighlightedElements([]);
+  };
+
   const nextStep = () => {
-    console.log('nextStep called, currentStep:', currentStep, 'totalSteps:', tourSteps.length);
-    console.log('Condition check:', currentStep, '<', tourSteps.length - 1, '=', currentStep < tourSteps.length - 1);
     if (currentStep < tourSteps.length - 1) {
-      console.log('Advancing to step:', currentStep + 1);
+      removeHighlights();
       setCurrentStep(currentStep + 1);
     } else {
-      console.log('Tour completed, calling onComplete');
-      onComplete();
+      completeTour();
     }
   };
-
-  const previousStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  // Navigate to appropriate page when step changes
-  useEffect(() => {
-    const currentTourStep = tourSteps[currentStep];
-    console.log('Navigation useEffect triggered, currentStep:', currentStep, 'route:', currentTourStep.route, 'location:', location);
-    if (currentTourStep.route && location !== currentTourStep.route) {
-      console.log('Navigating to:', currentTourStep.route);
-      navigate(currentTourStep.route);
-    }
-  }, [currentStep, navigate, location]);
-
-  // Add highlighting effects for specific elements with longer delay
-  useEffect(() => {
-    const currentTourStep = tourSteps[currentStep];
-    console.log('Highlighting useEffect triggered, currentStep:', currentStep, 'highlightElements:', currentTourStep.highlightElements);
-    if (currentTourStep.highlightElements) {
-      // Wait longer for page content to fully load and try multiple times
-      let attempts = 0;
-      const maxAttempts = 5;
-      
-      const tryHighlighting = () => {
-        attempts++;
-        let foundElements = 0;
-        
-        currentTourStep.highlightElements.forEach(selector => {
-          const elements = document.querySelectorAll(selector);
-          console.log(`Attempt ${attempts}: Found`, elements.length, 'elements for selector:', selector);
-          foundElements += elements.length;
-          elements.forEach(el => {
-            el.classList.add('tour-highlight');
-          });
-        });
-        
-        // If no elements found and we haven't exceeded max attempts, try again
-        if (foundElements === 0 && attempts < maxAttempts) {
-          setTimeout(tryHighlighting, 500);
-        }
-      };
-      
-      const timeoutId = setTimeout(tryHighlighting, 800);
-
-      // Cleanup function to remove highlights
-      return () => {
-        clearTimeout(timeoutId);
-        console.log('Cleaning up highlights for step:', currentStep);
-        document.querySelectorAll('.tour-highlight').forEach(el => {
-          el.classList.remove('tour-highlight');
-        });
-      };
-    }
-  }, [currentStep, location]);
 
   const prevStep = () => {
     if (currentStep > 0) {
+      removeHighlights();
       setCurrentStep(currentStep - 1);
     }
   };
 
-  const currentTourStep = tourSteps[currentStep];
-  const StepIcon = currentTourStep.icon;
+  const completeTour = () => {
+    removeHighlights();
+    setIsVisible(false);
+    onComplete();
+  };
+
+  const skipTour = () => {
+    removeHighlights();
+    setIsVisible(false);
+    onSkip();
+  };
+
+  const goToStep = (stepIndex: number) => {
+    removeHighlights();
+    setCurrentStep(stepIndex);
+  };
+
+  if (!isVisible) return null;
 
   return (
     <>
-      {/* Compact Tour Modal positioned at bottom-right with proper spacing */}
-      <div className="fixed bottom-4 right-4 z-50 max-w-sm w-96 max-h-[calc(100vh-100px)]">
-      <Card className="shadow-2xl border-2 border-blue-500 overflow-hidden">
-        <CardHeader className="relative pb-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onSkip}
-            className="absolute right-2 top-2 text-white hover:bg-white/20"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-white/20 rounded-lg">
-              <StepIcon className="h-5 w-5 text-white" />
+      {/* Tour overlay */}
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={(e) => e.preventDefault()} />
+      
+      {/* Tour modal */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <Card className="w-full max-w-4xl bg-white shadow-2xl pointer-events-auto relative">
+          <CardContent className="p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-primary-500 rounded-full flex items-center justify-center">
+                  <currentTourStep.icon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{currentTourStep.title}</h2>
+                  <Badge variant="secondary">
+                    Step {currentStep + 1} of {tourSteps.length}
+                  </Badge>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={skipTour}>
+                <X className="h-4 w-4" />
+              </Button>
             </div>
-            <div className="flex-1">
-              <CardTitle className="text-lg font-bold text-white">{currentTourStep.title}</CardTitle>
-              <p className="text-blue-100 text-sm mt-1">{currentTourStep.description}</p>
+
+            <Progress value={(currentStep + 1) / tourSteps.length * 100} className="mb-6" />
+
+            <p className="text-lg text-gray-700 mb-6">{currentTourStep.description}</p>
+            
+            {/* Step Navigation */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {tourSteps.map((step, index) => (
+                <Button
+                  key={step.id}
+                  variant={index === currentStep ? "default" : index < currentStep ? "outline" : "ghost"}
+                  size="sm"
+                  onClick={() => goToStep(index)}
+                  className="flex items-center gap-1"
+                >
+                  {index < currentStep && <CheckCircle className="h-3 w-3" />}
+                  <step.icon className="h-3 w-3" />
+                  <span className="hidden sm:inline">{step.title}</span>
+                </Button>
+              ))}
             </div>
-          </div>
-          
-          <div className="mt-3">
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-              Step {currentStep + 1} of {tourSteps.length}
-            </Badge>
-          </div>
-        </CardHeader>
 
-        <CardContent className="space-y-4 p-4 max-h-96 overflow-y-auto">
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-            <p className="text-blue-800 text-sm">
-              <strong>👀 Live Demo:</strong> Look around the page to see these features in action!
-            </p>
-          </div>
-          
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Key Features:</h4>
-            <ul className="space-y-1.5">
-              {currentTourStep.features.slice(0, 4).map((feature, index) => (
-                <li key={index} className="flex items-start space-x-2">
-                  <CheckCircle className="h-3.5 w-3.5 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-xs text-gray-700 leading-tight">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <Sparkles className="mr-2 h-5 w-5 text-yellow-500" />
+                  Key Features
+                </h3>
+                <ul className="space-y-2">
+                  {currentTourStep.features.map((feature, index) => (
+                    <li key={index} className="flex items-start space-x-2 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Pro Tips:</h4>
-            <ul className="space-y-1.5">
-              {currentTourStep.tips.slice(0, 3).map((tip, index) => (
-                <li key={index} className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-xs text-gray-700 leading-tight">{tip}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </CardContent>
-        
-        <div className="px-4 py-3 bg-gray-50 border-t flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={previousStep}
-            disabled={currentStep === 0}
-            size="sm"
-            className="text-xs"
-          >
-            <ArrowLeft className="mr-1 h-3 w-3" />
-            Previous
-          </Button>
-          
-          <Button 
-            onClick={nextStep} 
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4"
-          >
-            {currentStep === tourSteps.length - 1 ? 'Finish' : 'Next'}
-            <ArrowRight className="ml-1 h-3 w-3" />
-          </Button>
-        </div>
-        
-        {/* Step indicators */}
-        <div className="flex justify-center space-x-1 py-2 bg-gray-50">
-          {tourSteps.map((_, index) => (
-            <div
-              key={index}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                index === currentStep ? 'bg-blue-500' : 
-                index < currentStep ? 'bg-green-500' : 'bg-gray-300'
-              }`}
-            />
-          ))}
-        </div>
-      </Card>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                  <Lightbulb className="mr-2 h-5 w-5 text-blue-500" />
+                  Pro Tips
+                </h3>
+                <ul className="space-y-2">
+                  {currentTourStep.tips.map((tip, index) => (
+                    <li key={index} className="flex items-start space-x-2 text-sm">
+                      <Eye className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-gray-700">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            
+            {highlightedElements.length > 0 && (
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center gap-2 text-yellow-800 mb-2">
+                  <Eye className="h-4 w-4" />
+                  <span className="font-medium">Look for highlighted elements</span>
+                </div>
+                <p className="text-sm text-yellow-700">
+                  The yellow highlighted areas on the page show the features we're discussing. Take a moment to explore them!
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between">
+              <Button
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 0}
+                className="flex items-center space-x-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>Previous</span>
+              </Button>
+
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">
+                  {currentStep + 1} of {tourSteps.length}
+                </span>
+                <Button variant="ghost" onClick={skipTour} size="sm">
+                  Skip Tour
+                </Button>
+                <Button
+                  onClick={nextStep}
+                  className="flex items-center space-x-2 bg-primary-500 hover:bg-primary-600"
+                >
+                  <span>{currentStep === tourSteps.length - 1 ? 'Complete Tour' : 'Next'}</span>
+                  {currentStep === tourSteps.length - 1 ? <CheckCircle className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-
-      {/* Add CSS for highlighting elements */}
-      <style>{`
+      
+      {/* Tour highlight styles */}
+      <style jsx global>{`
         .tour-highlight {
           position: relative;
-          z-index: 45;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.6), 
-                      0 0 0 6px rgba(59, 130, 246, 0.3);
-          border-radius: 6px;
-          transition: all 0.3s ease;
+          z-index: 60;
+          outline: 3px solid #fbbf24 !important;
+          outline-offset: 2px;
+          border-radius: 8px;
+          box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3) !important;
+          animation: tour-pulse 2s infinite;
         }
         
-        .tour-highlight::before {
-          content: '';
-          position: absolute;
-          top: -3px;
-          left: -3px;
-          right: -3px;
-          bottom: -3px;
-          background: rgba(59, 130, 246, 0.15);
-          border-radius: 9px;
-          z-index: -1;
-          animation: tourPulse 2s infinite;
-        }
-        
-        @keyframes tourPulse {
-          0% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(1.02); }
-          100% { opacity: 1; transform: scale(1); }
+        @keyframes tour-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+          }
+          50% { 
+            box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.2);
+          }
         }
       `}</style>
     </>

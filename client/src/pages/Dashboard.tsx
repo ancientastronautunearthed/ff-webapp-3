@@ -249,7 +249,7 @@ export default function Dashboard() {
         <div className="flex gap-2">
           <Button
             onClick={() => setShowCheckin(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 daily-checkin-button"
           >
             <Target className="h-4 w-4 mr-2" />
             Daily Check-in
@@ -258,6 +258,7 @@ export default function Dashboard() {
             variant="outline"
             onClick={startTour}
             className="flex items-center gap-2"
+            data-tour="take-tour-button"
           >
             <HelpCircle className="h-4 w-4" />
             Take Tour
