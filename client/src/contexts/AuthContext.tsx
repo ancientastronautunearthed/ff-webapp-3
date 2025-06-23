@@ -29,7 +29,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Force logout for fresh start - clear all authentication
+    const forceLogout = localStorage.getItem('forceLogout');
+    if (forceLogout) {
+      localStorage.clear();
+      import('@/lib/auth').then(({ logOut }) => {
+        logOut().then(() => {
+          setUser(null);
+          setLoading(false);
+          console.log('Forced logout complete - should show login screen');
+        }).catch(() => {
+          // Even if logout fails, clear user state
+          setUser(null);
+          setLoading(false);
+        });
+      });
+      return;
+    }
+
     const unsubscribe = onAuthChange(async (firebaseUser) => {
+      console.log('Auth state changed:', firebaseUser ? 'User logged in' : 'No user');
+      
       if (firebaseUser) {
         try {
           const { getUserFromFirestore, createUserInFirestore } = await import('@/lib/firestore');
