@@ -52,9 +52,12 @@ export const AuthForm = ({ mode, onToggleMode }: AuthFormProps) => {
     try {
       if (mode === 'signup') {
         await signUp(data.email, data.password);
+        // Clear any existing onboarding flags for new users to force medical profile setup
+        localStorage.removeItem('onboardingComplete');
+        localStorage.removeItem('medicalProfileComplete');
         toast({
           title: "Account Created",
-          description: "Welcome to Fiber Friends! Your account has been created successfully.",
+          description: "Let's set up your comprehensive medical profile to get personalized insights and contribute to research.",
         });
       } else {
         await signIn(data.email, data.password);

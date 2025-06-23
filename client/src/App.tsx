@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -28,6 +28,7 @@ import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const [location] = useLocation();
 
   if (loading) {
     return (
@@ -48,11 +49,11 @@ function AppContent() {
     return <Login />;
   }
 
-  // Check if user needs onboarding
-  // For new users, show onboarding with comprehensive medical profile
-  const needsOnboarding = false; // This forces onboarding for demo purposes
-
-  if (needsOnboarding) {
+  // Check if user has completed onboarding
+  const hasCompletedOnboarding = localStorage.getItem('onboardingComplete') === 'true';
+  
+  // Force new users through comprehensive medical onboarding (except when explicitly accessing onboarding routes)
+  if (!hasCompletedOnboarding && !location.startsWith('/onboarding') && !location.startsWith('/medical-onboarding') && !location.startsWith('/research-consent')) {
     return <Onboarding />;
   }
 

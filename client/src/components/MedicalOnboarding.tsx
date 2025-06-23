@@ -197,10 +197,14 @@ export const MedicalOnboarding = ({ onComplete, onSkip }: MedicalOnboardingProps
   const onSubmit = async (data: MedicalProfileData) => {
     setLoading(true);
     try {
+      // Mark medical profile as complete
+      localStorage.setItem('medicalProfileComplete', 'true');
+      localStorage.setItem('medicalProfileData', JSON.stringify(data));
+      
       onComplete(data);
       toast({
         title: "Medical profile completed",
-        description: "Thank you for providing your medical information for research.",
+        description: `Thank you for providing comprehensive health information with ${Object.keys(data).length} data points for research.`,
       });
     } catch (error) {
       toast({

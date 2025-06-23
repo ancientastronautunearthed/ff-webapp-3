@@ -179,6 +179,11 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Comprehensive demographic, medical, and lifestyle data capture
 - ✓ Integrated research consent flow with medical profile setup
 - ✓ Enhanced onboarding flow with research participation emphasis
+- ✓ Integrated Medical Onboarding into Registration Flow
+- ✓ New users now required to complete comprehensive medical profile
+- ✓ 50+ data points collected including demographics, symptoms, lifestyle
+- ✓ Registration flows directly from signup into medical profile setup
+- ✓ Onboarding completion tracked to prevent dashboard access without profile
 
 ## User Preferences
 
@@ -187,3 +192,4 @@ Form requirements: All data entry forms need Submit buttons, not just Save butto
 Draft functionality: Users should be able to save entries as drafts before final submission.
 Research focus: Registration should collect comprehensive medical/demographic data for research analysis.
 Medical profile: New users need robust registration with all health factors for pattern analysis.
+Onboarding requirement: New users must complete comprehensive medical profile before accessing main application.
