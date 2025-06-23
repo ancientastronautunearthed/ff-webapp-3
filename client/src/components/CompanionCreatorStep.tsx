@@ -34,6 +34,8 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
 
+  console.log('CompanionCreatorStep rendered');
+
   const questions = [
     {
       id: 'species',

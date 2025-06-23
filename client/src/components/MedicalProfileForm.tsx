@@ -88,6 +88,42 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
   const [companionData, setCompanionData] = useState<{imageUrl: string, config: any} | null>(null);
   const { toast } = useToast();
 
+  console.log('MedicalProfileForm state:', { currentStep, showCompanionCreator });
+
+  // Define companion creator handlers first
+  const handleCompanionCreated = (imageUrl: string, config: any) => {
+    console.log('Companion created:', { imageUrl, config });
+    setCompanionData({ imageUrl, config });
+    
+    toast({
+      title: "Profile & Companion Complete!",
+      description: "Your medical profile and AI companion have been created successfully.",
+    });
+    
+    onComplete();
+  };
+
+  const handleSkipCompanion = () => {
+    console.log('Companion creation skipped');
+    toast({
+      title: "Profile Complete!",
+      description: "You can create your AI companion later from settings.",
+    });
+    
+    onComplete();
+  };
+
+  // Show companion creator if flag is set
+  if (showCompanionCreator) {
+    console.log('Rendering CompanionCreatorStep');
+    return (
+      <CompanionCreatorStep
+        onComplete={handleCompanionCreated}
+        onSkip={handleSkipCompanion}
+      />
+    );
+  }
+
   const form = useForm<MedicalProfileData>({
     resolver: zodResolver(medicalProfileSchema),
     defaultValues: {
@@ -734,6 +770,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                     }
                     
                     // Show companion creator after profile completion
+                    console.log('Setting showCompanionCreator to true');
                     setShowCompanionCreator(true);
                   }}
                 >
@@ -746,35 +783,6 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       </Card>
     </div>
   );
-
-  const handleCompanionCreated = (imageUrl: string, config: any) => {
-    setCompanionData({ imageUrl, config });
-    
-    toast({
-      title: "Profile & Companion Complete!",
-      description: "Your medical profile and AI companion have been created successfully.",
-    });
-    
-    onComplete();
-  };
-
-  const handleSkipCompanion = () => {
-    toast({
-      title: "Profile Complete!",
-      description: "You can create your AI companion later from settings.",
-    });
-    
-    onComplete();
-  };
-
-  if (showCompanionCreator) {
-    return (
-      <CompanionCreatorStep
-        onComplete={handleCompanionCreated}
-        onSkip={handleSkipCompanion}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
