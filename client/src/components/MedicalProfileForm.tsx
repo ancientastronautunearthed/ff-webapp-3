@@ -88,6 +88,33 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
   const [companionData, setCompanionData] = useState<{imageUrl: string, config: any} | null>(null);
   const { toast } = useToast();
 
+  // US States dropdown options
+  const US_STATES = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+    'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+    'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+    'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+    'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+    'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+    'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming', 'District of Columbia',
+    'Puerto Rico', 'US Virgin Islands', 'American Samoa', 'Guam', 'Northern Mariana Islands'
+  ];
+
+  // Ethnicity dropdown options
+  const ETHNICITIES = [
+    'Hispanic or Latino',
+    'Not Hispanic or Latino',
+    'White',
+    'Black or African American',
+    'American Indian or Alaska Native',
+    'Asian',
+    'Native Hawaiian or Other Pacific Islander',
+    'Mixed Race',
+    'Middle Eastern or North African',
+    'Prefer not to answer',
+    'Other'
+  ];
+
   console.log('MedicalProfileForm state:', { currentStep, showCompanionCreator });
 
   // Define companion creator handlers first

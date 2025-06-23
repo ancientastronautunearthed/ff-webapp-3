@@ -326,6 +326,8 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Created Cloud Functions for companion chat, memory management, and pattern analysis
 - ✓ Documented Firestore security rules and performance optimization strategies
 - ✓ Provided complete client-side migration from Express API to Firebase Functions
+- ✓ Fixed "Complete Profile & Create Companion" button functionality
+- ✓ Added dropdown selectable options for State and Ethnicity fields in medical profile form
 
 ## User Preferences
 
@@ -336,4 +338,5 @@ Research focus: Registration should collect comprehensive medical/demographic da
 Medical profile: New users need robust registration with all health factors for pattern analysis.
 Onboarding requirement: New users must complete comprehensive medical profile before accessing main application.
 Dropdown preferences: All questions should have dropdown or checkmark boxes with pre-populated selections for frequently used answers instead of text input.
+State and Ethnicity fields: User requested dropdown selectable options for State and Ethnicity fields in medical profile form.
 AI engagement focus: Implement AI features that encourage daily login and symptom tracking through personalized insights, predictions, and gamification.
