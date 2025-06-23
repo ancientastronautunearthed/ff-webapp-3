@@ -17,6 +17,7 @@ import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import CalendarView from "@/pages/CalendarView";
 import ResearchDashboard from "@/pages/ResearchDashboard";
+import ProfileSetup from "@/pages/ProfileSetup";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -40,6 +41,14 @@ function AppContent() {
     return <Login />;
   }
 
+  // Check if user needs to complete profile setup
+  // In production, check user.profileComplete from Firestore
+  const needsProfileSetup = false; // This would be determined from user data
+
+  if (needsProfileSetup) {
+    return <ProfileSetup />;
+  }
+
   return (
     <Layout>
       <Switch>
@@ -54,6 +63,7 @@ function AppContent() {
         <Route path="/calendar" component={CalendarView} />
         <Route path="/ai-insights" component={AIInsights} />
         <Route path="/research" component={ResearchDashboard} />
+        <Route path="/profile-setup" component={ProfileSetup} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
