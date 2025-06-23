@@ -258,105 +258,102 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
 
   return (
     <>
-      {/* Compact Tour Modal positioned at bottom-right */}
-      <div className="fixed bottom-6 right-6 z-50 max-w-md w-80">
-      <Card className="shadow-2xl border-2 border-blue-500">
-        <CardHeader className="relative">
+      {/* Compact Tour Modal positioned at bottom-right with proper spacing */}
+      <div className="fixed bottom-4 right-4 z-50 max-w-sm w-96 max-h-[calc(100vh-100px)]">
+      <Card className="shadow-2xl border-2 border-blue-500 overflow-hidden">
+        <CardHeader className="relative pb-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <Button
             variant="ghost"
             size="sm"
             onClick={onSkip}
-            className="absolute right-2 top-2"
+            className="absolute right-2 top-2 text-white hover:bg-white/20"
           >
             <X className="h-4 w-4" />
           </Button>
           
-          <div className="text-center">
-            <div className="w-16 h-16 bg-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <StepIcon className="h-8 w-8 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-white/20 rounded-lg">
+              <StepIcon className="h-5 w-5 text-white" />
             </div>
-            <CardTitle className="text-xl font-bold">{currentTourStep.title}</CardTitle>
-            <p className="text-gray-600 mt-2">{currentTourStep.description}</p>
-            
-            <div className="flex justify-center mt-4">
-              <Badge variant="outline">
-                Step {currentStep + 1} of {tourSteps.length}
-              </Badge>
+            <div className="flex-1">
+              <CardTitle className="text-lg font-bold text-white">{currentTourStep.title}</CardTitle>
+              <p className="text-blue-100 text-sm mt-1">{currentTourStep.description}</p>
             </div>
+          </div>
+          
+          <div className="mt-3">
+            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+              Step {currentStep + 1} of {tourSteps.length}
+            </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+        <CardContent className="space-y-4 p-4 max-h-96 overflow-y-auto">
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
             <p className="text-blue-800 text-sm">
-              <strong>Live Demo:</strong> This tour is showing you the actual {currentTourStep.title.toLowerCase()} page. 
-              Look around to see the features being described!
+              <strong>👀 Live Demo:</strong> Look around the page to see these features in action!
             </p>
           </div>
           
           <div>
-            <h4 className="font-semibold text-gray-900 mb-3">Key Features:</h4>
-            <ul className="space-y-2">
-              {currentTourStep.features.map((feature, index) => (
+            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Key Features:</h4>
+            <ul className="space-y-1.5">
+              {currentTourStep.features.slice(0, 4).map((feature, index) => (
                 <li key={index} className="flex items-start space-x-2">
-                  <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                  <span className="text-sm text-gray-700">{feature}</span>
+                  <CheckCircle className="h-3.5 w-3.5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-xs text-gray-700 leading-tight">{feature}</span>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-gray-900 mb-3">Pro Tips:</h4>
-            <ul className="space-y-2">
-              {currentTourStep.tips.map((tip, index) => (
+            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Pro Tips:</h4>
+            <ul className="space-y-1.5">
+              {currentTourStep.tips.slice(0, 3).map((tip, index) => (
                 <li key={index} className="flex items-start space-x-2">
-                  <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-                  </div>
-                  <span className="text-sm text-gray-700">{tip}</span>
+                  <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-xs text-gray-700 leading-tight">{tip}</span>
                 </li>
               ))}
             </ul>
           </div>
-
-          <div className="flex justify-between pt-4">
-            <Button
-              variant="outline"
-              onClick={previousStep}
-              disabled={currentStep === 0}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Previous
-            </Button>
-            
-            <div className="flex space-x-2">
-              <Button variant="ghost" onClick={onSkip}>
-                Skip Tour
-              </Button>
-              <Button 
-                onClick={nextStep} 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {currentStep === tourSteps.length - 1 ? 'Finish Tour' : 'Next'}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Step indicators */}
-          <div className="flex justify-center space-x-2 pt-2">
-            {tourSteps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentStep ? 'bg-blue-500' : 
-                  index < currentStep ? 'bg-green-500' : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
         </CardContent>
+        
+        <div className="px-4 py-3 bg-gray-50 border-t flex items-center justify-between">
+          <Button
+            variant="outline"
+            onClick={previousStep}
+            disabled={currentStep === 0}
+            size="sm"
+            className="text-xs"
+          >
+            <ArrowLeft className="mr-1 h-3 w-3" />
+            Previous
+          </Button>
+          
+          <Button 
+            onClick={nextStep} 
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4"
+          >
+            {currentStep === tourSteps.length - 1 ? 'Finish' : 'Next'}
+            <ArrowRight className="ml-1 h-3 w-3" />
+          </Button>
+        </div>
+        
+        {/* Step indicators */}
+        <div className="flex justify-center space-x-1 py-2 bg-gray-50">
+          {tourSteps.map((_, index) => (
+            <div
+              key={index}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                index === currentStep ? 'bg-blue-500' : 
+                index < currentStep ? 'bg-green-500' : 'bg-gray-300'
+              }`}
+            />
+          ))}
+        </div>
       </Card>
       </div>
 
