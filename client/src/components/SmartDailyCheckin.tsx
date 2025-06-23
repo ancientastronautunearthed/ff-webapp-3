@@ -338,18 +338,18 @@ export const SmartDailyCheckin = () => {
   }
 
   return (
-    <Card className="border-l-4 border-l-blue-500">
+    <Card className="border-l-4 border-l-blue-500" id="daily-checkin">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageCircle className="h-5 w-5 text-blue-600" />
-          Smart Daily Check-in
+          Daily Check-in
           <Badge variant="secondary" className="ml-auto">
             <Timer className="h-3 w-3 mr-1" />
             ~2 min
           </Badge>
         </CardTitle>
         <div className="flex items-center gap-4 text-sm text-gray-600">
-          <span>Current streak: {currentStreak} days</span>
+          <span>Streak: {currentStreak} days</span>
           <Progress value={Math.min((currentStreak / 30) * 100, 100)} className="flex-1 max-w-32" />
         </div>
       </CardHeader>

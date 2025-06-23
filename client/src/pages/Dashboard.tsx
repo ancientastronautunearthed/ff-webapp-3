@@ -11,8 +11,7 @@ import { WelcomeTour } from '@/components/WelcomeTour';
 import { AIHealthCoach } from '@/components/AIHealthCoach';
 import { SmartDailyCheckin } from '@/components/SmartDailyCheckin';
 import { GamifiedProgress } from '@/components/GamifiedProgress';
-import { CommunityEngagementWidget } from '@/components/CommunityEngagementWidget';
-import { PeerMatchingWidget } from '@/components/PeerMatchingWidget';
+import { DailyTaskList } from '@/components/DailyTaskList';
 import { Link } from 'wouter';
 import { 
   Activity, 
@@ -177,21 +176,20 @@ export default function Dashboard() {
         </Button>
       </div>
 
-      {/* Smart Daily Check-in - Top Priority */}
-      <div className="mb-8">
-        <SmartDailyCheckin />
+      {/* Daily Task List - Main Focus */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <DailyTaskList />
+        </div>
+        <div className="space-y-6">
+          <SmartDailyCheckin />
+          <AIHealthCoach />
+        </div>
       </div>
 
-      {/* AI Health Coach and Gamification */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <AIHealthCoach />
+      {/* Gamification Progress */}
+      <div className="mb-8" id="gamification">
         <GamifiedProgress />
-      </div>
-
-      {/* Community Features */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <CommunityEngagementWidget />
-        <PeerMatchingWidget />
       </div>
 
       {/* Quick Stats */}
