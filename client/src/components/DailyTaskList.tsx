@@ -140,7 +140,7 @@ export const DailyTaskList = () => {
             completed: completedTasks.includes('check_matches'),
             priority: 'low',
             icon: Users,
-            action: () => scrollToElement('peer-matching')
+            href: '/peer-matching'
           },
           {
             id: 'share_experience',
@@ -347,11 +347,10 @@ export const DailyTaskList = () => {
   };
 
   const handleTaskClick = (task: DailyTask) => {
-    if (task.action) {
+    if (task.action && typeof task.action === 'function') {
       task.action();
     } else if (task.href) {
-      // Link will handle navigation
-      return;
+      window.location.href = task.href;
     }
   };
 
@@ -406,7 +405,16 @@ export const DailyTaskList = () => {
                             ? 'bg-green-50 border-green-200' 
                             : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                         } ${task.href ? 'cursor-pointer' : ''}`}
-                        onClick={() => !task.href && handleTaskClick(task)}
+                        onClick={(e) => {
+                          // Don't trigger if clicking checkbox
+                          if ((e.target as HTMLElement).closest('button[role="checkbox"]')) return;
+                          
+                          if (task.href) {
+                            window.location.href = task.href;
+                          } else if (task.action) {
+                            handleTaskClick(task);
+                          }
+                        }}
                       >
                         <Checkbox
                           checked={task.completed}

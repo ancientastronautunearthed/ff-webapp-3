@@ -28,10 +28,10 @@ import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
 import DoctorLogin from "@/pages/DoctorLogin";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import DoctorDemo from "@/pages/DoctorDemo";
+import { PeerMatchingPage } from "@/pages/PeerMatchingPage";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
-import { PeerMatchingPage } from "@/pages/PeerMatchingPage";
 
 function AppContent() {
   const { user, loading } = useAuth();
