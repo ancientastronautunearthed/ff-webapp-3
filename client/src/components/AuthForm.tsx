@@ -43,20 +43,11 @@ export const AuthForm = ({ mode, onToggleMode }: AuthFormProps) => {
       email: '',
       password: '',
       confirmPassword: '',
-      terms: false,
+      terms: true,
     },
   });
 
   const onSubmit = async (data: AuthFormData) => {
-    if (mode === 'signup' && !data.terms) {
-      toast({
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setLoading(true);
     try {
       if (mode === 'signup') {
@@ -185,7 +176,8 @@ export const AuthForm = ({ mode, onToggleMode }: AuthFormProps) => {
               <div className="flex items-start space-x-3">
                 <Checkbox
                   id="terms"
-                  {...form.register('terms')}
+                  defaultChecked={true}
+                  onCheckedChange={(checked) => form.setValue('terms', !!checked)}
                   className="mt-1"
                 />
                 <Label htmlFor="terms" className="text-sm text-gray-700">
