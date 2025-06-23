@@ -1,0 +1,35 @@
+Could not load companion data: FirebaseError: Missing or insufficient permissions.
+Layout.tsx:53 Could not load companion image: FirebaseError: Missing or insufficient permissions.
+The script has an unsupported MIME type ('text/html').Understand this error
+companion:187 SW registration failed:  SecurityError: Failed to register a ServiceWorker for scope ('https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/') with script ('https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/sw.js'): The script has an unsupported MIME type ('text/html').
+3CompanionDemo.tsx:70 ➕ Adding 100 points manually
+CompanionDemo.tsx:70 ➕ Adding 50 points manually
+2CompanionDemo.tsx:70 ➕ Adding 100 points manually
+CompanionDemo.tsx:70 ➕ Adding 500 points manually
+CompanionDemo.tsx:70 ➕ Adding 50 points manually
+CompanionDemo.tsx:35 🔄 Starting demo - resetting to Level 1
+CompanionDemo.tsx:44 ⚡ Setting points to 0 for Level 1
+CompanionDemo.tsx:51 ✅ Level 1 unlocked functions: (2) ['Basic Chat', 'Symptom Logging']
+CompanionDemo.tsx:44 ⚡ Setting points to 100 for Level 2
+CompanionDemo.tsx:51 ✅ Level 2 unlocked functions: ['Daily Check-ins']
+CompanionDemo.tsx:44 ⚡ Setting points to 300 for Level 3
+CompanionDemo.tsx:51 ✅ Level 3 unlocked functions: ['Meal Suggestions']
+CompanionDemo.tsx:44 ⚡ Setting points to 600 for Level 4
+CompanionDemo.tsx:51 ✅ Level 4 unlocked functions: ['Pattern Analysis']
+CompanionDemo.tsx:44 ⚡ Setting points to 1000 for Level 5
+CompanionDemo.tsx:51 ✅ Level 5 unlocked functions: ['Supplement Recommendations']
+CompanionDemo.tsx:44 ⚡ Setting points to 1500 for Level 6
+CompanionDemo.tsx:51 ✅ Level 6 unlocked functions: ['Symptom Predictions']
+CompanionDemo.tsx:44 ⚡ Setting points to 2200 for Level 7
+CompanionDemo.tsx:51 ✅ Level 7 unlocked functions: ['Treatment Optimization']
+CompanionDemo.tsx:44 ⚡ Setting points to 3000 for Level 8
+CompanionDemo.tsx:51 ✅ Level 8 unlocked functions: ['Research Matching']
+CompanionDemo.tsx:44 ⚡ Setting points to 4000 for Level 9
+CompanionDemo.tsx:51 ✅ Level 9 unlocked functions: ['Advanced Analytics']
+CompanionDemo.tsx:44 ⚡ Setting points to 5500 for Level 10
+CompanionDemo.tsx:51 ✅ Level 10 unlocked functions: ['Comprehensive Reports']
+CompanionDemo.tsx:58 🎉 Demo complete - all tiers unlocked
+CompanionDashboard.tsx:40 
+            
+            
+           POST https://firestore.googleapis.com/google.firestore.v1.Firestore/Listen/channel?VER=8&database=projects%2Fff-webapp-3%2Fdatabases%2F(default)&gsessionid=CKrT9ZzARZwPUkRT9ZryQBl3uZpByy7FFFfi6DbOMas&SID=4PH6Yzl4Ivcy6XaF6bMXyA&RID=3373&TYPE=terminate&zx=noorlnjs6swk 400 (Bad Request)

@@ -350,24 +350,35 @@ export const CompanionProgressProvider = ({ children }: CompanionProgressProvide
 
   // Direct points setter for testing
   const setPoints = (points: number) => {
-    if (!progressData) return;
-
     const newTier = COMPANION_TIERS.reduce((tier, current) => {
       return points >= current.pointsRequired ? current.level : tier;
     }, 1);
 
     const updatedData: CompanionProgressData = {
-      ...progressData,
+      userId: user?.uid || '',
       totalPoints: points,
       currentTier: newTier,
-      lastUpdated: new Date()
+      pointHistory: progressData?.pointHistory || [],
+      tierUnlockHistory: progressData?.tierUnlockHistory || [],
+      lastUpdated: new Date(),
+      dailyPoints: points,
+      weeklyPoints: points,
+      monthlyPoints: points,
+      streaks: progressData?.streaks || {
+        dailyLogin: 0,
+        symptomTracking: 0,
+        journaling: 0,
+        communityEngagement: 0
+      }
     };
 
     setProgressData(updatedData);
     
     if (user?.uid) {
       const progressRef = doc(db, 'companionProgress', user.uid);
-      updateDoc(progressRef, updatedData).catch(console.error);
+      setDoc(progressRef, updatedData, { merge: true }).catch(error => {
+        console.error('Error updating companion progress:', error);
+      });
     }
   };
 
