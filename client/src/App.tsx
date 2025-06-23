@@ -148,6 +148,7 @@ function AppContent() {
         <Route path="/peer-matching" component={PeerMatching} />
         <Route path="/companion" component={CompanionDashboard} />
         <Route path="/settings" component={UserSettings} />
+        <Route path="/social-impact" component={SocialImpactLeaderboard} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
       </Switch>

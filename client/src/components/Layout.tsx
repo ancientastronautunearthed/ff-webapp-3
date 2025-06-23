@@ -180,6 +180,12 @@ export const Layout = ({ children }: LayoutProps) => {
                         <span>Settings</span>
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/social-impact">
+                        <Trophy className="mr-2 h-4 w-4" />
+                        <span>Impact Board</span>
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
