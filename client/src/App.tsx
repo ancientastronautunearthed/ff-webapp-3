@@ -19,6 +19,7 @@ import CalendarView from "@/pages/CalendarView";
 import ResearchDashboard from "@/pages/ResearchDashboard";
 import ProfileSetup from "@/pages/ProfileSetup";
 import { Onboarding } from "@/components/Onboarding";
+import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -44,7 +45,7 @@ function AppContent() {
 
   // Check if user needs onboarding
   // For new users, show onboarding with comprehensive medical profile
-  const needsOnboarding = true; // This forces onboarding for demo purposes
+  const needsOnboarding = false; // This forces onboarding for demo purposes
 
   if (needsOnboarding) {
     return <Onboarding />;
@@ -66,6 +67,7 @@ function AppContent() {
         <Route path="/research" component={ResearchDashboard} />
         <Route path="/profile-setup" component={ProfileSetup} />
         <Route path="/onboarding" component={Onboarding} />
+        <Route path="/telemedicine" component={TelemedicineScheduling} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

@@ -50,6 +50,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { name: 'Symptom Tracker', href: '/tracker', icon: Heart },
     { name: 'Digital Matchbox', href: '/journal', icon: BookOpen },
     { name: 'Community', href: '/community', icon: Users },
+    { name: 'Telemedicine', href: '/telemedicine', icon: Video },
     { name: 'Research Dashboard', href: '/research', icon: Microscope },
     { name: 'Reports', href: '/reports', icon: FileText },
   ];
