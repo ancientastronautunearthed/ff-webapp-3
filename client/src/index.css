@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 40%, 8%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 40%, 8%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 40%, 8%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(159, 75%, 40%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(210, 40%, 8%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(207, 90%, 54%);
+  --radius: 0.5rem;
+  --chart-1: hsl(207, 90%, 54%);
+  --chart-2: hsl(159, 75%, 40%);
+  --chart-3: hsl(280, 100%, 70%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+  --sidebar-background: hsl(0, 0%, 98%);
+  --sidebar-foreground: hsl(240, 5.3%, 26.1%);
+  --sidebar-primary: hsl(207, 90%, 54%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(210, 40%, 96%);
+  --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
+  --sidebar-border: hsl(214, 32%, 91%);
+  --sidebar-ring: hsl(207, 90%, 54%);
+}
+
+.dark {
+  --background: hsl(210, 40%, 2%);
+  --foreground: hsl(0, 0%, 95%);
+  --muted: hsl(210, 40%, 8%);
+  --muted-foreground: hsl(215, 16%, 57%);
+  --popover: hsl(210, 40%, 2%);
+  --popover-foreground: hsl(0, 0%, 95%);
+  --card: hsl(210, 40%, 2%);
+  --card-foreground: hsl(0, 0%, 95%);
+  --border: hsl(210, 40%, 8%);
+  --input: hsl(210, 40%, 8%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(159, 75%, 40%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(210, 40%, 8%);
+  --accent-foreground: hsl(0, 0%, 95%);
+  --destructive: hsl(0, 62%, 30%);
+  --destructive-foreground: hsl(0, 0%, 95%);
+  --ring: hsl(207, 90%, 54%);
+  --chart-1: hsl(207, 90%, 54%);
+  --chart-2: hsl(159, 75%, 40%);
+  --chart-3: hsl(280, 100%, 70%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+  --sidebar-background: hsl(210, 40%, 2%);
+  --sidebar-foreground: hsl(0, 0%, 95%);
+  --sidebar-primary: hsl(207, 90%, 54%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(210, 40%, 8%);
+  --sidebar-accent-foreground: hsl(0, 0%, 95%);
+  --sidebar-border: hsl(210, 40%, 8%);
+  --sidebar-ring: hsl(207, 90%, 54%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-3xl font-bold;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold;
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+
+  h4 {
+    @apply text-lg font-semibold;
+  }
+
+  /* Patient-centric design enhancements */
+  .patient-focus {
+    @apply rounded-lg border border-primary/20 bg-primary/5 p-4;
+  }
+
+  .health-metric {
+    @apply rounded-lg border border-secondary/20 bg-secondary/5 p-3;
+  }
+
+  .correlation-positive {
+    @apply bg-green-50 border-green-200 text-green-800;
+  }
+
+  .correlation-negative {
+    @apply bg-red-50 border-red-200 text-red-800;
+  }
+
+  .correlation-neutral {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+  }
+
+  /* Accessible focus states */
+  .focus-visible:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Enhanced button accessibility */
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Form field enhancements for better UX */
+  input[type="range"] {
+    @apply appearance-none bg-transparent cursor-pointer;
+  }
+
+  input[type="range"]::-webkit-slider-track {
+    @apply bg-muted h-2 rounded-lg;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    @apply appearance-none w-5 h-5 bg-primary rounded-full shadow-lg border-2 border-white cursor-pointer;
+  }
+
+  input[type="range"]::-moz-range-track {
+    @apply bg-muted h-2 rounded-lg border-none;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    @apply w-5 h-5 bg-primary rounded-full shadow-lg border-2 border-white cursor-pointer;
+  }
+
+  /* Loading states */
+  .loading-skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  /* Chart and visualization styles */
+  .chart-container {
+    @apply bg-card border border-border rounded-lg p-4;
+  }
+
+  /* Community and social features */
+  .community-post {
+    @apply bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow;
+  }
+
+  .user-avatar {
+    @apply w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium;
+  }
+
+  /* Medical report styling */
+  .medical-report {
+    @apply bg-white border border-gray-300 rounded-lg p-6 font-sans text-sm;
+  }
+
+  .medical-header {
+    @apply text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200;
+  }
+
+  .medical-section {
+    @apply mb-6;
+  }
+
+  .medical-section h3 {
+    @apply text-md font-semibold text-gray-800 mb-2;
+  }
+
+  /* Responsive design utilities */
+  @media (max-width: 640px) {
+    .mobile-stack {
+      @apply flex-col space-y-4 space-x-0;
+    }
+  }
+
+  /* Print styles for reports */
+  @media print {
+    .no-print {
+      @apply hidden;
+    }
+    
+    .print-break {
+      page-break-before: always;
+    }
+    
+    body {
+      @apply text-black bg-white;
+    }
+  }
+}
+
+/* Custom animations for health tracking */
+@keyframes pulse-gentle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse-gentle {
+  animation: pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .pulse-gentle {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border: hsl(0, 0%, 20%);
+    --ring: hsl(207, 90%, 40%);
+  }
+  
+  .dark {
+    --border: hsl(0, 0%, 80%);
+    --ring: hsl(207, 90%, 60%);
+  }
+}

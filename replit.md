@@ -1,0 +1,130 @@
+# Fiber Friends - Morgellons Health Companion
+
+## Overview
+
+Fiber Friends is a comprehensive health tracking and community support application specifically designed for people with Morgellons disease. The application provides secure symptom tracking, digital journaling, data visualization, community forums, and provider-ready reporting features.
+
+The system is built as a full-stack web application with a React frontend and Express.js backend, utilizing Firebase for authentication and file storage, PostgreSQL for data persistence, and shadcn/ui for the user interface components.
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React 18 with TypeScript
+- **Routing**: Wouter for client-side routing
+- **State Management**: React Query (TanStack Query) for server state management
+- **Styling**: Tailwind CSS with shadcn/ui component library
+- **Build Tool**: Vite for development and production builds
+- **Forms**: React Hook Form with Zod for validation
+
+### Backend Architecture
+- **Framework**: Express.js with TypeScript
+- **Runtime**: Node.js 20
+- **Database ORM**: Drizzle ORM for type-safe database operations
+- **API Design**: RESTful APIs with /api prefix routing
+- **Session Management**: Express sessions with PostgreSQL store
+
+### Authentication & Authorization
+- **Provider**: Firebase Authentication
+- **Methods**: Email/password and Google OAuth
+- **Security**: Secure session management with HTTP-only cookies
+- **User Management**: Firebase user data synchronized with PostgreSQL user records
+
+## Key Components
+
+### Data Models
+The application uses a comprehensive database schema with the following core entities:
+
+- **Users**: Firebase UID integration with research opt-in preferences
+- **Symptom Entries**: Structured symptom tracking with factors and notes
+- **Journal Entries**: Digital "matchbox" for observations and media
+- **Forum Posts & Replies**: Community discussion with moderation
+- **File Storage**: Firebase Storage integration for media uploads
+
+### Core Features
+1. **Symptom Tracker**: Comprehensive symptom logging with severity scales, factors, and correlations
+2. **Digital Matchbox**: Secure journaling with photo documentation capabilities
+3. **Community Forums**: Moderated discussion spaces with category-based organization
+4. **Data Visualization**: Charts and insights showing symptom trends and correlations
+5. **Provider Reports**: HIPAA-compliant report generation for healthcare providers
+6. **Research Participation**: Optional anonymized data contribution for research
+
+### UI Component System
+- Uses shadcn/ui components for consistent design
+- Responsive design with mobile-first approach
+- Dark/light mode support via CSS variables
+- Accessible components with proper ARIA labels
+- Toast notifications for user feedback
+
+## Data Flow
+
+### Authentication Flow
+1. User authenticates via Firebase (email/password or Google)
+2. Firebase user token validated on backend
+3. User record created/updated in PostgreSQL
+4. Express session established for subsequent requests
+
+### Data Persistence Flow
+1. Frontend forms validate data using Zod schemas
+2. React Query manages API calls and caching
+3. Backend APIs validate and process requests
+4. Drizzle ORM handles database operations
+5. Structured data stored in PostgreSQL with proper relationships
+
+### File Upload Flow
+1. User selects files in frontend components
+2. Files uploaded directly to Firebase Storage
+3. Storage URLs saved in PostgreSQL for reference
+4. Media displayed via Firebase Storage URLs
+
+## External Dependencies
+
+### Core Services
+- **Firebase**: Authentication, file storage, and user management
+- **PostgreSQL**: Primary database (Neon serverless)
+- **Recharts**: Data visualization and charting
+
+### Development Tools
+- **TypeScript**: Type safety across frontend and backend
+- **ESLint/Prettier**: Code quality and formatting
+- **Drizzle Kit**: Database migrations and schema management
+
+### UI Libraries
+- **Radix UI**: Headless component primitives
+- **Lucide React**: Icon library
+- **date-fns**: Date manipulation utilities
+
+## Deployment Strategy
+
+### Development Environment
+- **Runtime**: Node.js 20 with hot module replacement
+- **Database**: PostgreSQL 16 via Replit modules
+- **Build Process**: Vite dev server for frontend, tsx for backend
+- **Port Configuration**: Backend on 5000, frontend proxied through Vite
+
+### Production Build
+- **Frontend**: Static build via Vite to dist/public
+- **Backend**: Bundled via esbuild to dist/index.js
+- **Deployment**: Replit autoscale with build/start scripts
+- **Static Assets**: Served from dist/public directory
+
+### Environment Configuration
+- Firebase configuration via environment variables
+- Database URL via DATABASE_URL environment variable
+- Production/development mode switching via NODE_ENV
+
+## Changelog
+- June 23, 2025. Initial setup and Firebase integration complete
+
+## Recent Changes
+- ✓ Implemented Firebase Authentication with Google OAuth
+- ✓ Created Firestore data models for users, symptoms, journal entries, and forum posts
+- ✓ Added Firebase Storage integration for secure media uploads
+- ✓ Built comprehensive symptom tracking with real-time data analysis
+- ✓ Implemented Digital Matchbox with encrypted file storage
+- ✓ Created patient-centric UI with extensive preset options for easy data entry
+- ✓ Added data visualization with real symptom correlation analysis
+- ✓ Integrated React Query for efficient data management and caching
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
