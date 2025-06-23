@@ -223,6 +223,11 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Pattern discovery achievements that unlock when AI identifies correlations
 - ✓ Community challenges with group goals and leaderboards
 - ✓ Level progression system with XP points and rarity-based rewards
+- ✓ Community Engagement Reward System
+- ✓ Community badges for helpful posts, support, and participation
+- ✓ Weekly missions and quick actions to encourage forum engagement
+- ✓ Leaderboard showcasing most helpful community members
+- ✓ Points system for posts, replies, helpful votes, and topic creation
 
 ## User Preferences
 

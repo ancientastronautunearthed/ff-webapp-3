@@ -65,6 +65,51 @@ export async function saveAchievementUnlock(userId: string, achievementData: any
   }
 }
 
+// Save community contribution
+export async function saveCommunityContribution(userId: string, contributionData: any) {
+  try {
+    const docRef = await addDoc(collection(db, 'community_contributions'), {
+      userId,
+      ...contributionData,
+      createdAt: serverTimestamp()
+    });
+    
+    // Also update user's community stats
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      [`communityStats.${contributionData.type}Count`]: contributionData.count || 1,
+      [`communityStats.totalPoints`]: contributionData.totalPoints || 0,
+      updatedAt: serverTimestamp()
+    });
+    
+    return docRef.id;
+  } catch (error) {
+    console.error('Error saving community contribution:', error);
+    throw error;
+  }
+}
+
+// Get user's community contributions
+export async function getUserCommunityContributions(userId: string, limitCount = 20) {
+  try {
+    const q = query(
+      collection(db, 'community_contributions'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting community contributions:', error);
+    return [];
+  }
+}
+
 // Update user points and level
 export async function updateUserProgress(userId: string, progressData: any) {
   try {
