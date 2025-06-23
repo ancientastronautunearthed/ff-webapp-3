@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { PeerMatchingWidget } from '@/components/PeerMatchingWidget';
 import { CompanionWidget } from '@/components/CompanionWidget';
+import { ChallengeSystem } from '@/components/ChallengeSystem';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -282,10 +283,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Gamification Progress */}
-      <div className="mb-8" id="gamification">
-        <GamifiedProgress />
+      {/* Gamified Challenge System */}
+      <div className="mb-8">
+        <ChallengeSystem />
       </div>
+
 
       {/* Quick Stats */}
       <div className="grid md:grid-cols-4 gap-6 mb-8" data-tour="stats-cards">
