@@ -64,14 +64,54 @@ function AppContent() {
   }
 
   // Check if user is a doctor and redirect to doctor dashboard
-  const userRole = localStorage.getItem('userRole');
-  const isDemoDoctor = localStorage.getItem('demoDoctor') === 'true';
-  if (userRole === 'doctor' && isDemoDoctor) {
+  // Check user role from Firebase instead of localStorage
+  const [userRole, setUserRole] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (user) {
+      checkUserRole();
+    }
+  }, [user]);
+
+  const checkUserRole = async () => {
+    if (!user) return;
+    
+    try {
+      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
+      if (prefsDoc.exists()) {
+        setUserRole(prefsDoc.data().userRole || null);
+      }
+    } catch (error) {
+      console.error('Error checking user role:', error);
+      setUserRole(null);
+    }
+  };
+  if (userRole === 'doctor') {
     return <DoctorDashboard />;
   }
 
   // Check if user has completed onboarding
-  const hasCompletedOnboarding = localStorage.getItem('onboardingComplete') === 'true';
+  // Check onboarding completion from Firebase
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  
+  useEffect(() => {
+    if (user) {
+      checkOnboardingStatus();
+    }
+  }, [user]);
+
+  const checkOnboardingStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
+      const completed = prefsDoc.exists() ? prefsDoc.data().onboardingComplete : false;
+      setHasCompletedOnboarding(completed);
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setHasCompletedOnboarding(false);
+    }
+  };
   
   // Force new users through comprehensive medical onboarding (except when explicitly accessing onboarding routes)
   if (!hasCompletedOnboarding && !location.startsWith('/onboarding') && !location.startsWith('/medical-onboarding') && !location.startsWith('/research-consent')) {
@@ -113,11 +153,7 @@ function AppContent() {
       </Switch>
       
       {/* Check if tour is active and show tour overlay */}
-      {localStorage.getItem('tourActive') === 'true' && <WelcomeTour onComplete={() => {
-        localStorage.removeItem('tourActive');
-      }} onSkip={() => {
-        localStorage.removeItem('tourActive');
-      }} />}
+      {/* Tour removed - integrated into dashboard onboarding flow */}
     </Layout>
   );
 }

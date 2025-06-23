@@ -266,12 +266,14 @@ export const AskDoctorForum = () => {
     }
   };
 
-  const handleDoctorResponse = (questionId: string) => {
-    // Check if user is a doctor (demo or real)
-    const isDemoDoctor = localStorage.getItem('demoDoctor') === 'true';
-    const userRole = localStorage.getItem('userRole');
+  const handleDoctorResponse = async (questionId: string) => {
+    if (!user) return;
     
-    if (isDemoDoctor || userRole === 'doctor') {
+    // Check if user is a verified doctor through Firebase
+    const doctorDoc = await getDoc(doc(db, 'doctors', user.uid));
+    const userRole = doctorDoc.exists() ? 'doctor' : 'patient';
+    
+    if (userRole === 'doctor') {
       setRespondingTo(questionId);
     } else {
       toast({

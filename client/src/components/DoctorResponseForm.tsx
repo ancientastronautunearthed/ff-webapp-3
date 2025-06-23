@@ -60,8 +60,9 @@ export const DoctorResponseForm = ({
   const submitResponse = async (data: ResponseFormData) => {
     setIsSubmitting(true);
     try {
-      // Get doctor profile from demo or localStorage
-      const isDemoDoctor = localStorage.getItem('demoDoctor') === 'true';
+      // Get doctor profile from Firebase
+      const doctorDoc = await getDoc(doc(db, 'doctors', user.uid));
+      const isDemoDoctor = false; // Remove demo functionality
       
       const responseData = {
         doctorName: isDemoDoctor ? 'Demo Dr. Sarah Johnson' : 'Dr. Sarah Johnson',

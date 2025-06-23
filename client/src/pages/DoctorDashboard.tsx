@@ -93,9 +93,27 @@ export default function DoctorDashboard() {
     loadDoctorData();
   }, [user]);
 
+  const [isDemo, setIsDemo] = useState(false);
+  
+  useEffect(() => {
+    if (user) {
+      checkDoctorStatus();
+    }
+  }, [user]);
+
+  const checkDoctorStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const doctorDoc = await getDoc(doc(db, 'doctors', user.uid));
+      setIsDemo(!doctorDoc.exists()); // If no doctor profile, treat as demo
+    } catch (error) {
+      console.error('Error checking doctor status:', error);
+      setIsDemo(false);
+    }
+  };
+
   const loadDoctorData = async () => {
-    // Check if this is a demo session
-    const isDemo = localStorage.getItem('demoDoctor') === 'true';
     
     // Load doctor profile
     const profile = {
@@ -186,10 +204,19 @@ export default function DoctorDashboard() {
     setActiveConsultations(8); // Mock active consultations
   };
 
-  const handleLogout = () => {
-    // Clear doctor session data
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('demoDoctor');
+  const handleLogout = async () => {
+    // Clear doctor preferences from Firebase
+    try {
+      if (user) {
+        const { deleteField } = await import('firebase/firestore');
+        await updateDoc(doc(db, 'userPreferences', user.uid), {
+          userRole: deleteField(),
+          doctorVerified: deleteField()
+        });
+      }
+    } catch (error) {
+      console.error('Error clearing doctor preferences:', error);
+    }
     
     toast({
       title: "Logged Out",

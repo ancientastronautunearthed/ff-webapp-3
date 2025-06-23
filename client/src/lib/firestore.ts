@@ -254,21 +254,33 @@ export async function getDoctorProfile(doctorId: string) {
 export async function getStateUserStatistics(states: string[]) {
   try {
     // In a real implementation, this would query users by state
-    // For now, return mock data based on the provided states
-    const q = query(
+    // Query actual user data from Firebase
+    const usersQuery = query(
       collection(db, 'users'),
-      limit(100) // Sample for now
+      limit(1000)
     );
     
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(usersQuery);
+    const users = querySnapshot.docs.map(doc => doc.data());
     
-    // Process data by state (mock implementation)
-    return states.map(state => ({
-      state,
-      totalUsers: Math.floor(Math.random() * 1000) + 100,
-      activeUsers: Math.floor(Math.random() * 500) + 50,
-      newThisMonth: Math.floor(Math.random() * 50) + 5
-    }));
+    // Calculate real statistics by state
+    return states.map(state => {
+      const stateUsers = users.filter(user => user.state === state);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const activeUsers = stateUsers.filter(user => 
+        user.lastLogin && new Date(user.lastLogin.seconds * 1000) > thirtyDaysAgo
+      );
+      const newUsers = stateUsers.filter(user => 
+        user.createdAt && new Date(user.createdAt.seconds * 1000) > thirtyDaysAgo
+      );
+      
+      return {
+        state,
+        totalUsers: stateUsers.length,
+        activeUsers: activeUsers.length,
+        newThisMonth: newUsers.length
+      };
+    });
   } catch (error) {
     console.error('Error getting state statistics:', error);
     return [];

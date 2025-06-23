@@ -295,15 +295,43 @@ export default function Dashboard() {
     }
   ];
 
-  const weeklyOverview = [
-    { day: 'Mon', completed: true, symptoms: 4.2 },
-    { day: 'Tue', completed: true, symptoms: 3.8 },
-    { day: 'Wed', completed: true, symptoms: 4.1 },
-    { day: 'Thu', completed: true, symptoms: 3.6 },
-    { day: 'Fri', completed: true, symptoms: 3.9 },
-    { day: 'Sat', completed: false, symptoms: 0 },
-    { day: 'Sun', completed: false, symptoms: 0 }
-  ];
+  // Real weekly data calculated from Firebase entries
+  const [weeklyOverview, setWeeklyOverview] = useState([]);
+
+  useEffect(() => {
+    if (user && symptomEntries) {
+      calculateWeeklyOverview();
+    }
+  }, [user, symptomEntries]);
+
+  const calculateWeeklyOverview = () => {
+    const today = new Date();
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const weekData = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dayName = days[date.getDay()];
+      
+      const dayEntries = symptomEntries?.filter(entry => {
+        const entryDate = new Date(entry.createdAt.toDate());
+        return entryDate.toDateString() === date.toDateString();
+      }) || [];
+      
+      const avgSymptoms = dayEntries.length > 0 
+        ? dayEntries.reduce((sum, entry) => sum + (entry.symptoms?.itchingIntensity || 0), 0) / dayEntries.length
+        : 0;
+
+      weekData.push({
+        day: dayName,
+        completed: dayEntries.length > 0,
+        symptoms: avgSymptoms
+      });
+    }
+    
+    setWeeklyOverview(weekData);
+  };
 
   const getTimeOfDay = () => {
     const hour = new Date().getHours();

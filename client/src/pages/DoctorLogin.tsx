@@ -113,8 +113,11 @@ export default function DoctorLogin() {
       const { signIn } = await import('@/lib/auth');
       await signIn(data.email, data.password);
       
-      // Set doctor role in localStorage
-      localStorage.setItem('userRole', 'doctor');
+      // Save doctor role to Firebase
+      await setDoc(doc(db, 'userPreferences', user.uid), {
+        userRole: 'doctor',
+        doctorVerified: true
+      }, { merge: true });
       
       toast({
         title: "Welcome Back, Doctor",
@@ -156,7 +159,13 @@ export default function DoctorLogin() {
       });
       
       // Set doctor role
-      localStorage.setItem('userRole', 'doctor');
+      // Save doctor role to Firebase
+      if (user) {
+        await setDoc(doc(db, 'userPreferences', user.uid), {
+          userRole: 'doctor',
+          doctorVerified: true
+        }, { merge: true });
+      }
       
       setVerificationStep(true);
       

@@ -116,9 +116,15 @@ export const Onboarding = () => {
     });
 
     // Transition to tour phase after brief delay to show completion message
-    setTimeout(() => {
-      localStorage.setItem('tourActive', 'true');
-      localStorage.setItem('onboardingComplete', 'true');
+    setTimeout(async () => {
+      // Save onboarding completion to Firebase
+      if (user) {
+        await setDoc(doc(db, 'userPreferences', user.uid), {
+          tourActive: true,
+          onboardingComplete: true,
+          onboardingCompletedAt: new Date()
+        }, { merge: true });
+      }
       window.location.href = '/dashboard'; // Navigate to dashboard and start tour
     }, 1500);
   };
@@ -134,10 +140,14 @@ export const Onboarding = () => {
     setCurrentPhase('welcome');
   };
 
-  const handleTourComplete = () => {
-    localStorage.setItem('onboardingComplete', 'true');
+  const handleTourComplete = async () => {
+    if (user) {
+      await setDoc(doc(db, 'userPreferences', user.uid), {
+        onboardingComplete: true,
+        onboardingCompletedAt: new Date()
+      }, { merge: true });
+    }
     setCurrentPhase('complete');
-    console.log('Onboarding complete - medical data captured for research');
     
     toast({
       title: "Welcome to Fiber Friends!",
@@ -145,10 +155,14 @@ export const Onboarding = () => {
     });
   };
 
-  const handleTourSkip = () => {
-    localStorage.setItem('onboardingComplete', 'true');
+  const handleTourSkip = async () => {
+    if (user) {
+      await setDoc(doc(db, 'userPreferences', user.uid), {
+        onboardingComplete: true,
+        onboardingSkippedAt: new Date()
+      }, { merge: true });
+    }
     setCurrentPhase('complete');
-    console.log('Tour skipped - medical data still captured for research');
   };
 
   if (currentPhase === 'tour') {
@@ -190,8 +204,13 @@ export const Onboarding = () => {
               Your onboarding is complete. You can now start tracking your symptoms, 
               journaling, and connecting with the community.
             </p>
-            <Button onClick={() => { 
-              localStorage.setItem('onboardingComplete', 'true');
+            <Button onClick={async () => { 
+              if (user) {
+                await setDoc(doc(db, 'userPreferences', user.uid), {
+                  onboardingComplete: true,
+                  onboardingCompletedAt: new Date()
+                }, { merge: true });
+              }
               window.location.href = '/dashboard';
             }} className="bg-blue-600 hover:bg-blue-700">
               Go to Dashboard

@@ -53,8 +53,7 @@ export const AuthForm = ({ mode, onToggleMode }: AuthFormProps) => {
       if (mode === 'signup') {
         await signUp(data.email, data.password);
         // Clear any existing onboarding flags for new users to force medical profile setup
-        localStorage.removeItem('onboardingComplete');
-        localStorage.removeItem('medicalProfileComplete');
+        // Clear user preferences for new registration to force medical profile setup
         toast({
           title: "Account Created",
           description: "Let's set up your comprehensive medical profile to get personalized insights and contribute to research.",
