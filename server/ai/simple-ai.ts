@@ -44,18 +44,15 @@ export async function analyzeSymptomPatterns(symptoms: any[], journals: any[]) {
     const text = response.text();
     
     try {
-      return JSON.parse(text);
+      // Extract JSON from the response text
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('No JSON found in response');
     } catch (parseError) {
-      // Fallback if JSON parsing fails
-      return {
-        patterns: [{
-          pattern: "Weather Sensitivity",
-          confidence: 0.7,
-          description: "Symptoms may correlate with weather changes based on data patterns",
-          recommendations: ["Monitor weather forecasts", "Track barometric pressure"],
-          triggers: ["weather-changes", "humidity"]
-        }]
-      };
+      console.error('JSON parsing failed:', parseError);
+      throw new Error('Failed to parse AI response');
     }
   } catch (error) {
     console.error('AI Analysis Error:', error);
@@ -95,18 +92,14 @@ export async function generateInsights(userId: string, recentData: any) {
     const text = response.text();
     
     try {
-      return JSON.parse(text);
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('No JSON found in response');
     } catch (parseError) {
-      return {
-        insights: [{
-          type: "recommendation",
-          title: "Consistent Tracking Benefits",
-          description: "Regular symptom tracking helps identify patterns over time",
-          confidence: 0.9,
-          actionable: true,
-          recommendations: ["Track symptoms daily", "Note environmental factors"]
-        }]
-      };
+      console.error('JSON parsing failed:', parseError);
+      throw new Error('Failed to parse AI response');
     }
   } catch (error) {
     console.error('AI Insights Error:', error);
@@ -139,14 +132,14 @@ export async function analyzeSymptomText(text: string) {
     const responseText = response.text();
     
     try {
-      return JSON.parse(responseText);
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('No JSON found in response');
     } catch (parseError) {
-      return {
-        extractedSymptoms: ["itching", "fatigue"],
-        severity: 5,
-        emotions: ["concerned"],
-        suggestions: ["Continue tracking symptoms", "Monitor patterns"]
-      };
+      console.error('JSON parsing failed:', parseError);
+      throw new Error('Failed to parse AI response');
     }
   } catch (error) {
     console.error('AI Text Analysis Error:', error);

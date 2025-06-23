@@ -84,7 +84,7 @@ export class MorgellonsAI {
       return patterns;
     } catch (error) {
       console.error('AI Pattern Analysis Error:', error);
-      return this.getFallbackPatterns(symptomEntries);
+      throw new Error('AI pattern analysis failed. Please check your connection and try again.');
     }
   }
 
@@ -106,7 +106,7 @@ export class MorgellonsAI {
       return insights;
     } catch (error) {
       console.error('AI Insights Error:', error);
-      return this.getFallbackInsights();
+      throw new Error('AI insights generation failed. Please check your connection and try again.');
     }
   }
 
@@ -134,7 +134,7 @@ export class MorgellonsAI {
       return await response.json();
     } catch (error) {
       console.error('AI Prediction Error:', error);
-      return this.getFallbackPrediction(symptomEntries);
+      throw new Error('AI prediction failed. Please check your connection and try again.');
     }
   }
 
@@ -159,12 +159,7 @@ export class MorgellonsAI {
       return await response.json();
     } catch (error) {
       console.error('AI Text Analysis Error:', error);
-      return {
-        extractedSymptoms: [],
-        severity: 0,
-        emotions: [],
-        suggestions: []
-      };
+      throw new Error('AI text analysis failed. Please check your connection and try again.');
     }
   }
 
@@ -201,67 +196,7 @@ export class MorgellonsAI {
     })) as AIInsight[];
   }
 
-  // Fallback patterns when AI is unavailable
-  private static getFallbackPatterns(symptomEntries: SymptomEntry[]): SymptomPattern[] {
-    if (symptomEntries.length < 3) return [];
 
-    // Simple pattern detection
-    const patterns: SymptomPattern[] = [];
-    
-    // Check for weather correlation
-    const weatherDays = symptomEntries.filter(entry => {
-      const factors = entry.factors as any;
-      return factors?.environmentalFactors?.includes('weather-changes');
-    });
-
-    if (weatherDays.length > 0) {
-      patterns.push({
-        pattern: 'Weather Sensitivity',
-        confidence: 0.7,
-        description: 'Symptoms may worsen with weather changes',
-        recommendations: [
-          'Monitor weather forecasts',
-          'Consider preventive measures on weather change days',
-          'Track barometric pressure if possible'
-        ],
-        triggers: ['weather-changes', 'humidity', 'pressure-changes']
-      });
-    }
-
-    return patterns;
-  }
-
-  // Fallback insights
-  private static getFallbackInsights(): AIInsight[] {
-    return [
-      {
-        id: 'fallback-1',
-        type: 'recommendation',
-        title: 'Consistent Tracking Benefits',
-        description: 'Regular symptom tracking helps identify patterns over time',
-        confidence: 0.9,
-        actionable: true,
-        recommendations: ['Track symptoms daily', 'Note environmental factors'],
-        createdAt: new Date()
-      }
-    ];
-  }
-
-  // Fallback prediction
-  private static getFallbackPrediction(symptomEntries: SymptomEntry[]): SymptomPrediction {
-    const recentAvg = symptomEntries.slice(-7).reduce((sum, entry) => {
-      const symptoms = entry.symptoms as any;
-      return sum + (symptoms?.itchingIntensity || 0);
-    }, 0) / Math.max(1, symptomEntries.slice(-7).length);
-
-    return {
-      predictedIntensity: Math.round(recentAvg * 10) / 10,
-      confidence: 0.6,
-      factors: ['recent-trends'],
-      timeframe: 'next 3 days',
-      suggestions: ['Continue current tracking', 'Monitor for changes']
-    };
-  }
 }
 
 // Hook for AI insights

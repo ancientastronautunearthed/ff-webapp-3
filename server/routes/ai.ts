@@ -21,8 +21,8 @@ router.post('/analyze-patterns', async (req, res) => {
   } catch (error) {
     console.error('AI Pattern Analysis Error:', error);
     res.status(500).json({ 
-      error: 'AI analysis temporarily unavailable',
-      fallback: true 
+      error: 'AI analysis failed. Please ensure valid Google AI API key is configured.',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
@@ -49,8 +49,8 @@ router.post('/generate-insights', async (req, res) => {
   } catch (error) {
     console.error('AI Insights Error:', error);
     res.status(500).json({ 
-      error: 'AI insights temporarily unavailable',
-      fallback: true 
+      error: 'AI insights generation failed. Please ensure valid Google AI API key is configured.',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
@@ -108,8 +108,8 @@ router.post('/analyze-text', async (req, res) => {
   } catch (error) {
     console.error('AI Text Analysis Error:', error);
     res.status(500).json({ 
-      error: 'AI text analysis temporarily unavailable',
-      fallback: true 
+      error: 'AI text analysis failed. Please ensure valid Google AI API key is configured.',
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
