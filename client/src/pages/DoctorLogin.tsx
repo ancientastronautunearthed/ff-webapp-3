@@ -90,8 +90,8 @@ export default function DoctorLogin() {
   const handleLogin = async (data: { email: string; password: string }) => {
     setIsLoading(true);
     try {
-      const { loginWithEmail } = await import('@/lib/auth');
-      await loginWithEmail(data.email, data.password);
+      const { signIn } = await import('@/lib/auth');
+      await signIn(data.email, data.password);
       
       // Set doctor role in localStorage
       localStorage.setItem('userRole', 'doctor');
@@ -115,8 +115,8 @@ export default function DoctorLogin() {
     setIsLoading(true);
     try {
       // Register with Firebase
-      const { registerWithEmail } = await import('@/lib/auth');
-      await registerWithEmail(data.email, data.password);
+      const { signUp } = await import('@/lib/auth');
+      await signUp(data.email, data.password);
       
       // Save doctor profile to Firestore
       const { createDoctorProfile } = await import('@/lib/firestore');

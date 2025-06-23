@@ -15,7 +15,11 @@ import {
   Menu,
   X,
   Microscope,
-  Video
+  Video,
+  Home,
+  Activity,
+  TrendingUp,
+  Stethoscope
 } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
