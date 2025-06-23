@@ -36,10 +36,31 @@ interface WelcomeTourProps {
 }
 
 export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  // Initialize from localStorage or start at 0
+  const [currentStep, setCurrentStep] = useState(() => {
+    const savedStep = localStorage.getItem('tourProgress');
+    return savedStep ? parseInt(savedStep, 10) : 0;
+  });
   const [location, navigate] = useLocation();
+  const [isResuming, setIsResuming] = useState(() => {
+    return localStorage.getItem('tourProgress') !== null;
+  });
   
   console.log('WelcomeTour rendered with currentStep:', currentStep);
+
+  // Handle tour pause/resume functionality
+  const handlePauseTour = () => {
+    localStorage.setItem('tourPaused', 'true');
+    localStorage.setItem('tourProgress', currentStep.toString());
+    onSkip(); // Use existing skip functionality to close tour
+  };
+
+  const handleRestartTour = () => {
+    localStorage.removeItem('tourProgress');
+    localStorage.removeItem('tourPaused');
+    setCurrentStep(0);
+    setIsResuming(false);
+  };
 
   const tourSteps: TourStep[] = [
     {
