@@ -55,32 +55,12 @@ function AppContent() {
     if (!user) return;
     
     try {
-      // Check localStorage first for recent completion
-      const recentCompletion = localStorage.getItem('profileCompleted');
-      if (recentCompletion) {
-        setUserRole('patient');
-        setHasCompletedOnboarding(true);
-        localStorage.removeItem('profileCompleted');
-        setDataLoaded(true);
-        return;
-      }
+      // Clear any stale localStorage data
+      localStorage.removeItem('profileCompleted');
       
-      // Try backend API without Firebase token (due to connection issues)
-      try {
-        const response = await fetch('/api/users/profile');
-        if (response.ok) {
-          const profile = await response.json();
-          setUserRole(profile.userRole || 'patient');
-          setHasCompletedOnboarding(profile.onboardingComplete || false);
-        } else {
-          setUserRole('patient');
-          setHasCompletedOnboarding(false);
-        }
-      } catch (apiError) {
-        console.log('API check failed, defaulting to new user');
-        setUserRole('patient');
-        setHasCompletedOnboarding(false);
-      }
+      // For new users, default to requiring onboarding
+      setUserRole('patient');
+      setHasCompletedOnboarding(false);
       setDataLoaded(true);
     } catch (error) {
       console.error('Error checking user data:', error);
