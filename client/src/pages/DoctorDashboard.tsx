@@ -5,6 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { DoctorProfileForm } from '@/components/DoctorProfileForm';
 import { 
   Users, 
   MapPin, 
@@ -18,10 +22,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 
 interface StateStatistics {
   state: string;
@@ -45,11 +48,46 @@ interface ResearchInsight {
 export default function DoctorDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [doctorProfile, setDoctorProfile] = useState<any>(null);
   const [stateStats, setStateStats] = useState<StateStatistics[]>([]);
   const [researchInsights, setResearchInsights] = useState<ResearchInsight[]>([]);
   const [totalPatients, setTotalPatients] = useState(0);
   const [activeConsultations, setActiveConsultations] = useState(0);
+
+  // Fetch doctor profile
+  const { data: doctorProfileData, isLoading: profileLoading } = useQuery({
+    queryKey: ['/api/doctors/profile'],
+    enabled: !!user
+  });
+
+  // Update doctor profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: (profileData: any) => 
+      fetch('/api/doctors/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profileData)
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to update profile');
+        return res.json();
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/doctors/profile'] });
+      toast({
+        title: "Profile Updated",
+        description: "Your doctor profile has been updated successfully.",
+      });
+    },
+    onError: (error) => {
+      console.error('Profile update error:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
 
   useEffect(() => {
     loadDoctorData();

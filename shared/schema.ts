@@ -174,12 +174,38 @@ export const doctors = pgTable("doctors", {
   morgellonsDescription: text("morgellons_description"),
   isVerified: boolean("is_verified").default(false),
   verificationDate: timestamp("verification_date"),
+  
+  // Enhanced Profile Information
   profileImage: text("profile_image"),
   bio: text("bio"),
-  consultationFee: integer("consultation_fee"),
+  phone: text("phone"),
+  
+  // Office Information
+  officeAddress: text("office_address"),
+  officeCity: text("office_city"),
+  officeState: text("office_state"),
+  officeZip: text("office_zip"),
+  
+  // Professional Details
+  medicalSchool: text("medical_school"),
+  residency: text("residency"),
+  boardCertifications: jsonb("board_certifications").default([]),
+  languages: jsonb("languages").default(['English']),
+  
+  // Practice Information
+  hospitalAffiliations: jsonb("hospital_affiliations").default([]),
+  insuranceAccepted: jsonb("insurance_accepted").default([]),
   telehealth: boolean("telehealth").default(true),
   inPerson: boolean("in_person").default(false),
-  languages: jsonb("languages").default(['English']),
+  
+  // Availability
+  officeHours: text("office_hours"),
+  appointmentTypes: jsonb("appointment_types").default([]),
+  
+  // Financial
+  consultationFee: integer("consultation_fee"),
+  
+  // Legacy fields
   credentials: jsonb("credentials").default([]),
   rating: integer("rating").default(0),
   reviewCount: integer("review_count").default(0),
@@ -192,9 +218,53 @@ export const doctors = pgTable("doctors", {
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
-  firebaseUid: true,
-  displayName: true,
-  researchOptIn: true,
+  firstName: true,
+  lastName: true,
+  dateOfBirth: true,
+  gender: true,
+  profileImage: true,
+  bio: true,
+  phone: true,
+  address: true,
+  city: true,
+  state: true,
+  zipCode: true,
+  country: true,
+  emergencyContactName: true,
+  emergencyContactPhone: true,
+  emergencyContactRelation: true,
+  timezone: true,
+  language: true,
+  emailNotifications: true,
+  smsNotifications: true,
+  profileVisibility: true,
+  allowDirectMessages: true,
+  shareDataForResearch: true
+});
+
+export const updateUserProfileSchema = createInsertSchema(users).pick({
+  firstName: true,
+  lastName: true,
+  dateOfBirth: true,
+  gender: true,
+  profileImage: true,
+  bio: true,
+  phone: true,
+  address: true,
+  city: true,
+  state: true,
+  zipCode: true,
+  country: true,
+  emergencyContactName: true,
+  emergencyContactPhone: true,
+  emergencyContactRelation: true,
+  timezone: true,
+  language: true,
+  emailNotifications: true,
+  smsNotifications: true,
+  profileVisibility: true,
+  allowDirectMessages: true,
+  shareDataForResearch: true
 });
 
 export const insertSymptomEntrySchema = createInsertSchema(symptomEntries).pick({
@@ -313,13 +383,49 @@ export const insertDoctorSchema = createInsertSchema(doctors).pick({
   institution: true,
   morgellonsExperience: true,
   morgellonsDescription: true,
+  profileImage: true,
   bio: true,
-  consultationFee: true,
+  phone: true,
+  officeAddress: true,
+  officeCity: true,
+  officeState: true,
+  officeZip: true,
+  medicalSchool: true,
+  residency: true,
+  boardCertifications: true,
+  languages: true,
+  hospitalAffiliations: true,
+  insuranceAccepted: true,
   telehealth: true,
   inPerson: true,
-  languages: true,
+  officeHours: true,
+  appointmentTypes: true,
+  consultationFee: true,
   credentials: true,
   location: true,
+});
+
+export const updateDoctorProfileSchema = createInsertSchema(doctors).pick({
+  profileImage: true,
+  bio: true,
+  phone: true,
+  officeAddress: true,
+  officeCity: true,
+  officeState: true,
+  officeZip: true,
+  medicalSchool: true,
+  residency: true,
+  boardCertifications: true,
+  languages: true,
+  hospitalAffiliations: true,
+  insuranceAccepted: true,
+  telehealth: true,
+  inPerson: true,
+  officeHours: true,
+  appointmentTypes: true,
+  consultationFee: true,
+  morgellonsExperience: true,
+  morgellonsDescription: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

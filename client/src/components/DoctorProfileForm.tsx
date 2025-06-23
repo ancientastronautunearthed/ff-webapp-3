@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { uploadFile } from '@/lib/storage';
@@ -23,12 +23,12 @@ import {
   Phone,
   Mail,
   GraduationCap,
-  Award,
-  Building2,
+  Building,
   Clock,
   Upload,
-  X,
-  Plus
+  DollarSign,
+  Shield,
+  Award
 } from 'lucide-react';
 
 interface DoctorProfileFormProps {
@@ -43,13 +43,6 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
   const [uploadingImage, setUploadingImage] = useState(false);
   
   const [formData, setFormData] = useState({
-    name: doctorData?.name || '',
-    email: doctorData?.email || user?.email || '',
-    specialty: doctorData?.specialty || '',
-    licenseNumber: doctorData?.licenseNumber || '',
-    state: doctorData?.state || '',
-    yearsExperience: doctorData?.yearsExperience || '',
-    morgellonsExperience: doctorData?.morgellonsExperience || false,
     profileImage: doctorData?.profileImage || '',
     bio: doctorData?.bio || '',
     phone: doctorData?.phone || '',
@@ -60,39 +53,37 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
     medicalSchool: doctorData?.medicalSchool || '',
     residency: doctorData?.residency || '',
     boardCertifications: doctorData?.boardCertifications || [],
-    languages: doctorData?.languages || [],
+    languages: doctorData?.languages || ['English'],
     hospitalAffiliations: doctorData?.hospitalAffiliations || [],
     insuranceAccepted: doctorData?.insuranceAccepted || [],
-    telehealth: doctorData?.telehealth || false,
+    telehealth: doctorData?.telehealth ?? true,
+    inPerson: doctorData?.inPerson ?? true,
     officeHours: doctorData?.officeHours || '',
-    appointmentTypes: doctorData?.appointmentTypes || []
+    appointmentTypes: doctorData?.appointmentTypes || [],
+    consultationFee: doctorData?.consultationFee || '',
+    morgellonsExperience: doctorData?.morgellonsExperience ?? false,
+    morgellonsDescription: doctorData?.morgellonsDescription || ''
   });
 
   const [newCertification, setNewCertification] = useState('');
   const [newLanguage, setNewLanguage] = useState('');
   const [newAffiliation, setNewAffiliation] = useState('');
   const [newInsurance, setNewInsurance] = useState('');
+  const [newAppointmentType, setNewAppointmentType] = useState('');
 
-  const specialties = [
-    'Dermatology',
-    'Internal Medicine',
-    'Family Medicine',
-    'Infectious Disease',
-    'Psychiatry',
-    'Neurology',
-    'Rheumatology',
-    'Immunology',
-    'Pain Management',
-    'Integrative Medicine'
+  const commonLanguages = [
+    'English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 
+    'Chinese', 'Japanese', 'Korean', 'Arabic', 'Russian', 'Hindi'
   ];
 
-  const appointmentTypes = [
-    'Initial Consultation',
-    'Follow-up Visit',
-    'Urgent Care',
-    'Telehealth Consultation',
-    'Second Opinion',
-    'Treatment Planning'
+  const commonInsurances = [
+    'Blue Cross Blue Shield', 'Aetna', 'Cigna', 'United Healthcare', 
+    'Medicare', 'Medicaid', 'Kaiser Permanente', 'Anthem', 'Humana'
+  ];
+
+  const appointmentTypeOptions = [
+    'Initial Consultation', 'Follow-up Visit', 'Telehealth Consultation', 
+    'Second Opinion', 'Urgent Care', 'Annual Physical', 'Preventive Care'
   ];
 
   const handleInputChange = (field: string, value: any) => {
@@ -123,16 +114,17 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
     }
   };
 
-  const addArrayItem = (field: string, value: string, setValue: (val: string) => void) => {
-    if (value.trim()) {
-      handleInputChange(field, [...formData[field as keyof typeof formData] as string[], value.trim()]);
+  const addToArray = (field: string, value: string, setValue: (val: string) => void) => {
+    if (value.trim() && !formData[field as keyof typeof formData].includes(value)) {
+      handleInputChange(field, [...formData[field as keyof typeof formData], value.trim()]);
       setValue('');
     }
   };
 
-  const removeArrayItem = (field: string, index: number) => {
-    const currentArray = formData[field as keyof typeof formData] as string[];
-    handleInputChange(field, currentArray.filter((_, i) => i !== index));
+  const removeFromArray = (field: string, index: number) => {
+    const newArray = [...formData[field as keyof typeof formData]];
+    newArray.splice(index, 1);
+    handleInputChange(field, newArray);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,7 +132,6 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
     setLoading(true);
 
     try {
-      // Call the onSave callback with form data
       if (onSave) {
         await onSave(formData);
       }
@@ -161,56 +152,14 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
     }
   };
 
-  const renderArrayField = (
-    title: string,
-    field: string,
-    newValue: string,
-    setNewValue: (val: string) => void,
-    placeholder: string
-  ) => (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium">{title}</Label>
-      <div className="flex gap-2">
-        <Input
-          value={newValue}
-          onChange={(e) => setNewValue(e.target.value)}
-          placeholder={placeholder}
-          className="flex-1"
-        />
-        <Button
-          type="button"
-          size="sm"
-          onClick={() => addArrayItem(field, newValue, setNewValue)}
-          disabled={!newValue.trim()}
-        >
-          <Plus className="w-4 h-4" />
-        </Button>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {(formData[field as keyof typeof formData] as string[]).map((item, index) => (
-          <Badge key={index} variant="secondary" className="flex items-center gap-1">
-            {item}
-            <button
-              type="button"
-              onClick={() => removeArrayItem(field, index)}
-              className="ml-1 hover:text-red-500"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          </Badge>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Profile Image */}
+      {/* Profile Image & Basic Info */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            Profile Image
+            Professional Profile
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -218,7 +167,7 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
             <Avatar className="w-20 h-20">
               <AvatarImage src={formData.profileImage} />
               <AvatarFallback>
-                {formData.name.split(' ').map(n => n[0]).join('')}
+                {(doctorData?.firstName?.[0] || 'D') + (doctorData?.lastName?.[0] || 'R')}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -238,100 +187,47 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
                 className="hidden"
               />
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Basic Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              required
-            />
+            {doctorData?.isVerified && (
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <Shield className="w-3 h-3 mr-1" />
+                Verified
+              </Badge>
+            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange('email', e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => handleInputChange('phone', e.target.value)}
-              placeholder="(555) 123-4567"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="specialty">Specialty *</Label>
-            <Select value={formData.specialty} onValueChange={(value) => handleInputChange('specialty', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select specialty" />
-              </SelectTrigger>
-              <SelectContent>
-                {specialties.map(specialty => (
-                  <SelectItem key={specialty} value={specialty}>
-                    {specialty}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="years-experience">Years of Experience</Label>
-            <Input
-              id="years-experience"
-              type="number"
-              value={formData.yearsExperience}
-              onChange={(e) => handleInputChange('yearsExperience', parseInt(e.target.value) || 0)}
-              min="0"
-              max="50"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="license-number">Medical License Number *</Label>
-            <Input
-              id="license-number"
-              value={formData.licenseNumber}
-              onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="col-span-1 md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="bio">Professional Bio</Label>
-              <Textarea
-                id="bio"
-                value={formData.bio}
-                onChange={(e) => handleInputChange('bio', e.target.value)}
-                placeholder="Share your experience, approach to patient care, and expertise..."
-                rows={4}
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                placeholder="(555) 123-4567"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="consultationFee">Consultation Fee ($)</Label>
+              <Input
+                id="consultationFee"
+                type="number"
+                value={formData.consultationFee}
+                onChange={(e) => handleInputChange('consultationFee', Number(e.target.value))}
+                placeholder="250"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="bio">Professional Bio</Label>
+            <Textarea
+              id="bio"
+              value={formData.bio}
+              onChange={(e) => handleInputChange('bio', e.target.value)}
+              placeholder="Describe your experience, specializations, and approach to patient care..."
+              rows={4}
+            />
           </div>
         </CardContent>
       </Card>
@@ -340,137 +236,331 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MapPin className="w-5 h-5" />
+            <Building className="w-5 h-5" />
             Office Information
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="col-span-1 md:col-span-2 space-y-2">
-            <Label htmlFor="office-address">Office Address</Label>
+            <Label htmlFor="officeAddress">Office Address</Label>
             <Input
-              id="office-address"
+              id="officeAddress"
               value={formData.officeAddress}
               onChange={(e) => handleInputChange('officeAddress', e.target.value)}
-              placeholder="123 Medical Center Dr, Suite 100"
+              placeholder="123 Medical Plaza, Suite 500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="office-city">City</Label>
+            <Label htmlFor="officeCity">City</Label>
             <Input
-              id="office-city"
+              id="officeCity"
               value={formData.officeCity}
               onChange={(e) => handleInputChange('officeCity', e.target.value)}
+              placeholder="San Francisco"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="office-state">State</Label>
+            <Label htmlFor="officeState">State</Label>
             <Input
-              id="office-state"
+              id="officeState"
               value={formData.officeState}
               onChange={(e) => handleInputChange('officeState', e.target.value)}
+              placeholder="CA"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="office-zip">ZIP Code</Label>
+            <Label htmlFor="officeZip">ZIP Code</Label>
             <Input
-              id="office-zip"
+              id="officeZip"
               value={formData.officeZip}
               onChange={(e) => handleInputChange('officeZip', e.target.value)}
+              placeholder="94102"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="office-hours">Office Hours</Label>
+            <Label htmlFor="officeHours">Office Hours</Label>
             <Input
-              id="office-hours"
+              id="officeHours"
               value={formData.officeHours}
               onChange={(e) => handleInputChange('officeHours', e.target.value)}
-              placeholder="Mon-Fri 9AM-5PM"
+              placeholder="Monday-Friday 8:00 AM - 5:00 PM"
             />
           </div>
         </CardContent>
       </Card>
 
-      {/* Professional Details */}
+      {/* Education & Credentials */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <GraduationCap className="w-5 h-5" />
-            Professional Details
+            Education & Credentials
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="medical-school">Medical School</Label>
+              <Label htmlFor="medicalSchool">Medical School</Label>
               <Input
-                id="medical-school"
+                id="medicalSchool"
                 value={formData.medicalSchool}
                 onChange={(e) => handleInputChange('medicalSchool', e.target.value)}
-                placeholder="University Medical School"
+                placeholder="UCSF School of Medicine"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="residency">Residency</Label>
+              <Label htmlFor="residency">Residency Program</Label>
               <Input
                 id="residency"
                 value={formData.residency}
                 onChange={(e) => handleInputChange('residency', e.target.value)}
-                placeholder="Hospital Residency Program"
+                placeholder="Stanford Dermatology Residency"
               />
             </div>
           </div>
 
-          {renderArrayField(
-            'Board Certifications',
-            'boardCertifications',
-            newCertification,
-            setNewCertification,
-            'American Board of Dermatology'
-          )}
-
-          {renderArrayField(
-            'Languages Spoken',
-            'languages',
-            newLanguage,
-            setNewLanguage,
-            'English, Spanish, etc.'
-          )}
-
-          {renderArrayField(
-            'Hospital Affiliations',
-            'hospitalAffiliations',
-            newAffiliation,
-            setNewAffiliation,
-            'City General Hospital'
-          )}
-
-          {renderArrayField(
-            'Insurance Accepted',
-            'insuranceAccepted',
-            newInsurance,
-            setNewInsurance,
-            'Blue Cross, Aetna, etc.'
-          )}
+          <div className="space-y-2">
+            <Label>Board Certifications</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newCertification}
+                onChange={(e) => setNewCertification(e.target.value)}
+                placeholder="Add board certification"
+              />
+              <Button
+                type="button"
+                onClick={() => addToArray('boardCertifications', newCertification, setNewCertification)}
+              >
+                Add
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.boardCertifications.map((cert, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  <Award className="w-3 h-3" />
+                  {cert}
+                  <button
+                    type="button"
+                    onClick={() => removeFromArray('boardCertifications', index)}
+                    className="ml-1 text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Practice Settings */}
+      {/* Languages & Services */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Building2 className="w-5 h-5" />
-            Practice Settings
+            <Phone className="w-5 h-5" />
+            Languages & Services
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Languages Spoken</Label>
+            <div className="flex gap-2">
+              <Select value={newLanguage} onValueChange={setNewLanguage}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {commonLanguages.map(lang => (
+                    <SelectItem key={lang} value={lang}>
+                      {lang}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                onClick={() => addToArray('languages', newLanguage, setNewLanguage)}
+              >
+                Add
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.languages.map((lang, index) => (
+                <Badge key={index} variant="secondary">
+                  {lang}
+                  <button
+                    type="button"
+                    onClick={() => removeFromArray('languages', index)}
+                    className="ml-1 text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label>Telehealth Services</Label>
+                <p className="text-sm text-gray-600">Offer virtual consultations</p>
+              </div>
+              <Switch
+                checked={formData.telehealth}
+                onCheckedChange={(checked) => handleInputChange('telehealth', checked)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label>In-Person Visits</Label>
+                <p className="text-sm text-gray-600">Accept office visits</p>
+              </div>
+              <Switch
+                checked={formData.inPerson}
+                onCheckedChange={(checked) => handleInputChange('inPerson', checked)}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Appointment Types</Label>
+            <div className="flex gap-2">
+              <Select value={newAppointmentType} onValueChange={setNewAppointmentType}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select appointment type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {appointmentTypeOptions.map(type => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                onClick={() => addToArray('appointmentTypes', newAppointmentType, setNewAppointmentType)}
+              >
+                Add
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.appointmentTypes.map((type, index) => (
+                <Badge key={index} variant="secondary">
+                  {type}
+                  <button
+                    type="button"
+                    onClick={() => removeFromArray('appointmentTypes', index)}
+                    className="ml-1 text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Professional Networks */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Building className="w-5 h-5" />
+            Professional Networks
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Hospital Affiliations</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newAffiliation}
+                onChange={(e) => setNewAffiliation(e.target.value)}
+                placeholder="Add hospital affiliation"
+              />
+              <Button
+                type="button"
+                onClick={() => addToArray('hospitalAffiliations', newAffiliation, setNewAffiliation)}
+              >
+                Add
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.hospitalAffiliations.map((affiliation, index) => (
+                <Badge key={index} variant="secondary">
+                  {affiliation}
+                  <button
+                    type="button"
+                    onClick={() => removeFromArray('hospitalAffiliations', index)}
+                    className="ml-1 text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Insurance Accepted</Label>
+            <div className="flex gap-2">
+              <Select value={newInsurance} onValueChange={setNewInsurance}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select insurance" />
+                </SelectTrigger>
+                <SelectContent>
+                  {commonInsurances.map(insurance => (
+                    <SelectItem key={insurance} value={insurance}>
+                      {insurance}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                type="button"
+                onClick={() => addToArray('insuranceAccepted', newInsurance, setNewInsurance)}
+              >
+                Add
+              </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.insuranceAccepted.map((insurance, index) => (
+                <Badge key={index} variant="secondary">
+                  {insurance}
+                  <button
+                    type="button"
+                    onClick={() => removeFromArray('insuranceAccepted', index)}
+                    className="ml-1 text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Morgellons Experience */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Award className="w-5 h-5" />
+            Morgellons Disease Expertise
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <Label>Morgellons Disease Experience</Label>
+              <Label>Morgellons Experience</Label>
               <p className="text-sm text-gray-600">Do you have experience treating Morgellons disease?</p>
             </div>
             <Switch
@@ -479,42 +569,18 @@ export const DoctorProfileForm = ({ doctorData, onSave }: DoctorProfileFormProps
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label>Telehealth Services</Label>
-              <p className="text-sm text-gray-600">Do you offer virtual appointments?</p>
+          {formData.morgellonsExperience && (
+            <div className="space-y-2">
+              <Label htmlFor="morgellonsDescription">Describe Your Morgellons Experience</Label>
+              <Textarea
+                id="morgellonsDescription"
+                value={formData.morgellonsDescription}
+                onChange={(e) => handleInputChange('morgellonsDescription', e.target.value)}
+                placeholder="Describe your experience treating Morgellons disease, research involvement, or specialized training..."
+                rows={3}
+              />
             </div>
-            <Switch
-              checked={formData.telehealth}
-              onCheckedChange={(checked) => handleInputChange('telehealth', checked)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Appointment Types Offered</Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {appointmentTypes.map(type => (
-                <div key={type} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id={`appointment-${type}`}
-                    checked={formData.appointmentTypes.includes(type)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        handleInputChange('appointmentTypes', [...formData.appointmentTypes, type]);
-                      } else {
-                        handleInputChange('appointmentTypes', formData.appointmentTypes.filter(t => t !== type));
-                      }
-                    }}
-                    className="rounded border-gray-300"
-                  />
-                  <Label htmlFor={`appointment-${type}`} className="text-sm">
-                    {type}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </CardContent>
       </Card>
 
