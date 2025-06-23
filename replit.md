@@ -133,6 +133,11 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Intelligent health insights generation based on user data
 - ✓ Symptom trend prediction using machine learning
 - ✓ Natural language processing for journal entry analysis
+- ✓ Created Research Dashboard for doctors and researchers
+- ✓ Aggregated analytics from opted-in patient data
+- ✓ Statistical correlations between symptoms and environmental factors
+- ✓ Treatment effectiveness analysis and demographic insights
+- ✓ Geographic distribution mapping and data export capabilities
 
 ## User Preferences
 

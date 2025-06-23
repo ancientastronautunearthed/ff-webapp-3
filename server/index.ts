@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import aiRoutes from "./routes/ai";
+import researchRoutes from "./routes/research";
 
 const app = express();
 app.use(express.json());
@@ -9,6 +10,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Add AI routes
 app.use("/api/ai", aiRoutes);
+// Add research routes
+app.use("/api/research", researchRoutes);
 
 app.use((req, res, next) => {
   const start = Date.now();

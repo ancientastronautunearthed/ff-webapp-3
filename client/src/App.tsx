@@ -16,6 +16,7 @@ import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
 import CalendarView from "@/pages/CalendarView";
+import ResearchDashboard from "@/pages/ResearchDashboard";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -48,10 +49,11 @@ function AppContent() {
         <Route path="/journal" component={DigitalMatchbox} />
         <Route path="/community" component={Community} />
         <Route path="/insights" component={DataVisualization} />
-        <Route path="/research" component={ResearchOptIn} />
+        <Route path="/research-opt-in" component={ResearchOptIn} />
         <Route path="/reports" component={ProviderReports} />
         <Route path="/calendar" component={CalendarView} />
         <Route path="/ai-insights" component={AIInsights} />
+        <Route path="/research" component={ResearchDashboard} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
