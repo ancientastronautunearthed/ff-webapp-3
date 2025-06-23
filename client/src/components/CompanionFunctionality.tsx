@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCompanionFunctions } from './CompanionTierSystem';
+import { useCompanionFunctions, COMPANION_TIERS } from './CompanionTierSystem';
 import { 
   ChefHat, 
   Pill, 
@@ -36,7 +36,10 @@ export const CompanionFunctionality = ({
 
   // Tier 3+ Function: Personalized Meal Suggestions
   const generateMealSuggestions = async () => {
-    if (!hasFunction('meal suggestions')) return;
+    if (companionTier < 3) {
+      alert(`Meal suggestions unlock at Level 3. You are currently Level ${companionTier}.`);
+      return;
+    }
     
     setActiveFunction('meals');
     // AI-powered meal suggestions based on symptoms and dietary needs
@@ -70,7 +73,10 @@ export const CompanionFunctionality = ({
 
   // Tier 5+ Function: Supplement Recommendations
   const generateSupplementPlan = async () => {
-    if (!hasFunction('supplement recommendations')) return;
+    if (companionTier < 5) {
+      alert(`Supplement recommendations unlock at Level 5. You are currently Level ${companionTier}.`);
+      return;
+    }
     
     setActiveFunction('supplements');
     const recommendations = {
@@ -106,7 +112,10 @@ export const CompanionFunctionality = ({
 
   // Tier 6+ Function: Predictive Symptom Modeling
   const generateSymptomPredictions = async () => {
-    if (!hasFunction('predictive symptom')) return;
+    if (companionTier < 6) {
+      alert(`Symptom predictions unlock at Level 6. You are currently Level ${companionTier}.`);
+      return;
+    }
     
     setActiveFunction('predictions');
     const predictions = {
@@ -138,7 +147,10 @@ export const CompanionFunctionality = ({
 
   // Tier 7+ Function: Treatment Timeline Optimization
   const optimizeTreatmentSchedule = async () => {
-    if (!hasFunction('treatment timeline')) return;
+    if (companionTier < 7) {
+      alert(`Treatment optimization unlocks at Level 7. You are currently Level ${companionTier}.`);
+      return;
+    }
     
     setActiveFunction('schedule');
     const timeline = {
@@ -170,7 +182,10 @@ export const CompanionFunctionality = ({
 
   // Tier 8+ Function: Research Study Matching
   const findRelevantStudies = async () => {
-    if (!hasFunction('research study')) return;
+    if (companionTier < 8) {
+      alert(`Research study matching unlocks at Level 8. You are currently Level ${companionTier}.`);
+      return;
+    }
     
     setActiveFunction('research');
     const studies = {
@@ -268,29 +283,45 @@ export const CompanionFunctionality = ({
                 {unlockedFunctions.map((func) => {
                   const Icon = func.icon;
                   const isActive = activeFunction === func.id;
+                  const isUnlocked = companionTier >= func.tier;
                   
                   return (
-                    <Card key={func.id} className={`cursor-pointer transition-all ${
-                      isActive ? 'ring-2 ring-blue-500' : 'hover:shadow-md'
+                    <Card key={func.id} className={`transition-all ${
+                      isUnlocked 
+                        ? isActive 
+                          ? 'ring-2 ring-blue-500' 
+                          : 'hover:shadow-md cursor-pointer' 
+                        : 'opacity-60 cursor-not-allowed'
                     }`}>
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
-                            <Icon className="w-5 h-5 text-blue-600" />
-                            <h4 className="font-medium">{func.name}</h4>
+                            <Icon className={`w-5 h-5 ${isUnlocked ? 'text-blue-600' : 'text-gray-400'}`} />
+                            <h4 className={`font-medium ${isUnlocked ? 'text-gray-900' : 'text-gray-500'}`}>
+                              {func.name}
+                            </h4>
                           </div>
-                          <Badge variant="outline">Tier {func.tier}</Badge>
+                          <Badge variant={isUnlocked ? "outline" : "secondary"}>
+                            Tier {func.tier}
+                          </Badge>
                         </div>
-                        <p className="text-sm text-gray-600">{func.description}</p>
+                        <p className={`text-sm ${isUnlocked ? 'text-gray-600' : 'text-gray-500'}`}>
+                          {func.description}
+                        </p>
                       </CardHeader>
                       <CardContent>
                         <Button 
                           onClick={func.action}
-                          disabled={isActive}
+                          disabled={isActive || !isUnlocked}
                           className="w-full"
-                          variant={isActive ? "secondary" : "default"}
+                          variant={isActive ? "secondary" : isUnlocked ? "default" : "outline"}
                         >
-                          {isActive ? "Generating..." : "Activate"}
+                          {!isUnlocked 
+                            ? `Unlock at Level ${func.tier}`
+                            : isActive 
+                              ? "Generating..." 
+                              : "Activate"
+                          }
                         </Button>
                       </CardContent>
                     </Card>
@@ -303,22 +334,26 @@ export const CompanionFunctionality = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {lockedFunctions.map((func) => {
                   const Icon = func.icon;
+                  const pointsNeeded = COMPANION_TIERS.find(t => t.level === func.tier)?.pointsRequired || 0;
                   
                   return (
-                    <Card key={func.id} className="opacity-60">
+                    <Card key={func.id} className="opacity-60 border-2 border-dashed border-gray-300">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <Icon className="w-5 h-5 text-gray-400" />
                             <h4 className="font-medium text-gray-600">{func.name}</h4>
                           </div>
-                          <Badge variant="secondary">Tier {func.tier}</Badge>
+                          <Badge variant="secondary">Level {func.tier}</Badge>
                         </div>
                         <p className="text-sm text-gray-500">{func.description}</p>
+                        <p className="text-xs text-gray-400 mt-2">
+                          Requires {pointsNeeded} total points to unlock
+                        </p>
                       </CardHeader>
                       <CardContent>
                         <Button disabled className="w-full" variant="outline">
-                          Unlock at Tier {func.tier}
+                          🔒 Locked - Level {func.tier} Required
                         </Button>
                       </CardContent>
                     </Card>
