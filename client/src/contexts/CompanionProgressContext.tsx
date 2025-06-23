@@ -50,6 +50,8 @@ interface CompanionProgressContextType {
   tierProgress: TierProgress;
   loading: boolean;
   addPoints: (points: number, action: string, category: PointSource['category']) => Promise<void>;
+  awardPoints: (points: number, reason: string) => Promise<void>;
+  setPoints: (points: number) => void;
   getTierProgress: () => TierProgress;
   checkTierUnlock: () => boolean;
   markCelebrationShown: (tier: number) => Promise<void>;
@@ -341,6 +343,34 @@ export const CompanionProgressProvider = ({ children }: CompanionProgressProvide
     }, {} as Record<string, number>);
   };
 
+  // Demo-compatible wrapper function
+  const awardPoints = async (points: number, reason: string) => {
+    await addPoints(points, reason, 'engagement');
+  };
+
+  // Direct points setter for testing
+  const setPoints = (points: number) => {
+    if (!progressData) return;
+
+    const newTier = COMPANION_TIERS.reduce((tier, current) => {
+      return points >= current.pointsRequired ? current.level : tier;
+    }, 1);
+
+    const updatedData: CompanionProgressData = {
+      ...progressData,
+      totalPoints: points,
+      currentTier: newTier,
+      lastUpdated: new Date()
+    };
+
+    setProgressData(updatedData);
+    
+    if (user?.uid) {
+      const progressRef = doc(db, 'companionProgress', user.uid);
+      updateDoc(progressRef, updatedData).catch(console.error);
+    }
+  };
+
   const tierProgress = getTierProgress();
 
   return (
@@ -350,6 +380,8 @@ export const CompanionProgressProvider = ({ children }: CompanionProgressProvide
         tierProgress,
         loading,
         addPoints,
+        awardPoints,
+        setPoints,
         getTierProgress,
         checkTierUnlock,
         markCelebrationShown,
