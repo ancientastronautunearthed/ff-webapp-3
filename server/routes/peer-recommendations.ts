@@ -90,24 +90,18 @@ peerRecommendationsRoutes.get('/connection-analytics/:userId', async (req, res) 
 
 async function buildUserProfile(userId: string): Promise<UserProfile | null> {
   try {
-    // Get user basic info from Firebase
-    const userSnapshot = await getDocs(
-      query(collection(db, 'users'), limit(100))
-    );
-    const userDoc = userSnapshot.docs.find(doc => doc.id === userId);
-    const userData = userDoc?.data();
+    // Get user basic info from Firebase Admin SDK
+    const userDoc = await adminDb.collection('users').doc(userId).get();
+    const userData = userDoc.data();
     
     if (!userData) return null;
 
-    // Get symptom entries
-    const symptomSnapshot = await getDocs(
-      query(
-        collection(db, 'symptomEntries'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
-        limit(50)
-      )
-    );
+    // Get symptom entries using Firebase Admin SDK
+    const symptomSnapshot = await adminDb.collection('symptomEntries')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .limit(50)
+      .get();
     
     const symptomEntries = symptomSnapshot.docs.map(doc => doc.data());
     
@@ -168,8 +162,8 @@ async function buildUserProfile(userId: string): Promise<UserProfile | null> {
 
 async function getPotentialMatches(currentUserId: string): Promise<UserProfile[]> {
   try {
-    // Get all users except current user
-    const usersSnapshot = await getDocs(collection(db, 'users'));
+    // Get all users except current user using Firebase Admin SDK
+    const usersSnapshot = await adminDb.collection('users').get();
     const users = usersSnapshot.docs
       .filter(doc => doc.id !== currentUserId)
       .map(doc => ({ id: doc.id, ...doc.data() }));
@@ -222,13 +216,10 @@ async function buildRecommendationContext(userId: string): Promise<Recommendatio
     const recentJournals = recentJournalSnapshot.docs.map(doc => doc.data());
     const emotionalState = assessEmotionalState(recentJournals);
     
-    // Get previous connections
-    const connectionsSnapshot = await getDocs(
-      query(
-        collection(db, 'peerConnections'),
-        where('fromUserId', '==', userId)
-      )
-    );
+    // Get previous connections using Firebase Admin SDK
+    const connectionsSnapshot = await adminDb.collection('peerConnections')
+      .where('fromUserId', '==', userId)
+      .get();
     
     const previousConnections = connectionsSnapshot.docs.map(doc => doc.data().toUserId || '');
 

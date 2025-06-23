@@ -25,7 +25,9 @@ import {
   CheckCircle,
   ArrowRight,
   Globe,
-  Shield
+  Shield,
+  Brain,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
