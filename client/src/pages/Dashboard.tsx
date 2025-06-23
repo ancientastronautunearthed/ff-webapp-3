@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { WelcomeTour } from '@/components/WelcomeTour';
+import { AIHealthCoach } from '@/components/AIHealthCoach';
+import { SmartDailyCheckin } from '@/components/SmartDailyCheckin';
+import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { Link } from 'wouter';
 import { 
   Activity, 
