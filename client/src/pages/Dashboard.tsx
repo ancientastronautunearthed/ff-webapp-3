@@ -277,6 +277,8 @@ export default function Dashboard() {
         <div className="space-y-6">
           <SmartDailyCheckin />
           <AIHealthCoach />
+          {/* AI Companion Widget */}
+          <CompanionWidget />
         </div>
       </div>
 

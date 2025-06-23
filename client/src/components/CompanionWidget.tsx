@@ -22,15 +22,18 @@ export const CompanionWidget = () => {
   const { tierProgress } = useCompanionProgress();
   const [companionImage, setCompanionImage] = useState<string | null>(null);
   const [companionConfig, setCompanionConfig] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadCompanionData = async () => {
+      setLoading(true);
       if (user?.uid) {
         try {
+          console.log('CompanionWidget: Attempting to load companion data for user:', user.uid);
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
-            console.log('CompanionWidget: User data loaded:', userData);
+            console.log('CompanionWidget: User data loaded successfully:', userData);
             
             // Check for companion data - ONLY use real Firebase data
             const image = userData.companionImage;
@@ -42,28 +45,54 @@ export const CompanionWidget = () => {
               hasImage: !!image,
               hasConfig: !!config,
               hasCompanion,
-              companionSkipped
+              companionSkipped,
+              imageUrl: image
             });
             
             if (image) {
-              console.log('CompanionWidget: Setting companion image');
+              console.log('CompanionWidget: Setting companion image:', image);
               setCompanionImage(image);
             }
             if (config) {
-              console.log('CompanionWidget: Setting companion config');
+              console.log('CompanionWidget: Setting companion config:', config);
               setCompanionConfig(config);
             }
           } else {
-            console.log('CompanionWidget: No user document found');
+            console.log('CompanionWidget: No user document found in Firestore');
           }
         } catch (error) {
-          console.error('CompanionWidget: Error loading companion data:', error);
+          console.error('CompanionWidget: Firebase error (network/auth issue):', error);
+          // Don't set fallback data - just log the error and show creation prompt
         }
+      } else {
+        console.log('CompanionWidget: No user UID available');
       }
+      setLoading(false);
     };
 
     loadCompanionData();
   }, [user]);
+
+  console.log('CompanionWidget: Rendering - loading:', loading, 'companionImage:', !!companionImage, 'companionConfig:', !!companionConfig);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardContent className="p-4">
+          <div className="text-center space-y-3">
+            <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center animate-pulse">
+              <Heart className="w-8 h-8 text-purple-500" />
+            </div>
+            <div>
+              <h3 className="font-medium text-gray-900">Loading Companion...</h3>
+              <p className="text-sm text-gray-600">Checking for your AI companion</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Always show companion widget - either with data or creation prompt
   const hasCompanionData = companionImage || companionConfig;
