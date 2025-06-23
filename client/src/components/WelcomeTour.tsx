@@ -252,13 +252,9 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
 
   return (
     <>
-      {/* Tour Overlay */}
-      <div className="fixed inset-0 bg-black bg-opacity-30 z-40" />
-      
-      {/* Tour Modal */}
-      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
-        <div className="pointer-events-auto">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      {/* Compact Tour Modal positioned at bottom-right */}
+      <div className="fixed bottom-6 right-6 z-50 max-w-md w-80">
+      <Card className="shadow-2xl border-2 border-blue-500">
         <CardHeader className="relative">
           <Button
             variant="ghost"
@@ -356,37 +352,36 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
           </div>
         </CardContent>
       </Card>
-        </div>
       </div>
 
       {/* Add CSS for highlighting elements */}
-      <style jsx global>{`
+      <style>{`
         .tour-highlight {
           position: relative;
           z-index: 45;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), 
-                      0 0 0 8px rgba(59, 130, 246, 0.3);
-          border-radius: 8px;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.6), 
+                      0 0 0 6px rgba(59, 130, 246, 0.3);
+          border-radius: 6px;
           transition: all 0.3s ease;
         }
         
         .tour-highlight::before {
           content: '';
           position: absolute;
-          top: -4px;
-          left: -4px;
-          right: -4px;
-          bottom: -4px;
-          background: rgba(59, 130, 246, 0.1);
-          border-radius: 12px;
+          top: -3px;
+          left: -3px;
+          right: -3px;
+          bottom: -3px;
+          background: rgba(59, 130, 246, 0.15);
+          border-radius: 9px;
           z-index: -1;
-          animation: pulse 2s infinite;
+          animation: tourPulse 2s infinite;
         }
         
-        @keyframes pulse {
-          0% { opacity: 1; }
-          50% { opacity: 0.5; }
-          100% { opacity: 1; }
+        @keyframes tourPulse {
+          0% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.02); }
+          100% { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </>
