@@ -105,25 +105,20 @@ async function buildUserProfile(userId: string): Promise<UserProfile | null> {
     
     const symptomEntries = symptomSnapshot.docs.map(doc => doc.data());
     
-    // Get journal entries
-    const journalSnapshot = await getDocs(
-      query(
-        collection(db, 'journalEntries'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
-        limit(20)
-      )
-    );
+    // Get journal entries using Firebase Admin SDK
+    const journalSnapshot = await adminDb.collection('journalEntries')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .limit(30)
+      .get();
     
     const journalEntries = journalSnapshot.docs.map(doc => doc.data());
     
-    // Get matching preferences
-    const preferencesSnapshot = await getDocs(
-      query(
-        collection(db, 'matchingPreferences'),
-        where('userId', '==', userId)
-      )
-    );
+    // Get matching preferences using Firebase Admin SDK
+    const preferencesSnapshot = await adminDb.collection('matchingPreferences')
+      .where('userId', '==', userId)
+      .limit(1)
+      .get();
     
     const preferences = preferencesSnapshot.docs[0]?.data() || {
       supportType: [],
@@ -188,30 +183,24 @@ async function getPotentialMatches(currentUserId: string): Promise<UserProfile[]
 
 async function buildRecommendationContext(userId: string): Promise<RecommendationContext> {
   try {
-    // Get recent symptom entries to detect changes
-    const recentSymptomsSnapshot = await getDocs(
-      query(
-        collection(db, 'symptomEntries'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
-        limit(7)
-      )
-    );
+    // Get recent symptom entries to detect changes using Firebase Admin SDK
+    const recentSymptomsSnapshot = await adminDb.collection('symptomEntries')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .limit(10)
+      .get();
     
     const recentSymptoms = recentSymptomsSnapshot.docs.map(doc => doc.data());
     
     // Analyze for recent changes
     const recentSymptomChanges = detectSymptomChanges(recentSymptoms);
     
-    // Get recent journal entries to assess emotional state
-    const recentJournalSnapshot = await getDocs(
-      query(
-        collection(db, 'journalEntries'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc'),
-        limit(5)
-      )
-    );
+    // Get recent journal entries to assess emotional state using Firebase Admin SDK
+    const recentJournalSnapshot = await adminDb.collection('journalEntries')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .limit(5)
+      .get();
     
     const recentJournals = recentJournalSnapshot.docs.map(doc => doc.data());
     const emotionalState = assessEmotionalState(recentJournals);
