@@ -543,6 +543,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* AI Companion Widget */}
+          <CompanionWidget />
+          
           {/* Peer Matching Widget */}
           <PeerMatchingWidget />
 
