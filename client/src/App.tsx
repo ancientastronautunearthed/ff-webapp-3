@@ -14,6 +14,8 @@ import { DataVisualization } from "@/components/DataVisualization";
 import { ResearchOptIn } from "@/components/ResearchOptIn";
 import { ProviderReports } from "@/components/ProviderReports";
 import { AIInsights } from "@/components/AIInsights";
+import { ResearchConsentManager } from "@/components/ResearchConsentManager";
+import { ResearchDashboardEnhanced } from "@/components/ResearchDashboardEnhanced";
 import Dashboard from "@/pages/Dashboard";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/not-found";
@@ -69,6 +71,8 @@ function AppContent() {
         <Route path="/calendar" component={CalendarView} />
         <Route path="/ai-insights" component={AIInsights} />
         <Route path="/research" component={ResearchDashboard} />
+        <Route path="/research-enhanced" component={ResearchDashboardEnhanced} />
+        <Route path="/research-consent" component={ResearchConsentManager} />
         <Route path="/profile-setup" component={ProfileSetup} />
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/telemedicine" component={TelemedicineScheduling} />

@@ -99,6 +99,45 @@ export const insertForumReplySchema = createInsertSchema(forumReplies).pick({
 });
 
 // Types
+export const insertResearchConsentSchema = createInsertSchema(researchConsent).pick({
+  userId: true,
+  generalResearchConsent: true,
+  symptomDataConsent: true,
+  journalDataConsent: true,
+  demographicDataConsent: true,
+  treatmentDataConsent: true,
+  locationDataConsent: true,
+  dataRetentionYears: true,
+  allowDataSharing: true,
+  allowCommercialUse: true,
+});
+
+export const insertResearchStudySchema = createInsertSchema(researchStudies).pick({
+  title: true,
+  description: true,
+  principalInvestigator: true,
+  institution: true,
+  approvalNumber: true,
+  studyType: true,
+  dataRequirements: true,
+  inclusionCriteria: true,
+  exclusionCriteria: true,
+  estimatedDuration: true,
+  compensationOffered: true,
+  compensationDetails: true,
+  contactEmail: true,
+  startDate: true,
+  endDate: true,
+});
+
+export const insertUserStudyParticipationSchema = createInsertSchema(userStudyParticipation).pick({
+  userId: true,
+  studyId: true,
+  participationStatus: true,
+  withdrawalReason: true,
+  notes: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertSymptomEntry = z.infer<typeof insertSymptomEntrySchema>;
@@ -109,3 +148,9 @@ export type InsertForumPost = z.infer<typeof insertForumPostSchema>;
 export type ForumPost = typeof forumPosts.$inferSelect;
 export type InsertForumReply = z.infer<typeof insertForumReplySchema>;
 export type ForumReply = typeof forumReplies.$inferSelect;
+export type InsertResearchConsent = z.infer<typeof insertResearchConsentSchema>;
+export type ResearchConsent = typeof researchConsent.$inferSelect;
+export type InsertResearchStudy = z.infer<typeof insertResearchStudySchema>;
+export type ResearchStudy = typeof researchStudies.$inferSelect;
+export type InsertUserStudyParticipation = z.infer<typeof insertUserStudyParticipationSchema>;
+export type UserStudyParticipation = typeof userStudyParticipation.$inferSelect;

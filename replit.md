@@ -169,6 +169,11 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Removed all mock data and implemented Firebase backend
 - ✓ Post creation, categorization, and viewing functionality
 - ✓ Authentication-gated access with proper error handling
+- ✓ Patient-Led Research Data Aggregation System
+- ✓ Comprehensive consent preference management interface
+- ✓ Granular data sharing controls by category
+- ✓ Enhanced research dashboard with analytics
+- ✓ IRB compliance and ethics tracking
 
 ## User Preferences
 
