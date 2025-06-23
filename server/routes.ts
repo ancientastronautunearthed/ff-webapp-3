@@ -198,5 +198,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Therapy Session endpoints
+  app.post('/api/therapy/session', async (req: Request, res: Response) => {
+    try {
+      const { userId, message, sessionPhase } = req.body;
+      
+      if (!userId || !message) {
+        return res.status(400).json({ error: 'User ID and message required' });
+      }
+
+      // Generate therapy response
+      const { generateTherapyResponse } = await import('./routes/therapy');
+      const therapyResponse = await generateTherapyResponse(userId, message, sessionPhase || 'exploration');
+      
+      res.json(therapyResponse);
+    } catch (error) {
+      console.error('Error generating therapy response:', error);
+      res.status(500).json({ 
+        message: "I understand this might be difficult to share. Sometimes I need a moment to process what you've told me. Could you try expressing that again?",
+        sessionPhase: 'exploration',
+        technique: 'supportive'
+      });
+    }
+  });
+
   return httpServer;
 }

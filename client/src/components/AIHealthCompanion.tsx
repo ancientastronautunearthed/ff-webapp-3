@@ -356,7 +356,7 @@ export function AIHealthCompanion() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-lg">AI Companion Options</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button 
@@ -375,14 +375,15 @@ export function AIHealthCompanion() {
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Research Insights
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-start"
-                  onClick={() => setCurrentMessage("Help me prepare for my doctor appointment")}
-                >
-                  <Heart className="h-4 w-4 mr-2" />
-                  Medical Advocacy
-                </Button>
+                <Link href="/therapy-session">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700"
+                  >
+                    <Heart className="h-4 w-4 mr-2" />
+                    Therapy Session
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
