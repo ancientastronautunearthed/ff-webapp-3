@@ -1,0 +1,37 @@
+Warning: validateDOMNesting(...): <a> cannot appear as a descendant of &lt;a&gt;.
+    at a
+    at a
+    at https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=66ee8dd7:337:18
+    at NavigationItems (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/components/Layout.tsx:67:30)
+    at div
+    at div
+    at div
+    at nav
+    at div
+    at Layout (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/components/Layout.tsx:36:26)
+    at AppContent (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/App.tsx?v=Q0ssDyQtQXiJQtUMSv-Ow:42:29)
+    at Provider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=66ee8dd7:38:15)
+    at TooltipProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=66ee8dd7:68:5)
+    at AuthProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/contexts/AuthContext.tsx:33:32)
+    at QueryClientProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=66ee8dd7:2805:3)
+    at App
+at a
+at a
+at https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=66ee8dd7:337:18
+at NavigationItems (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/components/Layout.tsx:67:30)
+at div
+at div
+at div
+at nav
+at div
+at Layout (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/components/Layout.tsx:36:26)
+at AppContent (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/App.tsx?v=Q0ssDyQtQXiJQtUMSv-Ow:42:29)
+at Provider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=66ee8dd7:38:15)
+at TooltipProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=66ee8dd7:68:5)
+at AuthProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/contexts/AuthContext.tsx:33:32)
+at QueryClientProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=66ee8dd7:2805:3)
+at App
+at t.value (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

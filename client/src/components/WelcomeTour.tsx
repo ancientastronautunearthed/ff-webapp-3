@@ -38,6 +38,8 @@ interface WelcomeTourProps {
 export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [location, navigate] = useLocation();
+  
+  console.log('WelcomeTour rendered with currentStep:', currentStep);
 
   const tourSteps: TourStep[] = [
     {

@@ -40,11 +40,17 @@ export default function Dashboard() {
   }, []);
 
   const completeTour = () => {
+    console.log('completeTour called');
     localStorage.setItem('hasSeenDashboardTour', 'true');
     setShowTour(false);
+    toast({
+      title: "Welcome to Fiber Friends!",
+      description: "You're all set to start tracking your health journey.",
+    });
   };
 
   const skipTour = () => {
+    console.log('skipTour called');
     localStorage.setItem('hasSeenDashboardTour', 'true');
     setShowTour(false);
   };
