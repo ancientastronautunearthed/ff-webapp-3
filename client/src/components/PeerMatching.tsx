@@ -75,15 +75,15 @@ export const PeerMatching = () => {
   
   const [preferences, setPreferences] = useState<MatchPreferences>({
     symptoms: [],
-    ageRangeMin: 18,
-    ageRangeMax: 99,
+    ageRange: [18, 65],
     location: 'anywhere',
     experienceLevel: 'any',
     supportType: [],
     interests: [],
     timeZone: 'UTC',
     communicationStyle: 'occasional',
-    privacyLevel: 'selective'
+    privacyLevel: 'selective',
+    bio: ''
   });
   
   const [potentialMatches, setPotentialMatches] = useState<PotentialMatch[]>([]);
