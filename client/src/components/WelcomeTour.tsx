@@ -228,6 +228,10 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     if (currentTourStep.route && location !== currentTourStep.route) {
       console.log('Navigating to:', currentTourStep.route);
       navigate(currentTourStep.route);
+      // Force a slight delay to ensure page navigation completes
+      setTimeout(() => {
+        console.log('Navigation completed to:', currentTourStep.route);
+      }, 100);
     }
   }, [currentStep, navigate]);
 
@@ -236,16 +240,30 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
     const currentTourStep = tourSteps[currentStep];
     console.log('Highlighting useEffect triggered, currentStep:', currentStep, 'highlightElements:', currentTourStep.highlightElements);
     if (currentTourStep.highlightElements) {
-      // Wait longer for page content to fully load
-      const timeoutId = setTimeout(() => {
+      // Wait longer for page content to fully load and try multiple times
+      let attempts = 0;
+      const maxAttempts = 5;
+      
+      const tryHighlighting = () => {
+        attempts++;
+        let foundElements = 0;
+        
         currentTourStep.highlightElements.forEach(selector => {
           const elements = document.querySelectorAll(selector);
-          console.log('Found', elements.length, 'elements for selector:', selector);
+          console.log(`Attempt ${attempts}: Found`, elements.length, 'elements for selector:', selector);
+          foundElements += elements.length;
           elements.forEach(el => {
             el.classList.add('tour-highlight');
           });
         });
-      }, 800); // Wait 800ms for page content to fully render
+        
+        // If no elements found and we haven't exceeded max attempts, try again
+        if (foundElements === 0 && attempts < maxAttempts) {
+          setTimeout(tryHighlighting, 500);
+        }
+      };
+      
+      const timeoutId = setTimeout(tryHighlighting, 800);
 
       // Cleanup function to remove highlights
       return () => {

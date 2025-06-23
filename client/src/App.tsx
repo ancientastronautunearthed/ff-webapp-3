@@ -81,7 +81,13 @@ function AppContent() {
         <Route path="/telemedicine" component={TelemedicineScheduling} />
         <Route component={NotFound} />
       </Switch>
-
+      
+      {/* Check if tour is active and show tour overlay */}
+      {localStorage.getItem('tourActive') === 'true' && <WelcomeTour onComplete={() => {
+        localStorage.removeItem('tourActive');
+      }} onSkip={() => {
+        localStorage.removeItem('tourActive');
+      }} />}
     </Layout>
   );
 }

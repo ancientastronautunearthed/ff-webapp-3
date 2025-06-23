@@ -117,7 +117,9 @@ export const Onboarding = () => {
 
     // Transition to tour phase after brief delay to show completion message
     setTimeout(() => {
-      setCurrentPhase('tour');
+      localStorage.setItem('tourActive', 'true');
+      localStorage.setItem('onboardingComplete', 'true');
+      window.location.href = '/dashboard'; // Navigate to dashboard and start tour
     }, 1500);
   };
 
