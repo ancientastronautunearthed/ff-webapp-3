@@ -17,9 +17,11 @@ import {
   Calendar,
   AlertTriangle,
   CheckCircle,
-  Clock
+  Clock,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface StateStatistics {
   state: string;
@@ -42,6 +44,7 @@ interface ResearchInsight {
 
 export default function DoctorDashboard() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [doctorProfile, setDoctorProfile] = useState<any>(null);
   const [stateStats, setStateStats] = useState<StateStatistics[]>([]);
   const [researchInsights, setResearchInsights] = useState<ResearchInsight[]>([]);
@@ -145,6 +148,20 @@ export default function DoctorDashboard() {
     setActiveConsultations(8); // Mock active consultations
   };
 
+  const handleLogout = () => {
+    // Clear doctor session data
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('demoDoctor');
+    
+    toast({
+      title: "Logged Out",
+      description: "You have been logged out of the doctor portal.",
+    });
+    
+    // Redirect to login
+    window.location.href = '/';
+  };
+
   const getSignificanceColor = (significance: string) => {
     switch (significance) {
       case 'high': return 'border-red-500 bg-red-50';
@@ -206,6 +223,10 @@ export default function DoctorDashboard() {
                   Demo Mode - Sample Data
                 </Badge>
               )}
+              <Button variant="outline" onClick={handleLogout} className="ml-auto">
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </div>

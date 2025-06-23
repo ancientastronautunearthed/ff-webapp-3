@@ -3,9 +3,11 @@ import DoctorDashboard from '@/pages/DoctorDashboard';
 
 export default function DoctorDemo() {
   useEffect(() => {
-    // Set demo doctor role
-    localStorage.setItem('userRole', 'doctor');
-    localStorage.setItem('demoDoctor', 'true');
+    // Set demo doctor role only if not already set
+    if (localStorage.getItem('demoDoctor') !== 'true') {
+      localStorage.setItem('userRole', 'doctor');
+      localStorage.setItem('demoDoctor', 'true');
+    }
   }, []);
 
   return <DoctorDashboard />;
