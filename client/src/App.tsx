@@ -101,6 +101,7 @@ function AppContent() {
         <Route path="/doctor/dashboard" component={DoctorDashboard} />
         <Route path="/doctor/demo" component={DoctorDemo} />
         <Route path="/ask-doctor" component={AskDoctorForum} />
+        <Route path="/peer-matching" component={PeerMatchingPage} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
       </Switch>

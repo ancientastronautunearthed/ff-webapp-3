@@ -5,15 +5,15 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Users } from 'lucide-react';
 import { Link } from 'wouter';
 
-export default function PeerMatchingPage() {
+export function PeerMatchingPage() {
   return (
     <Layout>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/community">
+          <Link href="/dashboard">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Community
+              Back to Dashboard
             </Button>
           </Link>
           <div>
