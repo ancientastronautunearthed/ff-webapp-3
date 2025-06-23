@@ -46,7 +46,17 @@ function AppContent() {
   }
 
   if (!user) {
+    // Check if accessing doctor portal
+    if (location.startsWith('/doctor')) {
+      return <DoctorLogin />;
+    }
     return <Login />;
+  }
+
+  // Check if user is a doctor and redirect to doctor dashboard
+  const userRole = localStorage.getItem('userRole');
+  if (userRole === 'doctor') {
+    return <DoctorDashboard />;
   }
 
   // Check if user has completed onboarding
@@ -79,6 +89,10 @@ function AppContent() {
         <Route path="/profile-setup" component={ProfileSetup} />
         <Route path="/onboarding" component={Onboarding} />
         <Route path="/telemedicine" component={TelemedicineScheduling} />
+        <Route path="/doctor" component={DoctorLogin} />
+        <Route path="/doctor/login" component={DoctorLogin} />
+        <Route path="/doctor/dashboard" component={DoctorDashboard} />
+        <Route path="/ask-doctor" component={() => import('@/components/AskDoctorForum').then(({ AskDoctorForum }) => <AskDoctorForum />)} />
         <Route component={NotFound} />
       </Switch>
       

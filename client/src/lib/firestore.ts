@@ -164,6 +164,81 @@ export async function updatePeerConnectionStatus(connectionId: string, status: '
   }
 }
 
+// Create doctor profile
+export async function createDoctorProfile(doctorData: any) {
+  try {
+    const docRef = await addDoc(collection(db, 'doctors'), {
+      ...doctorData,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error creating doctor profile:', error);
+    throw error;
+  }
+}
+
+// Get doctor profile
+export async function getDoctorProfile(doctorId: string) {
+  try {
+    const docRef = doc(db, 'doctors', doctorId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting doctor profile:', error);
+    return null;
+  }
+}
+
+// Get state-based user statistics for doctors
+export async function getStateUserStatistics(states: string[]) {
+  try {
+    // In a real implementation, this would query users by state
+    // For now, return mock data based on the provided states
+    const q = query(
+      collection(db, 'users'),
+      limit(100) // Sample for now
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    // Process data by state (mock implementation)
+    return states.map(state => ({
+      state,
+      totalUsers: Math.floor(Math.random() * 1000) + 100,
+      activeUsers: Math.floor(Math.random() * 500) + 50,
+      newThisMonth: Math.floor(Math.random() * 50) + 5
+    }));
+  } catch (error) {
+    console.error('Error getting state statistics:', error);
+    return [];
+  }
+}
+
+// Create doctor consultation response
+export async function createDoctorConsultation(consultationData: any) {
+  try {
+    const docRef = await addDoc(collection(db, 'doctor_consultations'), {
+      ...consultationData,
+      createdAt: serverTimestamp(),
+      status: 'active'
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error creating doctor consultation:', error);
+    throw error;
+  }
+}
+
 // Update user points and level
 export async function updateUserProgress(userId: string, progressData: any) {
   try {
