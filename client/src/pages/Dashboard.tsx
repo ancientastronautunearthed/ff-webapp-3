@@ -57,13 +57,23 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    // Don't auto-show tour, only show when user clicks button
-    const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
-    // Removed auto-show for better UX
+    if (user) {
+      checkTourStatus();
+      checkDailyCheckinStatus();
+    }
+  }, [user]);
+
+  const checkTourStatus = async () => {
+    if (!user) return;
     
-    // Check if daily check-in was completed today
-    checkDailyCheckinStatus();
-  }, []);
+    try {
+      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
+      const hasSeenTour = prefsDoc.exists() ? prefsDoc.data().hasSeenDashboardTour : false;
+      // Don't auto-show tour for better UX
+    } catch (error) {
+      console.error('Error checking tour status:', error);
+    }
+  };
 
   const checkDailyCheckinStatus = async () => {
     if (!user) return;
@@ -88,20 +98,40 @@ export default function Dashboard() {
     }
   };
 
-  const completeTour = () => {
-    console.log('completeTour called');
-    localStorage.setItem('hasSeenDashboardTour', 'true');
-    setShowTour(false);
-    toast({
-      title: "Welcome to Fiber Friends!",
-      description: "You're all set to start tracking your health journey.",
-    });
+  const completeTour = async () => {
+    if (!user) return;
+    
+    try {
+      await setDoc(doc(db, 'userPreferences', user.uid), {
+        hasSeenDashboardTour: true,
+        tourCompletedAt: new Date()
+      }, { merge: true });
+      
+      setShowTour(false);
+      toast({
+        title: "Welcome to Fiber Friends!",
+        description: "You're all set to start tracking your health journey.",
+      });
+    } catch (error) {
+      console.error('Error saving tour completion:', error);
+      setShowTour(false);
+    }
   };
 
-  const skipTour = () => {
-    console.log('skipTour called');
-    localStorage.setItem('hasSeenDashboardTour', 'true');
-    setShowTour(false);
+  const skipTour = async () => {
+    if (!user) return;
+    
+    try {
+      await setDoc(doc(db, 'userPreferences', user.uid), {
+        hasSeenDashboardTour: true,
+        tourSkippedAt: new Date()
+      }, { merge: true });
+      
+      setShowTour(false);
+    } catch (error) {
+      console.error('Error saving tour skip:', error);
+      setShowTour(false);
+    }
   };
 
   const startTour = () => {
@@ -109,12 +139,71 @@ export default function Dashboard() {
   };
 
   // Calculate real stats from Firebase data
-  const weeklyData = symptomEntries ? getWeeklyStats(symptomEntries) : null;
-  const todayStats = {
-    entriesCompleted: weeklyData?.trackingDays || 0,
-    totalEntries: 7, // Week target
-    trackingStreak: weeklyData?.trackingDays || 0,
-    completionRate: weeklyData?.completionRate || 0
+  const [todayStats, setTodayStats] = useState({
+    entriesCompleted: 0,
+    totalEntries: 7,
+    trackingStreak: 0,
+    completionRate: 0
+  });
+
+  useEffect(() => {
+    if (user && symptomEntries && journalEntries) {
+      calculateRealStats();
+    }
+  }, [user, symptomEntries, journalEntries]);
+
+  const calculateRealStats = async () => {
+    if (!user) return;
+
+    try {
+      // Calculate tracking streak from Firebase data
+      const today = new Date();
+      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      
+      // Count unique days with entries in last 7 days
+      const recentEntries = [
+        ...(symptomEntries?.filter(entry => new Date(entry.createdAt.toDate()) >= sevenDaysAgo) || []),
+        ...(journalEntries?.filter(entry => new Date(entry.createdAt.toDate()) >= sevenDaysAgo) || [])
+      ];
+      
+      const uniqueDays = new Set(
+        recentEntries.map(entry => 
+          new Date(entry.createdAt.toDate()).toDateString()
+        )
+      );
+      
+      // Calculate current streak
+      let streak = 0;
+      let currentDate = new Date();
+      
+      while (streak < 30) { // Max 30 days to check
+        const dateStr = currentDate.toDateString();
+        const hasEntry = uniqueDays.has(dateStr);
+        
+        if (hasEntry) {
+          streak++;
+          currentDate.setDate(currentDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      
+      setTodayStats({
+        entriesCompleted: uniqueDays.size,
+        totalEntries: 7,
+        trackingStreak: streak,
+        completionRate: Math.round((uniqueDays.size / 7) * 100)
+      });
+      
+    } catch (error) {
+      console.error('Error calculating stats:', error);
+      setTodayStats({
+        entriesCompleted: 0,
+        totalEntries: 7,
+        trackingStreak: 0,
+        completionRate: 0
+      });
+    }
   };
 
   // Load real insights from AI analysis

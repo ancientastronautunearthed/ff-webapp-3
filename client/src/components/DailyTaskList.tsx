@@ -71,8 +71,26 @@ export const DailyTaskList = () => {
   useEffect(() => {
     if (user) {
       loadDailyTasks();
+      loadUserStats();
     }
   }, [user]);
+
+  const loadUserStats = async () => {
+    if (!user) return;
+    
+    try {
+      const userStatsDoc = await getDoc(doc(db, 'userStats', user.uid));
+      if (userStatsDoc.exists()) {
+        const stats = userStatsDoc.data();
+        setTotalPoints(stats.totalPoints || 0);
+        setStreak(stats.currentStreak || 0);
+      }
+    } catch (error) {
+      console.error('Error loading user stats:', error);
+      setTotalPoints(0);
+      setStreak(0);
+    }
+  };
 
   useEffect(() => {
     if (categories.length > 0) {

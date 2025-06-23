@@ -74,6 +74,33 @@ export async function getSymptomEntriesFromFirestore(userId: string, limitCount 
   }
 }
 
+// Update user points in Firebase
+export async function updateUserPoints(userId: string, pointsToAdd: number) {
+  try {
+    const userStatsRef = doc(db, 'userStats', userId);
+    const userStatsDoc = await getDoc(userStatsRef);
+    
+    if (userStatsDoc.exists()) {
+      const currentPoints = userStatsDoc.data().totalPoints || 0;
+      await updateDoc(userStatsRef, {
+        totalPoints: currentPoints + pointsToAdd,
+        lastUpdated: serverTimestamp()
+      });
+      return currentPoints + pointsToAdd;
+    } else {
+      await setDoc(userStatsRef, {
+        totalPoints: pointsToAdd,
+        createdAt: serverTimestamp(),
+        lastUpdated: serverTimestamp()
+      });
+      return pointsToAdd;
+    }
+  } catch (error) {
+    console.error('Error updating user points:', error);
+    throw error;
+  }
+}
+
 // Save achievement unlock
 export async function saveAchievementUnlock(userId: string, achievementData: any) {
   try {

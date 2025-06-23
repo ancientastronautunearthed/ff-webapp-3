@@ -305,14 +305,12 @@ export const CommunityRewards = () => {
     const badge = badges.find(b => b.id === badgeId);
     if (!badge || !badge.earned) return;
 
-    // Award points for badge
-    const currentPoints = parseInt(localStorage.getItem('totalPoints') || '340');
-    const newTotal = currentPoints + badge.pointValue;
-    localStorage.setItem('totalPoints', newTotal.toString());
-
-    // Save badge achievement to Firestore
+    // Award points for badge through Firebase
     try {
-      const { saveAchievementUnlock } = await import('@/lib/firestore');
+      const { updateUserPoints, saveAchievementUnlock } = await import('@/lib/firestore');
+      await updateUserPoints(user?.uid || '', badge.pointValue);
+
+      // Save badge achievement to Firestore
       await saveAchievementUnlock(user?.uid || '', {
         type: 'community_badge',
         badgeId: badge.id,
