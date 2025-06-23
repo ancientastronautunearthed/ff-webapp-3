@@ -97,14 +97,10 @@ export const CompanionDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="progress" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Progress
-          </TabsTrigger>
-          <TabsTrigger value="demo" className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4" />
-            Demo
           </TabsTrigger>
           <TabsTrigger value="access" className="flex items-center gap-2">
             <Zap className="w-4 h-4" />
@@ -136,9 +132,7 @@ export const CompanionDashboard = () => {
           <ProgressTracker />
         </TabsContent>
 
-        <TabsContent value="demo" className="space-y-4">
-          <CompanionDemo />
-        </TabsContent>
+
 
         <TabsContent value="access" className="space-y-4">
           <DynamicFunctionGating />
