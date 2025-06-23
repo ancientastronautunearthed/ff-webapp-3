@@ -1608,9 +1608,577 @@ firebase emulators:start --only firestore
 
 This completes the comprehensive PostgreSQL to Firestore migration, ensuring zero PostgreSQL dependencies remain and all functionality operates exclusively through Firebase services.
 
-### Phase 4: Backend Migration to Cloud Functions
+### Phase 4: AI Companion Knowledge Base Migration
 
-#### 4.1 Cloud Functions Setup
+#### 4.1 Current AI Companion Infrastructure
+The AI Companion system currently uses:
+- **Server Routes**: `server/routes/companion.ts` - Express routes for companion API
+- **Firestore Collections**: `companionMemory`, `companionChats` - User companion data
+- **Google AI Integration**: Direct Gemini API calls from Node.js server
+- **Client Components**: `CompanionChat.tsx`, `CompanionInsights.tsx`, `CompanionDashboard.tsx`
+
+#### 4.2 Migration to Firebase Cloud Functions
+
+**Step 1: Create Cloud Functions for Companion Logic**
+Create `functions/src/companion.ts`:
+```typescript
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { logger } from 'firebase-functions';
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const db = getFirestore();
+
+interface CompanionMemory {
+  userId: string;
+  patterns: HealthPattern[];
+  preferences: UserPreference[];
+  insights: string[];
+  learningProgress: number;
+  lastInteraction: Date;
+  personalityAdaptations: Record<string, any>;
+  conversationHistory: ConversationSummary[];
+}
+
+interface HealthPattern {
+  id: string;
+  type: 'symptom' | 'trigger' | 'treatment' | 'lifestyle';
+  pattern: string;
+  confidence: number;
+  frequency: number;
+  lastObserved: Date;
+  relatedFactors: string[];
+}
+
+// Initialize companion memory
+export const initializeCompanion = onCall(async (request) => {
+  const { userId } = request.data;
+  
+  if (!userId) {
+    throw new HttpsError('invalid-argument', 'User ID is required');
+  }
+
+  try {
+    // Check if companion memory already exists
+    const memoryRef = db.collection('companionMemory').doc(userId);
+    const memoryDoc = await memoryRef.get();
+    
+    if (memoryDoc.exists) {
+      return memoryDoc.data();
+    }
+
+    // Create new companion memory by analyzing user's existing data
+    const memory = await initializeCompanionMemory(userId);
+    
+    // Save to Firestore
+    await memoryRef.set(memory);
+    
+    logger.info(`Companion initialized for user: ${userId}`);
+    return memory;
+  } catch (error) {
+    logger.error('Error initializing companion:', error);
+    throw new HttpsError('internal', 'Failed to initialize companion');
+  }
+});
+
+// Handle companion chat
+export const companionChat = onCall(async (request) => {
+  const { userId, message, context } = request.data;
+
+  if (!userId || !message) {
+    throw new HttpsError('invalid-argument', 'User ID and message are required');
+  }
+
+  try {
+    // Get current companion memory
+    const memoryRef = db.collection('companionMemory').doc(userId);
+    const memoryDoc = await memoryRef.get();
+    
+    let memory: CompanionMemory;
+    if (memoryDoc.exists) {
+      memory = memoryDoc.data() as CompanionMemory;
+    } else {
+      memory = await initializeCompanionMemory(userId);
+      await memoryRef.set(memory);
+    }
+
+    // Generate AI response using Gemini
+    const response = await generateCompanionResponse(userId, message, memory);
+
+    // Update memory with new learning
+    const updatedMemory = await updateCompanionLearning(userId, message, response, memory);
+
+    // Save updated memory
+    await memoryRef.set(updatedMemory);
+
+    // Save chat messages
+    await saveChatMessages(userId, message, response);
+
+    return {
+      reply: response,
+      updatedMemory,
+      insights: response.newInsights || []
+    };
+
+  } catch (error) {
+    logger.error('Error in companion chat:', error);
+    throw new HttpsError('internal', 'Failed to process chat message');
+  }
+});
+
+// Get companion insights
+export const getCompanionInsights = onCall(async (request) => {
+  const { userId } = request.data;
+
+  if (!userId) {
+    throw new HttpsError('invalid-argument', 'User ID is required');
+  }
+
+  try {
+    const memoryDoc = await db.collection('companionMemory').doc(userId).get();
+    
+    if (!memoryDoc.exists) {
+      return { patterns: [], insights: [], learningProgress: 0, preferences: [] };
+    }
+
+    const memory = memoryDoc.data() as CompanionMemory;
+    
+    return {
+      patterns: memory.patterns,
+      insights: memory.insights,
+      learningProgress: memory.learningProgress,
+      preferences: memory.preferences
+    };
+
+  } catch (error) {
+    logger.error('Error fetching insights:', error);
+    throw new HttpsError('internal', 'Failed to fetch insights');
+  }
+});
+
+// Get chat history
+export const getChatHistory = onCall(async (request) => {
+  const { userId } = request.data;
+
+  if (!userId) {
+    throw new HttpsError('invalid-argument', 'User ID is required');
+  }
+
+  try {
+    const chatSnapshot = await db.collection('companionChats')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .limit(50)
+      .get();
+
+    const messages = chatSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    return messages.reverse(); // Return in chronological order
+  } catch (error) {
+    logger.error('Error fetching chat history:', error);
+    throw new HttpsError('internal', 'Failed to fetch chat history');
+  }
+});
+
+// Helper Functions
+async function initializeCompanionMemory(userId: string): Promise<CompanionMemory> {
+  // Fetch user's existing data to bootstrap learning
+  const [symptomsSnapshot, journalsSnapshot, userDoc] = await Promise.all([
+    db.collection('symptomEntries')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .limit(50)
+      .get(),
+    db.collection('journalEntries')
+      .where('userId', '==', userId)
+      .orderBy('timestamp', 'desc')
+      .limit(20)
+      .get(),
+    db.collection('users').doc(userId).get()
+  ]);
+
+  const symptoms = symptomsSnapshot.docs.map(doc => doc.data());
+  const journals = journalsSnapshot.docs.map(doc => doc.data());
+  const userData = userDoc.exists ? userDoc.data() : {};
+
+  // Analyze existing data to identify initial patterns
+  const initialPatterns = await analyzeInitialPatterns(symptoms, journals);
+  const initialPreferences = await identifyInitialPreferences(userData, journals);
+
+  return {
+    userId,
+    patterns: initialPatterns,
+    preferences: initialPreferences,
+    insights: [],
+    learningProgress: initialPatterns.length > 0 ? 0.1 : 0,
+    lastInteraction: new Date(),
+    personalityAdaptations: {},
+    conversationHistory: []
+  };
+}
+
+async function generateCompanionResponse(userId: string, message: string, memory: CompanionMemory) {
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    
+    const context = {
+      userMessage: message,
+      patterns: memory.patterns.slice(0, 5),
+      preferences: memory.preferences,
+      recentInsights: memory.insights.slice(-3),
+      learningProgress: memory.learningProgress,
+      conversationHistory: memory.conversationHistory.slice(-2)
+    };
+
+    const prompt = `You are an AI health companion specialized in Morgellons disease support. You have been learning about this user's health patterns and preferences.
+
+Context about the user:
+- Learning Progress: ${(memory.learningProgress * 100).toFixed(1)}%
+- Known Patterns: ${memory.patterns.map(p => p.pattern).join(', ')}
+- Preferences: ${memory.preferences.map(p => `${p.category}: ${p.preference}`).join(', ')}
+- Recent Insights: ${memory.insights.slice(-3).join(', ')}
+
+User's message: "${message}"
+
+Respond as a caring, knowledgeable AI companion who remembers past conversations and can identify patterns. Be empathetic, provide actionable insights when appropriate, and reference relevant patterns you've learned about this user.
+
+Keep responses conversational but informative, warm and personal, showing you remember and care about this user's journey.`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+
+    // Determine response type based on content
+    let responseType = 'encouragement';
+    if (responseText.includes('pattern') || responseText.includes('notice')) responseType = 'pattern';
+    if (responseText.includes('recommend') || responseText.includes('suggest')) responseType = 'recommendation';
+    if (responseText.includes('insight') || responseText.includes('analyze')) responseType = 'insight';
+    if (responseText.includes('concern') || responseText.includes('worried')) responseType = 'concern';
+
+    return {
+      content: responseText,
+      type: responseType,
+      confidence: 0.8,
+      relatedData: memory.patterns.slice(0, 3).map(p => p.pattern),
+      newInsights: await identifyNewInsights(message, responseText, memory)
+    };
+
+  } catch (error) {
+    logger.error('Error generating response:', error);
+    return {
+      content: "I'm having trouble processing that right now. Could you try asking in a different way?",
+      type: 'encouragement',
+      confidence: 0.5,
+      relatedData: []
+    };
+  }
+}
+
+async function updateCompanionLearning(
+  userId: string, 
+  userMessage: string, 
+  response: any, 
+  memory: CompanionMemory
+): Promise<CompanionMemory> {
+  // Extract potential new patterns from conversation
+  const newPatterns = await extractPatternsFromConversation(userMessage, response.content, memory);
+  
+  // Update learning progress
+  const progressIncrease = newPatterns.length > 0 ? 0.05 : 0.01;
+  const newLearningProgress = Math.min(memory.learningProgress + progressIncrease, 1.0);
+
+  // Add conversation summary
+  const conversationSummary = {
+    date: new Date(),
+    topics: extractTopicsFromMessage(userMessage),
+    insights: response.newInsights || [],
+    userMood: analyzeMoodFromMessage(userMessage),
+    keyPoints: [userMessage.substring(0, 100)]
+  };
+
+  return {
+    ...memory,
+    patterns: [...memory.patterns, ...newPatterns].slice(0, 50),
+    insights: [...memory.insights, ...(response.newInsights || [])].slice(-20),
+    learningProgress: newLearningProgress,
+    lastInteraction: new Date(),
+    conversationHistory: [...memory.conversationHistory, conversationSummary].slice(-10)
+  };
+}
+
+async function saveChatMessages(userId: string, userMessage: string, response: any) {
+  const batch = db.batch();
+
+  // Save user message
+  const userMsgRef = db.collection('companionChats').doc();
+  batch.set(userMsgRef, {
+    userId,
+    role: 'user',
+    content: userMessage,
+    timestamp: FieldValue.serverTimestamp()
+  });
+
+  // Save companion response
+  const compMsgRef = db.collection('companionChats').doc();
+  batch.set(compMsgRef, {
+    userId,
+    role: 'companion',
+    content: response.content,
+    type: response.type,
+    confidence: response.confidence,
+    relatedData: response.relatedData,
+    timestamp: FieldValue.serverTimestamp()
+  });
+
+  await batch.commit();
+}
+
+// Additional helper functions for pattern analysis...
+async function analyzeInitialPatterns(symptoms: any[], journals: any[]): Promise<HealthPattern[]> {
+  // Implementation for initial pattern analysis
+  return [];
+}
+
+async function identifyInitialPreferences(userData: any, journals: any[]): Promise<any[]> {
+  // Implementation for preference identification
+  return [];
+}
+
+async function extractPatternsFromConversation(userMessage: string, responseContent: string, memory: CompanionMemory): Promise<HealthPattern[]> {
+  // Implementation for pattern extraction
+  return [];
+}
+
+async function identifyNewInsights(userMessage: string, responseContent: string, memory: CompanionMemory): Promise<any[]> {
+  // Implementation for insight identification
+  return [];
+}
+
+function extractTopicsFromMessage(message: string): string[] {
+  // Implementation for topic extraction
+  return [];
+}
+
+function analyzeMoodFromMessage(message: string): string {
+  // Implementation for mood analysis
+  return 'neutral';
+}
+```
+
+**Step 2: Update Firebase Functions Index**
+Update `functions/src/index.ts`:
+```typescript
+export {
+  initializeCompanion,
+  companionChat,
+  getCompanionInsights,
+  getChatHistory
+} from './companion';
+```
+
+**Step 3: Update Client to Use Firebase Functions**
+Update `client/src/components/CompanionChat.tsx`:
+```typescript
+import { getFunctions, httpsCallable } from 'firebase/functions';
+
+const functions = getFunctions();
+
+// Replace API calls with Firebase Functions
+const initializeCompanion = httpsCallable(functions, 'initializeCompanion');
+const companionChat = httpsCallable(functions, 'companionChat');
+const getCompanionInsights = httpsCallable(functions, 'getCompanionInsights');
+const getChatHistory = httpsCallable(functions, 'getChatHistory');
+
+// Update component methods
+const initializeCompanionFunction = async () => {
+  try {
+    const result = await initializeCompanion({ userId: user?.uid });
+    const memory = result.data;
+    setCompanionMemory(memory);
+    
+    const welcomeMessage: Message = {
+      id: Date.now().toString(),
+      role: 'companion',
+      content: generateWelcomeMessage(memory),
+      timestamp: new Date(),
+      type: 'encouragement'
+    };
+    setMessages([welcomeMessage]);
+  } catch (error) {
+    console.error('Failed to initialize companion:', error);
+  }
+};
+
+const sendMessage = async () => {
+  if (!input.trim() || isLoading) return;
+
+  const userMessage: Message = {
+    id: Date.now().toString(),
+    role: 'user',
+    content: input,
+    timestamp: new Date()
+  };
+
+  setMessages(prev => [...prev, userMessage]);
+  setInput('');
+  setIsLoading(true);
+
+  try {
+    const result = await companionChat({
+      userId: user?.uid,
+      message: input,
+      context: {
+        recentMessages: messages.slice(-5),
+        companionMemory
+      }
+    });
+
+    const { reply, updatedMemory, insights } = result.data;
+    
+    const companionMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'companion',
+      content: reply.content,
+      timestamp: new Date(),
+      type: reply.type,
+      confidence: reply.confidence,
+      relatedData: reply.relatedData
+    };
+
+    setMessages(prev => [...prev, companionMessage]);
+    setCompanionMemory(updatedMemory);
+
+    // Handle insights...
+  } catch (error) {
+    console.error('Chat error:', error);
+    // Handle error...
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+#### 4.3 Environment Variables Migration
+
+**Step 1: Add Gemini API Key to Firebase**
+```bash
+# Set Gemini API key for Firebase Functions
+firebase functions:config:set gemini.api_key="your-gemini-api-key"
+
+# Or use Firebase environment variables (newer approach)
+firebase functions:config:set runtime.env.GEMINI_API_KEY="your-gemini-api-key"
+```
+
+**Step 2: Update Functions Environment**
+In `functions/.env`:
+```
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+#### 4.4 Firestore Security Rules for Companion Data
+
+Update `firestore.rules`:
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Companion memory - user can only access their own
+    match /companionMemory/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Companion chats - user can only access their own
+    match /companionChats/{chatId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
+```
+
+#### 4.5 Firestore Indexes for Companion Data
+
+Add to `firestore.indexes.json`:
+```json
+{
+  "indexes": [
+    {
+      "collectionGroup": "companionChats",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "userId", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    }
+  ]
+}
+```
+
+#### 4.6 Migration Testing
+
+**Step 1: Test Cloud Functions Locally**
+```bash
+# Start Firebase emulators
+firebase emulators:start --only functions,firestore
+
+# Test companion initialization
+curl -X POST http://localhost:5001/your-project/us-central1/initializeCompanion \
+  -H "Content-Type: application/json" \
+  -d '{"data": {"userId": "test-user-id"}}'
+```
+
+**Step 2: Test Frontend Integration**
+```bash
+# Update Firebase config to use local emulators for testing
+// In client/src/lib/firebase.ts
+if (location.hostname === 'localhost') {
+  connectFunctionsEmulator(functions, 'localhost', 5001);
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
+```
+
+**Step 3: Deploy and Test Production**
+```bash
+# Deploy companion functions
+firebase deploy --only functions:initializeCompanion,functions:companionChat,functions:getCompanionInsights,functions:getChatHistory
+
+# Deploy Firestore rules and indexes
+firebase deploy --only firestore:rules,firestore:indexes
+
+# Test production deployment
+# Navigate to /companion in your deployed app
+```
+
+#### 4.7 Performance Optimization
+
+**Firestore Optimization:**
+- Use subcollections for chat messages to avoid document size limits
+- Implement pagination for large chat histories
+- Cache companion memory in client for faster responses
+
+**Cloud Functions Optimization:**
+- Use Firebase Functions Gen 2 for better performance
+- Implement connection pooling for Gemini API calls
+- Add response caching for common queries
+
+**Example Optimized Structure:**
+```
+/companionMemory/{userId}
+/companionMemory/{userId}/chatSessions/{sessionId}/messages/{messageId}
+/companionMemory/{userId}/patterns/{patternId}
+/companionMemory/{userId}/insights/{insightId}
+```
+
+This migration ensures the AI Companion system operates entirely within Firebase infrastructure with optimal performance and security.
+
+### Phase 5: Backend Migration to Cloud Functions
+
+#### 5.1 Cloud Functions Setup
 ```bash
 # Create functions directory
 mkdir functions
