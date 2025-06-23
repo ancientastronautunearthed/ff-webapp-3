@@ -118,6 +118,7 @@ The application uses a comprehensive database schema with the following core ent
 - June 23, 2025. Fixed Digital Matchbox submit functionality and community platform real data integration
 
 ## Recent Changes
+- ✓ Updated application tour to include all new features: Daily Tasks, AI Health Coach, Peer Matching, Ask a Doctor Forum, and Gamified Progress
 - ✓ Created comprehensive patient demo video script showcasing all features
 - ✓ Fixed doctor portal logout functionality with proper session management
 - ✓ Resolved patient login redirect issues - patients now properly access patient dashboard
