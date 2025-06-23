@@ -161,9 +161,13 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       description: "Your medical profile and AI companion have been created successfully.",
     });
     
-    // Get form data and call onComplete
+    // Hide companion creator and proceed to completion
+    console.log('MedicalProfileForm: Hiding companion creator and calling onComplete');
+    setShowCompanionCreator(false);
+    
+    // Get form data and call onComplete to proceed to tour
     const formData = form.getValues();
-    onComplete(formData as MedicalProfileData);;
+    onComplete(formData as MedicalProfileData);
   };
 
   const handleSkipCompanion = async () => {
@@ -187,7 +191,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       description: "You can create your AI companion later from settings.",
     });
     
-    // Get form data and call onComplete
+    // Hide companion creator and proceed to completion
+    console.log('MedicalProfileForm: Hiding companion creator and calling onComplete');
+    setShowCompanionCreator(false);
+    
+    // Get form data and call onComplete to proceed to tour
     const formData = form.getValues();
     onComplete(formData as MedicalProfileData);
   };
