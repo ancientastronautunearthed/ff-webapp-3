@@ -52,15 +52,19 @@ export default function DoctorDashboard() {
   }, [user]);
 
   const loadDoctorData = async () => {
+    // Check if this is a demo session
+    const isDemo = localStorage.getItem('demoDoctor') === 'true';
+    
     // Load doctor profile
     const profile = {
-      firstName: 'Dr. Sarah',
+      firstName: isDemo ? 'Demo Dr. Sarah' : 'Dr. Sarah',
       lastName: 'Johnson',
       specialty: 'Dermatology',
       institution: 'Mayo Clinic',
       practiceStates: ['California', 'Nevada', 'Arizona'],
       verificationStatus: 'verified',
-      morgellonsExperience: true
+      morgellonsExperience: true,
+      isDemo
     };
     setDoctorProfile(profile);
 
@@ -188,12 +192,17 @@ export default function DoctorDashboard() {
             <div className="flex items-center gap-3">
               <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                 <CheckCircle className="h-3 w-3 mr-1" />
-                Verified Physician
+                {doctorProfile?.isDemo ? 'Demo Account' : 'Verified Physician'}
               </Badge>
               <Button variant="outline">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Ask a Doctor Forum
               </Button>
+              {doctorProfile?.isDemo && (
+                <Badge variant="secondary" className="bg-blue-50 text-blue-700">
+                  Demo Mode - Sample Data
+                </Badge>
+              )}
             </div>
           </div>
         </div>
