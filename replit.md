@@ -329,6 +329,11 @@ The application uses a comprehensive database schema with the following core ent
 - ✓ Fixed "Complete Profile & Create Companion" button functionality
 - ✓ Added dropdown selectable options for State and Ethnicity fields in medical profile form
 - ✓ Extended State/Province dropdown to include Canada and Mexico (13 provinces, 32 states)
+- ✓ Fixed companion creation error and form submission issues
+- ✓ Changed symptom onset to year-only input for better user experience
+- ✓ Implemented AI companion image display throughout application
+- ✓ Companion images now appear as profile pictures in layout header and community forum
+- ✓ Added companion status indicators with heart icons and "AI Companion Active" text
 
 ## User Preferences
 

@@ -6,6 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Sparkles, Heart, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface CompanionConfig {
   species: string;
@@ -33,6 +36,7 @@ export const CompanionCreatorStep = ({ onComplete, onSkip }: CompanionCreatorSte
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   console.log('CompanionCreatorStep rendered');
 
