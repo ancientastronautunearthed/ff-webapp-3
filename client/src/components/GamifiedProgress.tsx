@@ -288,16 +288,45 @@ export const GamifiedProgress = () => {
   };
 
   const claimReward = (achievementId: string) => {
+    const achievement = achievements.find(a => a.id === achievementId);
+    if (!achievement || !achievement.earned) return;
+
+    // Award points based on achievement rarity
+    const pointValues = { common: 25, rare: 50, epic: 100, legendary: 250 };
+    const pointsEarned = pointValues[achievement.rarity];
+    
+    const currentPoints = parseInt(localStorage.getItem('totalPoints') || '340');
+    const newTotal = currentPoints + pointsEarned;
+    localStorage.setItem('totalPoints', newTotal.toString());
+    
+    // Update level if necessary
+    const newLevel = Math.floor(newTotal / 200) + 1;
+    localStorage.setItem('userLevel', newLevel.toString());
+    
+    setTotalPoints(newTotal);
+    setLevel(newLevel);
+    setProgressToNext(newTotal % 200);
+
     toast({
       title: "Achievement Unlocked!",
-      description: "Congratulations! You've earned new points and rewards.",
+      description: `${achievement.title} - You earned ${pointsEarned} points! ${achievement.reward}`,
     });
   };
 
   const joinChallenge = (challengeId: string) => {
+    const challenge = challenges.find(c => c.id === challengeId);
+    if (!challenge) return;
+
+    // Mark challenge as joined in localStorage
+    const joinedChallenges = JSON.parse(localStorage.getItem('joinedChallenges') || '[]');
+    if (!joinedChallenges.includes(challengeId)) {
+      joinedChallenges.push(challengeId);
+      localStorage.setItem('joinedChallenges', JSON.stringify(joinedChallenges));
+    }
+
     toast({
       title: "Challenge Joined!",
-      description: "Good luck! Track your progress in the challenges tab.",
+      description: `You're now participating in "${challenge.title}". Track your progress here!`,
     });
   };
 
@@ -375,11 +404,17 @@ export const GamifiedProgress = () => {
                           <p className="text-xs text-blue-600 font-medium">Reward: {achievement.reward}</p>
                         </div>
                       </div>
-                      {achievement.earned && (
+                      {achievement.earned ? (
                         <Button size="sm" variant="outline" onClick={() => claimReward(achievement.id)}>
                           <Gift className="h-4 w-4 mr-1" />
-                          Claimed
+                          Claim Reward
                         </Button>
+                      ) : (
+                        <div className="text-right">
+                          <div className="text-xs text-gray-500">
+                            {achievement.maxProgress - achievement.progress} more to unlock
+                          </div>
+                        </div>
                       )}
                     </div>
                   </CardContent>

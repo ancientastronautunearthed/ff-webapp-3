@@ -20,6 +20,7 @@ import {
   Cloud
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface HealthInsight {
   id: string;
@@ -41,6 +42,7 @@ interface DailyStreak {
 
 export const AIHealthCoach = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [insights, setInsights] = useState<HealthInsight[]>([]);
   const [streaks, setStreaks] = useState<DailyStreak[]>([]);
   const [todaysPrediction, setTodaysPrediction] = useState<any>(null);
@@ -194,9 +196,9 @@ export const AIHealthCoach = () => {
         <CardContent>
           <Tabs defaultValue="insights" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="insights">Daily Insights</TabsTrigger>
-              <TabsTrigger value="prediction">Today's Forecast</TabsTrigger>
-              <TabsTrigger value="streaks">Your Progress</TabsTrigger>
+              <TabsTrigger value="insights" className="text-xs">Daily Insights</TabsTrigger>
+              <TabsTrigger value="prediction" className="text-xs">Today's Forecast</TabsTrigger>
+              <TabsTrigger value="streaks" className="text-xs">Your Progress</TabsTrigger>
             </TabsList>
 
             <TabsContent value="insights" className="space-y-4 mt-4">
@@ -216,7 +218,17 @@ export const AIHealthCoach = () => {
                           </div>
                           <p className="text-sm">{insight.description}</p>
                           {insight.actionable && (
-                            <Button size="sm" variant="outline" className="mt-2">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="mt-2"
+                              onClick={() => {
+                                toast({
+                                  title: "Action Taken!",
+                                  description: "Your health insights are helping you make better decisions.",
+                                });
+                              }}
+                            >
                               Take Action
                             </Button>
                           )}

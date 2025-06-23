@@ -155,11 +155,13 @@ export const SmartDailyCheckin = () => {
       const checkinData = {
         date: new Date().toISOString().split('T')[0],
         responses,
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
+        userId: user?.uid
       };
 
-      // In production, save to your database
-      console.log('Saving daily check-in:', checkinData);
+      // Save to Firestore
+      const { saveCheckinToFirestore } = await import('@/lib/firestore');
+      await saveCheckinToFirestore(checkinData);
 
       // Update streak
       const newStreak = currentStreak + 1;
@@ -167,11 +169,16 @@ export const SmartDailyCheckin = () => {
       localStorage.setItem('checkinStreak', newStreak.toString());
       localStorage.setItem('lastCheckin', new Date().toDateString());
       
+      // Award points for completion
+      const currentPoints = parseInt(localStorage.getItem('totalPoints') || '340');
+      const pointsEarned = 20; // Points for daily check-in
+      localStorage.setItem('totalPoints', (currentPoints + pointsEarned).toString());
+      
       setIsComplete(true);
 
       toast({
         title: "Daily Check-in Complete!",
-        description: `Great job! You're on a ${newStreak}-day streak. Your patterns are helping advance research.`,
+        description: `Great job! You're on a ${newStreak}-day streak. +${pointsEarned} points earned!`,
       });
 
       // Generate new insights based on responses
@@ -391,9 +398,9 @@ export const SmartDailyCheckin = () => {
         <Button
           onClick={submitCheckin}
           disabled={loading || Object.keys(responses).length < 3}
-          className="w-full"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white"
         >
-          {loading ? 'Saving...' : 'Complete Check-in'}
+          {loading ? 'Saving...' : `Complete Check-in ${Object.keys(responses).length < 3 ? `(${3 - Object.keys(responses).length} more needed)` : ''}`}
         </Button>
 
         <p className="text-xs text-gray-500 text-center">
