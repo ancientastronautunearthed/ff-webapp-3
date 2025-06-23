@@ -145,7 +145,10 @@ export default function Dashboard() {
       color: checkinCompleted ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-600',
       urgent: !checkinCompleted,
       type: 'action',
-      action: () => setShowCheckin(true)
+      action: () => {
+        console.log('Daily Check-in clicked!');
+        setShowCheckin(true);
+      }
     },
     {
       title: 'Add Journal Entry',
@@ -311,7 +314,12 @@ export default function Dashboard() {
                   <Card 
                     key={index} 
                     className="hover:shadow-md transition-shadow cursor-pointer group"
-                    onClick={action.action}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Card clicked, calling action');
+                      action.action();
+                    }}
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between mb-4">
