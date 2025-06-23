@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 
 interface QuickQuestion {
   id: string;
@@ -40,6 +41,7 @@ interface CheckinSuggestion {
 export const SmartDailyCheckin = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { updateChallengeProgress } = useChallengeProgress();
   const [isComplete, setIsComplete] = useState(false);
   const [questions, setQuestions] = useState<QuickQuestion[]>([]);
   const [responses, setResponses] = useState<Record<string, any>>({});

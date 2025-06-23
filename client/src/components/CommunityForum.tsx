@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 import { 
   MessageSquare, 
   Heart, 
@@ -66,6 +67,7 @@ interface ForumReply {
 export const CommunityForum = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { updateChallengeProgress } = useChallengeProgress();
   const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [newPostTitle, setNewPostTitle] = useState('');

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { Link } from 'wouter';
 
 interface Challenge {
   id: string;
@@ -54,6 +55,61 @@ interface ChallengeReward {
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
   unlockedAt?: Date;
 }
+
+// Component for challenge action buttons that navigate to appropriate features
+const ChallengeActionButton = ({ challenge }: { challenge: Challenge }) => {
+  const getNavigationPath = (challengeId: string): string => {
+    switch (challengeId) {
+      case 'daily_symptom_track':
+        return '/tracker';
+      case 'daily_journal':
+        return '/journal';
+      case 'daily_community':
+      case 'weekly_community_leader':
+        return '/community';
+      case 'weekly_consistency':
+        return '/tracker';
+      case 'weekly_insights':
+        return '/insights';
+      case 'research_hero':
+        return '/research';
+      case 'companion_master':
+        return '/companion';
+      default:
+        return '/dashboard';
+    }
+  };
+
+  const getButtonText = (challenge: Challenge): string => {
+    switch (challenge.id) {
+      case 'daily_symptom_track':
+        return challenge.progress > 0 ? 'Continue Tracking' : 'Track Symptoms';
+      case 'daily_journal':
+        return challenge.progress > 0 ? 'Continue Journaling' : 'Write Entry';
+      case 'daily_community':
+      case 'weekly_community_leader':
+        return challenge.progress > 0 ? 'Continue Engaging' : 'Visit Community';
+      case 'weekly_consistency':
+        return 'Track More Symptoms';
+      case 'weekly_insights':
+        return 'View AI Insights';
+      case 'research_hero':
+        return 'Contribute to Research';
+      case 'companion_master':
+        return 'Upgrade Companion';
+      default:
+        return challenge.progress > 0 ? 'Continue' : 'Start Challenge';
+    }
+  };
+
+  return (
+    <Link href={getNavigationPath(challenge.id)}>
+      <Button size="sm" className="w-full">
+        {getButtonText(challenge)}
+      </Button>
+    </Link>
+  );
+};
 
 export const ChallengeSystem = () => {
   const { user } = useAuth();
@@ -504,13 +560,7 @@ export const ChallengeSystem = () => {
 
                   {/* Action Button */}
                   {!challenge.completed && !challenge.unlockCondition && (
-                    <Button 
-                      size="sm" 
-                      className="w-full"
-                      onClick={() => updateChallengeProgress(challenge.id)}
-                    >
-                      {challenge.progress > 0 ? 'Continue' : 'Start Challenge'}
-                    </Button>
+                    <ChallengeActionButton challenge={challenge} />
                   )}
 
                   {challenge.unlockCondition && (

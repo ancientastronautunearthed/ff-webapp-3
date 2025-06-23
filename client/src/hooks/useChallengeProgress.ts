@@ -1,21 +1,22 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export const useChallengeProgress = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
 
-  const updateChallengeProgress = async (challengeId: string, actionType: string) => {
+  const updateChallengeProgress = async (actionType: string, challengeData?: any) => {
     if (!user?.uid) return;
 
     try {
       const userChallengesRef = doc(db, 'userChallenges', user.uid);
       const userChallengesDoc = await getDoc(userChallengesRef);
       
-      if (!userChallengesDoc.exists()) return;
-      
-      const data = userChallengesDoc.data();
+      let data = userChallengesDoc.exists() ? userChallengesDoc.data() : {};
       const currentProgress = data.progress || {};
+      const completed = data.completed || [];
       
       // Define which challenges are affected by which actions
       const challengeMapping: Record<string, string[]> = {
@@ -29,16 +30,56 @@ export const useChallengeProgress = () => {
       };
 
       const affectedChallenges = challengeMapping[actionType] || [];
+      let newCompletions: string[] = [];
       
       for (const challengeId of affectedChallenges) {
         const current = currentProgress[challengeId] || 0;
-        currentProgress[challengeId] = current + 1;
+        const newProgress = current + 1;
+        currentProgress[challengeId] = newProgress;
+        
+        // Check if challenge is completed
+        const challengeTargets: Record<string, number> = {
+          'daily_symptom_track': 1,
+          'daily_journal': 1,
+          'daily_community': 1,
+          'weekly_consistency': 5,
+          'weekly_community_leader': 3,
+          'weekly_insights': 3,
+          'research_hero': 3,
+        };
+        
+        const target = challengeTargets[challengeId] || 1;
+        if (newProgress >= target && !completed.includes(challengeId)) {
+          completed.push(challengeId);
+          newCompletions.push(challengeId);
+        }
       }
 
-      await updateDoc(userChallengesRef, {
+      // Update Firebase
+      await setDoc(userChallengesRef, {
         progress: currentProgress,
+        completed: completed,
         lastUpdated: new Date()
-      });
+      }, { merge: true });
+
+      // Show completion notifications
+      for (const challengeId of newCompletions) {
+        const challengeTitles: Record<string, string> = {
+          'daily_symptom_track': 'Daily Symptom Check',
+          'daily_journal': 'Digital Matchbox Entry',
+          'daily_community': 'Community Connection',
+          'weekly_consistency': 'Consistency Champion',
+          'weekly_community_leader': 'Community Leader',
+          'weekly_insights': 'Pattern Detective',
+          'research_hero': 'Research Hero',
+        };
+        
+        const title = challengeTitles[challengeId] || 'Challenge';
+        toast({
+          title: "Challenge Completed!",
+          description: `${title} - Bonus points earned!`,
+        });
+      }
 
     } catch (error) {
       console.error('Error updating challenge progress:', error);

@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
+import { useChallengeProgress } from '@/hooks/useChallengeProgress';
 import { Hand, User, ClipboardList, Save, Check } from 'lucide-react';
 import { SYMPTOM_OPTIONS, TRIGGER_OPTIONS, LOCATION_OPTIONS, TREATMENT_OPTIONS } from './SymptomOptions';
 
