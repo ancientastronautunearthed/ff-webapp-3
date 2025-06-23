@@ -104,6 +104,37 @@ export const PeerMatching = () => {
     }
   }, [user]);
 
+  const loadAIRecommendations = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/ai/peer-recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load AI recommendations');
+      }
+
+      const data = await response.json();
+      setAiRecommendations(data.recommendations || []);
+      
+    } catch (error) {
+      console.error('Error loading AI recommendations:', error);
+      toast({
+        title: "AI Recommendations Unavailable",
+        description: "Using standard matching algorithm instead.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const loadUserPreferences = async () => {
     if (!user) return;
     

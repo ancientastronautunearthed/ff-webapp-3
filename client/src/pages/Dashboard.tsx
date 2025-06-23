@@ -41,6 +41,7 @@ import {
   HelpCircle,
   CheckCircle
 } from 'lucide-react';
+import { PeerMatchingWidget } from '@/components/PeerMatchingWidget';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -510,6 +511,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          {/* Peer Matching Widget */}
+          <PeerMatchingWidget />
+
           {/* Community Activity */}
           <Card>
             <CardHeader>
@@ -536,10 +540,12 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="w-full mt-4">
-                <Users className="mr-2 h-4 w-4" />
-                View Community
-              </Button>
+              <Link href="/community">
+                <Button variant="outline" size="sm" className="w-full mt-4">
+                  <Users className="mr-2 h-4 w-4" />
+                  View Community
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
