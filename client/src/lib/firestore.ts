@@ -230,12 +230,86 @@ export async function createDoctorConsultation(consultationData: any) {
     const docRef = await addDoc(collection(db, 'doctor_consultations'), {
       ...consultationData,
       createdAt: serverTimestamp(),
-      status: 'active'
+      status: consultationData.status || 'open'
     });
     return docRef.id;
   } catch (error) {
     console.error('Error creating doctor consultation:', error);
     throw error;
+  }
+}
+
+// Get doctor consultations/questions
+export async function getDoctorConsultations(limitCount = 20) {
+  try {
+    const q = query(
+      collection(db, 'doctor_consultations'),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error('Error getting doctor consultations:', error);
+    return [];
+  }
+}
+
+// Add doctor response to consultation
+export async function addDoctorResponse(consultationId: string, responseData: any) {
+  try {
+    const consultationRef = doc(db, 'doctor_consultations', consultationId);
+    
+    // Get current consultation data
+    const consultationSnap = await getDoc(consultationRef);
+    if (!consultationSnap.exists()) {
+      throw new Error('Consultation not found');
+    }
+    
+    const currentData = consultationSnap.data();
+    const responses = currentData.responses || [];
+    
+    // Add new response
+    const newResponse = {
+      id: Date.now().toString(),
+      ...responseData,
+      respondedAt: serverTimestamp()
+    };
+    
+    responses.push(newResponse);
+    
+    // Update consultation with new response and status
+    await updateDoc(consultationRef, {
+      responses,
+      status: 'answered',
+      updatedAt: serverTimestamp()
+    });
+    
+    return newResponse.id;
+  } catch (error) {
+    console.error('Error adding doctor response:', error);
+    throw error;
+  }
+}
+
+// Update consultation views
+export async function updateConsultationViews(consultationId: string) {
+  try {
+    const consultationRef = doc(db, 'doctor_consultations', consultationId);
+    const consultationSnap = await getDoc(consultationRef);
+    
+    if (consultationSnap.exists()) {
+      const currentViews = consultationSnap.data().views || 0;
+      await updateDoc(consultationRef, {
+        views: currentViews + 1
+      });
+    }
+  } catch (error) {
+    console.error('Error updating consultation views:', error);
   }
 }
 

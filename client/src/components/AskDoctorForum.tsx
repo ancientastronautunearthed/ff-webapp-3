@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { DoctorResponseForm } from '@/components/DoctorResponseForm';
 
 const questionSchema = z.object({
   title: z.string().min(10, 'Title must be at least 10 characters'),
@@ -76,6 +77,7 @@ export const AskDoctorForum = () => {
   const [questions, setQuestions] = useState<DoctorQuestion[]>([]);
   const [isAsking, setIsAsking] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<DoctorQuestion | null>(null);
+  const [respondingTo, setRespondingTo] = useState<string | null>(null);
 
   const {
     register,
@@ -91,8 +93,36 @@ export const AskDoctorForum = () => {
     loadQuestions();
   }, []);
 
-  const loadQuestions = () => {
-    // Mock data for demonstration
+  const loadQuestions = async () => {
+    try {
+      const { getDoctorConsultations } = await import('@/lib/firestore');
+      const consultations = await getDoctorConsultations();
+      
+      // Convert Firestore data to DoctorQuestion format
+      const formattedQuestions: DoctorQuestion[] = consultations.map(consultation => ({
+        id: consultation.id,
+        title: consultation.title || 'Medical Question',
+        category: consultation.category || 'General',
+        description: consultation.description || '',
+        urgency: consultation.urgency || 'medium',
+        askedBy: consultation.isAnonymous ? 'Anonymous' : consultation.askedBy || 'User',
+        askedAt: consultation.createdAt ? consultation.createdAt.toDate() : new Date(),
+        status: consultation.status || 'open',
+        views: consultation.views || 0,
+        responses: consultation.responses || [],
+        isAnonymous: consultation.isAnonymous || false
+      }));
+
+      setQuestions(formattedQuestions);
+    } catch (error) {
+      console.error('Error loading questions:', error);
+      // Fallback to sample data for demo
+      loadSampleQuestions();
+    }
+  };
+
+  const loadSampleQuestions = () => {
+    // Sample data for demonstration
     const mockQuestions: DoctorQuestion[] = [
       {
         id: '1',
@@ -162,6 +192,26 @@ export const AskDoctorForum = () => {
 
   const submitQuestion = async (data: QuestionFormData) => {
     try {
+      const questionData = {
+        title: data.title,
+        category: data.category,
+        description: data.description,
+        urgency: data.urgency,
+        askedBy: data.anonymousPost ? 'Anonymous' : user?.displayName || 'User',
+        userId: user?.uid,
+        isAnonymous: data.anonymousPost,
+        status: 'open',
+        views: 0,
+        responses: [],
+        type: 'forum_question',
+        createdAt: new Date()
+      };
+
+      // Save to Firestore
+      const { createDoctorConsultation } = await import('@/lib/firestore');
+      await createDoctorConsultation(questionData);
+
+      // Create local question object for immediate UI update
       const newQuestion: DoctorQuestion = {
         id: Date.now().toString(),
         title: data.title,
@@ -175,14 +225,6 @@ export const AskDoctorForum = () => {
         responses: [],
         isAnonymous: data.anonymousPost
       };
-
-      // Save to Firestore
-      const { createDoctorConsultation } = await import('@/lib/firestore');
-      await createDoctorConsultation({
-        ...newQuestion,
-        userId: user?.uid,
-        type: 'forum_question'
-      });
 
       setQuestions(prev => [newQuestion, ...prev]);
       setIsAsking(false);
@@ -222,6 +264,37 @@ export const AskDoctorForum = () => {
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
+  };
+
+  const handleDoctorResponse = (questionId: string) => {
+    // Check if user is a doctor (demo or real)
+    const isDemoDoctor = localStorage.getItem('demoDoctor') === 'true';
+    const userRole = localStorage.getItem('userRole');
+    
+    if (isDemoDoctor || userRole === 'doctor') {
+      setRespondingTo(questionId);
+    } else {
+      toast({
+        title: "Access Restricted",
+        description: "Only verified medical professionals can respond to questions.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const onResponseSubmitted = (questionId: string, response: any) => {
+    // Update the question with the new response
+    setQuestions(prev => prev.map(q => {
+      if (q.id === questionId) {
+        return {
+          ...q,
+          responses: [...q.responses, response],
+          status: 'answered' as const
+        };
+      }
+      return q;
+    }));
+    setRespondingTo(null);
   };
 
   if (isAsking) {
@@ -365,10 +438,8 @@ export const AskDoctorForum = () => {
 
       <div className="grid gap-6">
         {questions.map((question) => (
-          <Card 
-            key={question.id} 
-            className={`border-l-4 ${getUrgencyColor(question.urgency)}`}
-          >
+          <div key={question.id}>
+            <Card className={`border-l-4 ${getUrgencyColor(question.urgency)}`}>
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -440,10 +511,53 @@ export const AskDoctorForum = () => {
                       ))}
                     </div>
                   )}
+                  
+                  {/* Doctor Response Section */}
+                  <div className="mt-4 pt-4 border-t">
+                    {question.responses.length === 0 ? (
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500 mb-3">No medical responses yet</p>
+                        <Button
+                          size="sm"
+                          onClick={() => handleDoctorResponse(question.id)}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Stethoscope className="h-4 w-4 mr-2" />
+                          Provide Medical Response
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-700">
+                            {question.responses.length} Medical Response(s)
+                          </span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDoctorResponse(question.id)}
+                          >
+                            Add Response
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
-          </Card>
+            </Card>
+            {respondingTo === question.id && (
+              <div className="mt-4">
+                <DoctorResponseForm
+                  questionId={question.id}
+                  questionTitle={question.title}
+                  onResponseSubmitted={(response) => onResponseSubmitted(question.id, response)}
+                  onCancel={() => setRespondingTo(null)}
+                />
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>
