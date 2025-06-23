@@ -109,9 +109,9 @@ export const Onboarding = () => {
     }
     
     try {
-      // Save medical profile data to Firebase
+      // Save medical profile data to Firebase (filter out undefined values)
       if (user) {
-        await setDoc(doc(db, 'users', user.uid), {
+        const profileData = {
           // Basic info
           firstName: data.firstName,
           lastName: data.lastName,
@@ -144,7 +144,16 @@ export const Onboarding = () => {
           onboardingComplete: true,
           profileCompletedAt: new Date(),
           updatedAt: new Date()
-        }, { merge: true });
+        };
+
+        // Filter out undefined values to prevent Firebase errors
+        const cleanedData = Object.fromEntries(
+          Object.entries(profileData).filter(([_, value]) => value !== undefined)
+        );
+
+        console.log('Saving cleaned profile data:', cleanedData);
+        
+        await setDoc(doc(db, 'users', user.uid), cleanedData, { merge: true });
         
         // Also save to userPreferences for onboarding tracking
         await setDoc(doc(db, 'userPreferences', user.uid), {
