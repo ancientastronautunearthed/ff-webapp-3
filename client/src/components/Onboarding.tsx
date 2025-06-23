@@ -154,12 +154,32 @@ export const Onboarding = () => {
         console.log('Saving cleaned profile data:', cleanedData);
         
         await setDoc(doc(db, 'users', user.uid), cleanedData, { merge: true });
+        console.log('User profile saved successfully');
         
         // Also save to userPreferences for onboarding tracking
         await setDoc(doc(db, 'userPreferences', user.uid), {
           onboardingComplete: true,
           onboardingCompletedAt: new Date()
         }, { merge: true });
+        console.log('User preferences saved successfully');
+        
+        // Initialize companion progress
+        await setDoc(doc(db, 'companionProgress', user.uid), {
+          userId: user.uid,
+          currentTier: 1,
+          totalPoints: 0,
+          pointsToNextTier: 100,
+          progressPercentage: 0,
+          unlockedFeatures: ['basic_chat', 'health_tracking'],
+          achievements: [],
+          streaks: [
+            { type: 'daily_checkin', current: 0, longest: 0 },
+            { type: 'symptom_tracking', current: 0, longest: 0 },
+            { type: 'journal_entry', current: 0, longest: 0 }
+          ],
+          lastUpdated: new Date()
+        }, { merge: true });
+        console.log('Companion progress initialized');
       }
       
       setCompletedSteps(prev => new Set([...prev, 'profile']));
@@ -169,10 +189,11 @@ export const Onboarding = () => {
         description: "Your medical profile has been saved. Welcome to Fiber Friends!",
       });
       
-      // Navigate to dashboard immediately
+      // Navigate to dashboard after brief delay
       setTimeout(() => {
+        console.log('Navigating to dashboard...');
         window.location.href = '/dashboard';
-      }, 1000);
+      }, 1500);
       
     } catch (error) {
       console.error('Error saving medical profile:', error);
