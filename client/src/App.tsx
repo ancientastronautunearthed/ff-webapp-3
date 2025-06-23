@@ -35,52 +35,11 @@ import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
 import { CompanionDashboard } from "@/components/CompanionDashboard";
 import { UserSettings } from "@/pages/UserSettings";
-import SocialImpactLeaderboard from '@/components/SocialImpactLeaderboard';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
 
 function AppContent() {
   const { user, loading } = useAuth();
   const [location] = useLocation();
-  
-  // Always declare all hooks at the top level
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [statusLoading, setStatusLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      checkUserStatus();
-    } else {
-      setStatusLoading(false);
-    }
-  }, [user]);
-
-  const checkUserStatus = async () => {
-    if (!user) return;
-    
-    try {
-      setStatusLoading(true);
-      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
-      
-      if (prefsDoc.exists()) {
-        const data = prefsDoc.data();
-        setUserRole(data.userRole || null);
-        setHasCompletedOnboarding(data.onboardingComplete || false);
-      } else {
-        setUserRole(null);
-        setHasCompletedOnboarding(false);
-      }
-    } catch (error) {
-      console.error('Error checking user status:', error);
-      setUserRole(null);
-      setHasCompletedOnboarding(false);
-    } finally {
-      setStatusLoading(false);
-    }
-  };
-
-  // Handle global loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -96,35 +55,70 @@ function AppContent() {
     );
   }
 
-  // Handle unauthenticated users
   if (!user) {
+    // Check if accessing doctor portal
     if (location.startsWith('/doctor')) {
       return <DoctorLogin />;
     }
     return <Login />;
   }
 
-  // Handle status loading
-  if (statusLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking user status...</p>
-        </div>
-      </div>
-    );
-  }
+  // Check if user is a doctor and redirect to doctor dashboard
+  // Check user role from Firebase instead of localStorage
+  const [userRole, setUserRole] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (user) {
+      checkUserRole();
+    }
+  }, [user]);
 
-  // Handle doctor users
+  const checkUserRole = async () => {
+    if (!user) return;
+    
+    try {
+      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
+      if (prefsDoc.exists()) {
+        setUserRole(prefsDoc.data().userRole || null);
+      }
+    } catch (error) {
+      console.error('Error checking user role:', error);
+      setUserRole(null);
+    }
+  };
   if (userRole === 'doctor') {
     return <DoctorDashboard />;
   }
+
+  // Check if user has completed onboarding
+  // Check onboarding completion from Firebase
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   
-  // Handle onboarding
+  useEffect(() => {
+    if (user) {
+      checkOnboardingStatus();
+    }
+  }, [user]);
+
+  const checkOnboardingStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const prefsDoc = await getDoc(doc(db, 'userPreferences', user.uid));
+      const completed = prefsDoc.exists() ? prefsDoc.data().onboardingComplete : false;
+      setHasCompletedOnboarding(completed);
+    } catch (error) {
+      console.error('Error checking onboarding status:', error);
+      setHasCompletedOnboarding(false);
+    }
+  };
+  
+  // Force new users through comprehensive medical onboarding (except when explicitly accessing onboarding routes)
   if (!hasCompletedOnboarding && !location.startsWith('/onboarding') && !location.startsWith('/medical-onboarding') && !location.startsWith('/research-consent')) {
     return <Onboarding />;
   }
+
+
 
   return (
     <Layout>
@@ -154,13 +148,12 @@ function AppContent() {
         <Route path="/peer-matching" component={PeerMatching} />
         <Route path="/companion" component={CompanionDashboard} />
         <Route path="/settings" component={UserSettings} />
-        <Route path="/social-impact" component={SocialImpactLeaderboard} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
       </Switch>
       
-      {/* Tour overlay */}
-      <WelcomeTour />
+      {/* Check if tour is active and show tour overlay */}
+      {/* Tour removed - integrated into dashboard onboarding flow */}
     </Layout>
   );
 }
@@ -171,10 +164,8 @@ function App() {
       <AuthProvider>
         <CompanionProgressProvider>
           <TooltipProvider>
-            <div className="min-h-screen bg-slate-50">
-              <AppContent />
-              <Toaster />
-            </div>
+            <Toaster />
+            <AppContent />
           </TooltipProvider>
         </CompanionProgressProvider>
       </AuthProvider>

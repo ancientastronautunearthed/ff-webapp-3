@@ -138,18 +138,15 @@ export const AICompanionCreator = ({ onCompanionCreated, onSkip }: AICompanionCr
     try {
       // Create a detailed prompt from the user's selections
       const prompt = createImagePrompt(config);
-      console.log('Generating companion with prompt:', prompt);
       
       // Generate the image using Google AI
       const imageUrl = await generateImage(prompt);
-      console.log('Image generated successfully:', imageUrl);
       
       toast({
         title: "Companion Created!",
         description: "Your AI health companion has been successfully generated.",
       });
 
-      // Call the completion handler with the image and config
       onCompanionCreated(imageUrl, config);
     } catch (error) {
       console.error('Error generating companion:', error);
@@ -158,9 +155,9 @@ export const AICompanionCreator = ({ onCompanionCreated, onSkip }: AICompanionCr
         description: "Unable to create your companion. Please try again.",
         variant: "destructive",
       });
-      setIsGenerating(false); // Reset generating state on error
+    } finally {
+      setIsGenerating(false);
     }
-    // Note: Don't reset isGenerating here on success - let parent handle it
   };
 
   const createImagePrompt = (config: CompanionConfig): string => {

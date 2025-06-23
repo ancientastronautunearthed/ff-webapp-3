@@ -156,19 +156,14 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       console.error('Error saving companion data:', error);
     }
     
-    // Hide companion creator FIRST before any other operations
-    console.log('MedicalProfileForm: Hiding companion creator immediately');
-    setShowCompanionCreator(false);
-    
     toast({
       title: "Profile & Companion Complete!",
       description: "Your medical profile and AI companion have been created successfully.",
     });
     
-    // Get form data and call onComplete to proceed to tour
-    console.log('MedicalProfileForm: Calling onComplete to proceed to tour');
+    // Get form data and call onComplete
     const formData = form.getValues();
-    onComplete(formData as MedicalProfileData);
+    onComplete(formData as MedicalProfileData);;
   };
 
   const handleSkipCompanion = async () => {
@@ -187,17 +182,12 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
       console.error('Error saving companion skip status:', error);
     }
     
-    // Hide companion creator FIRST before any other operations
-    console.log('MedicalProfileForm: Hiding companion creator immediately');
-    setShowCompanionCreator(false);
-    
     toast({
       title: "Profile Complete!",
       description: "You can create your AI companion later from settings.",
     });
     
-    // Get form data and call onComplete to proceed to tour
-    console.log('MedicalProfileForm: Calling onComplete to proceed to tour');
+    // Get form data and call onComplete
     const formData = form.getValues();
     onComplete(formData as MedicalProfileData);
   };
@@ -346,57 +336,11 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
 
   // Show companion creator if flag is set
   if (showCompanionCreator) {
-    console.log('Rendering CompanionCreatorStep - showCompanionCreator:', showCompanionCreator);
+    console.log('Rendering CompanionCreatorStep');
     return (
       <CompanionCreatorStep
-        onComplete={(imageUrl: string, config: any) => {
-          console.log('CompanionCreatorStep onComplete called, setting showCompanionCreator to false immediately');
-          setShowCompanionCreator(false);
-          setCompanionData({ imageUrl, config });
-          
-          // Save companion data to Firebase
-          if (user?.uid) {
-            updateDoc(doc(db, 'users', user.uid), {
-              companionImage: imageUrl,
-              companionConfig: config,
-              hasCompanion: true,
-              companionCreatedAt: new Date()
-            }).catch(error => console.error('Error saving companion data:', error));
-          }
-          
-          toast({
-            title: "Profile & Companion Complete!",
-            description: "Your medical profile and AI companion have been created successfully.",
-          });
-          
-          // Get form data and call onComplete to proceed to tour
-          console.log('MedicalProfileForm: Calling onComplete to proceed to tour');
-          const formData = form.getValues();
-          onComplete(formData as MedicalProfileData);
-        }}
-        onSkip={() => {
-          console.log('CompanionCreatorStep onSkip called, setting showCompanionCreator to false immediately');
-          setShowCompanionCreator(false);
-          
-          // Save skip status to Firebase
-          if (user?.uid) {
-            updateDoc(doc(db, 'users', user.uid), {
-              hasCompanion: false,
-              companionSkipped: true,
-              companionSkippedAt: new Date()
-            }).catch(error => console.error('Error saving companion skip status:', error));
-          }
-          
-          toast({
-            title: "Profile Complete!",
-            description: "You can create your AI companion later from settings.",
-          });
-          
-          // Get form data and call onComplete to proceed to tour
-          console.log('MedicalProfileForm: Calling onComplete to proceed to tour');
-          const formData = form.getValues();
-          onComplete(formData as MedicalProfileData);
-        }}
+        onComplete={handleCompanionCreated}
+        onSkip={handleSkipCompanion}
       />
     );
   }

@@ -21,7 +21,6 @@ import { SmartDailyCheckin } from '@/components/SmartDailyCheckin';
 import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { DailyTaskList } from '@/components/DailyTaskList';
 import { DailyCheckin } from '@/components/DailyCheckin';
-import ImpactScoreWidget from '@/components/ImpactScoreWidget';
 import { Link } from 'wouter';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -387,57 +386,6 @@ export default function Dashboard() {
       </div>
 
 
-
-      {/* Quick Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {/* Impact Score Widget */}
-        <ImpactScoreWidget />
-
-        {/* Progress Overview */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-blue-100 mr-4">
-                <Target className="h-6 w-6 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Week Progress</p>
-                <p className="text-2xl font-bold">{todayStats.completionRate}%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Entries This Week */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-100 mr-4">
-                <Activity className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Entries This Week</p>
-                <p className="text-2xl font-bold">{todayStats.entriesCompleted}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Current Streak */}
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-orange-100 mr-4">
-                <Calendar className="h-6 w-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">Current Streak</p>
-                <p className="text-2xl font-bold">{todayStats.trackingStreak} days</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Daily Task List - Main Focus */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

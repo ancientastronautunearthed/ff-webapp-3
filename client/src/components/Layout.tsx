@@ -30,8 +30,7 @@ import {
   MoreVertical,
   Activity,
   TrendingUp,
-  Stethoscope,
-  Trophy
+  Stethoscope
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, getDoc } from 'firebase/firestore';
@@ -179,12 +178,6 @@ export const Layout = ({ children }: LayoutProps) => {
                       <Link href="/settings">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/social-impact">
-                        <Trophy className="mr-2 h-4 w-4" />
-                        <span>Impact Board</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
