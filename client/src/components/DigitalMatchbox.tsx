@@ -43,6 +43,7 @@ export const DigitalMatchbox = () => {
   });
 
   const onSubmit = async (data: JournalFormData) => {
+    console.log('Form submitted with data:', data);
     setLoading(true);
     try {
       const { createJournalEntry } = await import('@/lib/firestore');
@@ -126,6 +127,12 @@ export const DigitalMatchbox = () => {
     
     setSelectedFiles(prev => [...prev, ...validFiles]);
   };
+  
+  console.log('Current form state:', {
+    isValid: form.formState.isValid,
+    errors: form.formState.errors,
+    isDirty: form.formState.isDirty
+  });
 
   const removeFile = (index: number) => {
     setSelectedFiles(prev => prev.filter((_, i) => i !== index));
@@ -148,7 +155,7 @@ export const DigitalMatchbox = () => {
                 New Journal Entry
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div>
                   <Label htmlFor="title" className="text-sm font-medium text-gray-700 mb-2 block">
@@ -235,7 +242,7 @@ export const DigitalMatchbox = () => {
                 </div>
 
                 {/* Link to Symptom Entry */}
-                <div>
+                <div data-tour="entry-linking">
                   <Label className="text-sm font-medium text-gray-700 mb-2 block">
                     Link to Symptom Entry
                   </Label>
@@ -251,42 +258,44 @@ export const DigitalMatchbox = () => {
                   </Select>
                 </div>
 
-                {/* Security Info */}
-                <div className="flex items-center justify-center text-sm text-gray-600 pt-2">
-                  <Lock className="mr-2 h-4 w-4" />
-                  <span>End-to-end encrypted and secure</span>
-                </div>
-
-                {/* Submit Button Section */}
-                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      form.reset();
-                      setSelectedFiles([]);
-                    }}
-                    disabled={loading}
-                  >
-                    Clear Form
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-primary-600 hover:bg-primary-700 min-w-[140px]"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="mr-2 h-4 w-4" />
-                        Submit Entry
-                      </>
-                    )}
-                  </Button>
+                {/* Submit Button Section - ALWAYS VISIBLE */}
+                <div className="border-t border-gray-200 pt-6 mt-6">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Lock className="mr-2 h-4 w-4" />
+                      <span>End-to-end encrypted</span>
+                    </div>
+                    <div className="flex space-x-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          form.reset();
+                          setSelectedFiles([]);
+                        }}
+                        disabled={loading}
+                      >
+                        Clear Form
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={loading}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="mr-2 h-4 w-4" />
+                            Submit Entry
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </form>
             </CardContent>
