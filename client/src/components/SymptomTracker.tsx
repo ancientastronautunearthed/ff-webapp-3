@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Hand, User, ClipboardList, Save, Check } from 'lucide-react';
-import { SYMPTOM_OPTIONS } from './SymptomOptions';
+import { SYMPTOM_OPTIONS, TRIGGER_OPTIONS, LOCATION_OPTIONS, TREATMENT_OPTIONS } from './SymptomOptions';
 
 const symptomSchema = z.object({
   date: z.string(),
