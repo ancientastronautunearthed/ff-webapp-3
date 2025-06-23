@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { CompanionCreatorStep } from './CompanionCreatorStep';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -83,6 +84,8 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [showCompanionCreator, setShowCompanionCreator] = useState(false);
+  const [companionData, setCompanionData] = useState<{imageUrl: string, config: any} | null>(null);
   const { toast } = useToast();
 
   const form = useForm<MedicalProfileData>({
@@ -715,7 +718,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                 </Button>
               ) : (
                 <Button
-                  type="submit"
+                  type="button"
                   disabled={!form.watch('researchConsent') || !form.watch('anonymousDataSharing')}
                   className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
                   onClick={(e) => {
@@ -727,10 +730,123 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
                         description: "Please check both research consent checkboxes to continue.",
                         variant: "destructive",
                       });
+                      return;
                     }
+                    
+                    // Show companion creator after profile completion
+                    setShowCompanionCreator(true);
                   }}
                 >
-                  Complete Profile & Submit
+                  Complete Profile & Create Companion
+                </Button>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const handleCompanionCreated = (imageUrl: string, config: any) => {
+    setCompanionData({ imageUrl, config });
+    
+    toast({
+      title: "Profile & Companion Complete!",
+      description: "Your medical profile and AI companion have been created successfully.",
+    });
+    
+    onComplete();
+  };
+
+  const handleSkipCompanion = () => {
+    toast({
+      title: "Profile Complete!",
+      description: "You can create your AI companion later from settings.",
+    });
+    
+    onComplete();
+  };
+
+  if (showCompanionCreator) {
+    return (
+      <CompanionCreatorStep
+        onComplete={handleCompanionCreated}
+        onSkip={handleSkipCompanion}
+      />
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <Card className="w-full max-w-4xl mx-auto border-2 border-blue-200 shadow-xl bg-white/95 backdrop-blur-sm">
+        <CardHeader className="text-center border-b border-blue-100 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+          <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
+            <ShieldCheck className="w-6 h-6" />
+            Medical Profile Setup
+          </CardTitle>
+          <p className="text-blue-100 mt-2">
+            Help us understand your health journey for personalized insights and research contribution
+          </p>
+          
+          <div className="mt-4">
+            <div className="flex justify-center space-x-2 mb-2">
+              {[1, 2, 3, 4, 5].map((step) => (
+                <div
+                  key={step}
+                  className={`w-3 h-3 rounded-full ${
+                    step <= currentStep ? 'bg-white' : 'bg-blue-300'
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-xs text-blue-100">Step {currentStep} of 5</p>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {renderStep()}
+            
+            <div className="flex justify-between pt-6 border-t border-gray-200">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className="bg-white hover:bg-gray-50 border-gray-300"
+              >
+                Previous
+              </Button>
+              
+              {currentStep < 5 ? (
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg border-2 border-blue-700"
+                >
+                  Next Step
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  disabled={!form.watch('researchConsent') || !form.watch('anonymousDataSharing')}
+                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                  onClick={(e) => {
+                    console.log('Submit button clicked, research consent:', form.watch('researchConsent'), 'data sharing:', form.watch('anonymousDataSharing'));
+                    if (!form.watch('researchConsent') || !form.watch('anonymousDataSharing')) {
+                      e.preventDefault();
+                      toast({
+                        title: "Research Consent Required",
+                        description: "Please check both research consent checkboxes to continue.",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    
+                    setShowCompanionCreator(true);
+                  }}
+                >
+                  Complete Profile & Create Companion
                 </Button>
               )}
             </div>

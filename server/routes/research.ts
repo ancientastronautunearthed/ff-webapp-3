@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { db } from '../firebase-admin';
 
-const router = Router();
+export const researchRoutes = Router();
 
 // Get aggregated research dashboard data
-router.get('/dashboard', async (req, res) => {
+researchRoutes.get('/dashboard', async (req, res) => {
   try {
     const { timeRange = '90', region = 'all' } = req.query;
     
@@ -82,7 +82,7 @@ router.get('/dashboard', async (req, res) => {
 });
 
 // Export research data
-router.get('/export', async (req, res) => {
+researchRoutes.get('/export', async (req, res) => {
   try {
     const { format = 'csv', timeRange = '90' } = req.query;
     
@@ -312,4 +312,4 @@ function getRegion(userId: string): string {
   return regions[userId.charCodeAt(0) % regions.length];
 }
 
-export default router;
+// Router already exported as researchRoutes at the top

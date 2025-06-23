@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { aiRoutes } from "./routes/ai";
 import { peerRecommendationsRoutes } from "./routes/peer-recommendations";
 import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -56,6 +57,9 @@ app.use((req, res, next) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
+  // Serve static temp files for AI-generated images
+  app.use('/temp', express.static(path.join(process.cwd(), 'public', 'temp')));
+
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
