@@ -1,0 +1,52 @@
+{
+  "name": "Fiber Friends - Morgellons Health Companion",
+  "short_name": "Fiber Friends",
+  "description": "Comprehensive health tracking for Morgellons disease with secure symptom tracking and community support",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["health", "medical", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Track Symptoms",
+      "short_name": "Symptoms",
+      "description": "Log today's symptom data",
+      "url": "/tracker",
+      "icons": [
+        {
+          "src": "/favicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "AI Insights",
+      "short_name": "AI Analysis",
+      "description": "View AI-powered health insights",
+      "url": "/ai-insights",
+      "icons": [
+        {
+          "src": "/favicon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
