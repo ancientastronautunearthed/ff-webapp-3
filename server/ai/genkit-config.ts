@@ -1,11 +1,11 @@
-import { configureGenkit } from 'genkit';
+import { genkit } from 'genkit';
 import { firebase } from '@genkit-ai/firebase';
 import { googleAI } from '@genkit-ai/googleai';
 import { defineFlow } from '@genkit-ai/flow';
 import { generate } from '@genkit-ai/ai';
 
 // Configure Genkit with Firebase and Google AI
-export const ai = configureGenkit({
+export const ai = genkit({
   plugins: [
     firebase(),
     googleAI(),

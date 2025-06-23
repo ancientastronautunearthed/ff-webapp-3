@@ -1,126 +1,168 @@
 import { Router } from 'express';
-import { 
-  analyzeSymptomPatterns,
-  generateInsights,
-  analyzeSymptomText
-} from '../ai/simple-ai';
+import { generate } from '@genkit-ai/ai';
+import { googleAI } from '@genkit-ai/googleai';
 
-const router = Router();
+export const aiRoutes = Router();
 
-// Analyze symptom patterns endpoint
-router.post('/analyze-patterns', async (req, res) => {
+aiRoutes.post('/analyze-health-patterns', async (req, res) => {
   try {
-    const { symptoms, journals } = req.body;
-    
-    if (!symptoms || !Array.isArray(symptoms)) {
-      return res.status(400).json({ error: 'Invalid symptoms data' });
-    }
+    const { userId, symptoms, journals, checkins } = req.body;
 
-    const result = await analyzeSymptomPatterns(symptoms, journals || []);
-    res.json(result.patterns || []);
-  } catch (error) {
-    console.error('AI Pattern Analysis Error:', error);
-    res.status(500).json({ 
-      error: 'AI analysis failed. Please ensure valid Google AI API key is configured.',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
-});
-
-// Generate AI insights endpoint
-router.post('/generate-insights', async (req, res) => {
-  try {
-    const { userId } = req.body;
-    
     if (!userId) {
       return res.status(400).json({ error: 'User ID required' });
     }
 
-    // Mock recent data - in production, fetch from Firestore
-    const recentData = {
-      avgSymptoms: 5.2,
-      trackingDays: 15,
-      topFactors: ['weather-changes', 'high-stress'],
-      moodTrends: 'variable'
+    // Prepare data for AI analysis
+    const analysisData = {
+      userId,
+      symptoms: symptoms || [],
+      journals: journals || [],
+      checkins: checkins || [],
+      analysisType: 'health_patterns'
     };
 
-    const result = await generateInsights(userId, recentData);
-    res.json(result.insights || []);
-  } catch (error) {
-    console.error('AI Insights Error:', error);
-    res.status(500).json({ 
-      error: 'AI insights generation failed. Please ensure valid Google AI API key is configured.',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
-});
-
-// Predict symptom trends endpoint
-router.post('/predict-symptoms', async (req, res) => {
-  try {
-    const { recentSymptoms, currentFactors } = req.body;
+    // Call Google AI for health analysis
+    const prompt = `Analyze the following health data for Morgellons disease patterns:
     
-    if (!recentSymptoms || !Array.isArray(recentSymptoms)) {
-      return res.status(400).json({ error: 'Invalid symptom data' });
+    Symptoms (${symptoms.length} entries): Recent severity levels, environmental factors, and patterns
+    Journal entries (${journals.length} entries): Mood and observations
+    Daily check-ins (${checkins.length} entries): Overall wellbeing and sleep patterns
+    
+    Provide 2-3 actionable health insights focusing on:
+    1. Pattern recognition in symptoms
+    2. Environmental or lifestyle correlations
+    3. Positive trends or concerning changes
+    
+    Format as JSON with: insights array containing {type, title, description, actionable, priority, confidence}`;
+
+    const aiResult = await generate({
+      model: googleAI('gemini-1.5-flash'),
+      prompt: prompt,
+      config: {
+        temperature: 0.3,
+        maxOutputTokens: 1000,
+      }
+    });
+
+    // Parse AI response
+    let parsedInsights = [];
+    try {
+      const aiText = aiResult.text();
+      // Try to extract JSON from AI response
+      const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        parsedInsights = parsed.insights || [];
+      }
+    } catch (parseError) {
+      console.log('AI response parsing failed, using fallback');
     }
 
-    // Simple trend prediction based on recent data
-    const avgIntensity = recentSymptoms.reduce((sum: number, entry: any) => 
-      sum + (entry.intensity || 0), 0) / Math.max(1, recentSymptoms.length);
-
+    // Return structured response
     res.json({
-      predictedIntensity: Math.round(avgIntensity * 10) / 10,
-      confidence: 0.7,
-      factors: ['recent-trends', 'weather', 'stress'],
-      timeframe: 'next 3 days',
-      suggestions: [
-        'Continue current tracking routine',
-        'Monitor identified factor patterns',
-        'Consider preventive measures for high-risk factors'
-      ]
+      success: true,
+      insights: parsedInsights.length > 0 ? parsedInsights : generateFallbackAnalysis(req.body),
+      patterns: [],
+      prediction: null,
+      recommendations: [],
+      confidence: parsedInsights.length > 0 ? 85 : 60,
+      analysisDate: new Date().toISOString(),
+      aiGenerated: parsedInsights.length > 0
     });
+
   } catch (error) {
-    console.error('AI Prediction Error:', error);
-    res.status(500).json({ 
-      error: 'AI prediction temporarily unavailable',
-      fallback: true 
+    console.error('AI health analysis error:', error);
+    
+    // Return fallback analysis based on data patterns
+    const fallbackInsights = generateFallbackAnalysis(req.body);
+    
+    res.json({
+      success: true,
+      insights: fallbackInsights,
+      patterns: [],
+      prediction: null,
+      recommendations: [],
+      confidence: 60,
+      analysisDate: new Date().toISOString(),
+      note: 'Fallback analysis used due to AI service limitations'
     });
   }
 });
 
-// Analyze symptom text endpoint
-router.post('/analyze-text', async (req, res) => {
-  try {
-    const { text } = req.body;
+function generateFallbackAnalysis(data: any) {
+  const { symptoms, journals, checkins } = data;
+  const insights = [];
+
+  // Data collection insight
+  if (symptoms?.length > 0 || journals?.length > 0 || checkins?.length > 0) {
+    insights.push({
+      type: 'achievement',
+      title: 'Health Tracking Progress',
+      description: `You've been actively tracking your health with ${symptoms?.length || 0} symptom entries, ${journals?.length || 0} journal entries, and ${checkins?.length || 0} check-ins.`,
+      actionable: false,
+      priority: 'low',
+      confidence: 100
+    });
+  }
+
+  // Symptom trend analysis
+  if (symptoms?.length >= 5) {
+    const avgSeverity = symptoms.reduce((sum: number, s: any) => sum + (s.severity || 0), 0) / symptoms.length;
+    const recentSymptoms = symptoms.slice(0, 3);
+    const recentAvg = recentSymptoms.reduce((sum: number, s: any) => sum + (s.severity || 0), 0) / recentSymptoms.length;
     
-    if (!text || typeof text !== 'string') {
-      return res.status(400).json({ error: 'Text content required' });
+    if (recentAvg < avgSeverity * 0.8) {
+      insights.push({
+        type: 'prediction',
+        title: 'Positive Symptom Trend',
+        description: `Your recent symptoms show improvement of approximately ${Math.round(((avgSeverity - recentAvg) / avgSeverity) * 100)}% compared to your average.`,
+        actionable: true,
+        priority: 'high',
+        confidence: 75
+      });
+    } else if (recentAvg > avgSeverity * 1.2) {
+      insights.push({
+        type: 'warning',
+        title: 'Symptom Elevation Detected',
+        description: `Recent symptoms are elevated. Consider reviewing recent changes in lifestyle, stress, or environmental factors.`,
+        actionable: true,
+        priority: 'high',
+        confidence: 80
+      });
     }
+  }
 
-    const result = await analyzeSymptomText(text);
-    
-    res.json({
-      extractedSymptoms: result.extractedSymptoms || [],
-      severity: result.severity || 0,
-      emotions: result.emotions || [],
-      suggestions: result.suggestions || []
-    });
-  } catch (error) {
-    console.error('AI Text Analysis Error:', error);
-    res.status(500).json({ 
-      error: 'AI text analysis failed. Please ensure valid Google AI API key is configured.',
-      details: error instanceof Error ? error.message : 'Unknown error'
+  // Consistency insight
+  if (checkins?.length >= 3) {
+    insights.push({
+      type: 'tip',
+      title: 'Tracking Consistency',
+      description: 'Regular health check-ins help identify patterns and improve treatment effectiveness. Keep up the excellent work!',
+      actionable: false,
+      priority: 'medium',
+      confidence: 90
     });
   }
-});
 
-// Health check endpoint
-router.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
-    ai: 'Firebase Genkit integration active',
-    timestamp: new Date().toISOString()
-  });
-});
+  // Environmental factors
+  if (symptoms?.length > 0) {
+    const stressRelated = symptoms.filter((s: any) => 
+      s.environmentalFactors?.includes('High Stress') || 
+      s.environmentalFactors?.includes('Stress')
+    );
+    
+    if (stressRelated.length > 0) {
+      const stressPercentage = (stressRelated.length / symptoms.length) * 100;
+      insights.push({
+        type: 'correlation',
+        title: 'Stress-Symptom Connection',
+        description: `${Math.round(stressPercentage)}% of your symptoms occur during high-stress periods. Consider stress management techniques.`,
+        actionable: true,
+        priority: 'medium',
+        confidence: 70
+      });
+    }
+  }
 
-export default router;
+  return insights;
+}

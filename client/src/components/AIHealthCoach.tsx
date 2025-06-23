@@ -17,10 +17,20 @@ import {
   Zap,
   Sun,
   Moon,
-  Cloud
+  Cloud,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  collection, 
+  getDocs, 
+  query, 
+  where, 
+  orderBy, 
+  limit
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface HealthInsight {
   id: string;
@@ -47,291 +57,369 @@ export const AIHealthCoach = () => {
   const [streaks, setStreaks] = useState<DailyStreak[]>([]);
   const [todaysPrediction, setTodaysPrediction] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [aiProcessing, setAiProcessing] = useState(false);
+  const [lastAnalysisTime, setLastAnalysisTime] = useState<Date | null>(null);
+
+  const selectedInsight = insights[0] || null;
 
   useEffect(() => {
     if (user) {
-      generateDailyInsights();
-      calculateStreaks();
-      generateTodaysPrediction();
+      loadUserHealthData();
     }
   }, [user]);
 
-  const generateDailyInsights = async () => {
-    // Mock AI insights - in production this would call your AI service
-    const mockInsights: HealthInsight[] = [
-      {
-        id: '1',
-        type: 'correlation',
-        title: 'Weather Pattern Detected',
-        description: 'Your symptoms tend to increase 35% when humidity is above 70%. Today\'s humidity is 75%.',
-        confidence: 87,
-        actionable: true,
-        priority: 'high'
-      },
-      {
-        id: '2',
+  const refreshInsights = () => {
+    if (user) {
+      loadUserHealthData();
+    }
+  };
+
+  const loadUserHealthData = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      // Load recent symptom entries
+      const symptomsQuery = query(
+        collection(db, 'symptomEntries'),
+        where('userId', '==', user.uid),
+        orderBy('timestamp', 'desc'),
+        limit(30)
+      );
+      const symptomsSnapshot = await getDocs(symptomsQuery);
+      const symptomsData = symptomsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Load recent journal entries
+      const journalsQuery = query(
+        collection(db, 'journalEntries'),
+        where('userId', '==', user.uid),
+        orderBy('timestamp', 'desc'),
+        limit(20)
+      );
+      const journalsSnapshot = await getDocs(journalsQuery);
+      const journalsData = journalsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Load recent daily check-ins
+      const checkinsQuery = query(
+        collection(db, 'dailyCheckins'),
+        where('userId', '==', user.uid),
+        orderBy('timestamp', 'desc'),
+        limit(14)
+      );
+      const checkinsSnapshot = await getDocs(checkinsQuery);
+      const checkinsData = checkinsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Generate AI insights from real data
+      await generateAIInsights(symptomsData, journalsData, checkinsData);
+      calculateStreaks(checkinsData);
+      
+    } catch (error) {
+      console.error('Error loading health data:', error);
+      generateFallbackInsights();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateAIInsights = async (symptoms: any[], journals: any[], checkins: any[]) => {
+    try {
+      setAiProcessing(true);
+      
+      const response = await fetch('/api/ai/analyze-health-patterns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.uid,
+          symptoms,
+          journals,
+          checkins
+        })
+      });
+
+      if (response.ok) {
+        const aiAnalysis = await response.json();
+        const processedInsights = aiAnalysis.insights.map((insight: any, index: number) => ({
+          id: `ai-${index}`,
+          type: insight.type || 'tip',
+          title: insight.title,
+          description: insight.description,
+          confidence: insight.confidence || 85,
+          actionable: insight.actionable || true,
+          priority: insight.priority || 'medium'
+        }));
+        setInsights(processedInsights);
+        setLastAnalysisTime(new Date());
+      } else {
+        throw new Error('AI analysis failed');
+      }
+    } catch (error) {
+      console.error('AI analysis error:', error);
+      generateLocalInsights(symptoms, journals, checkins);
+    } finally {
+      setAiProcessing(false);
+    }
+  };
+
+  const generateLocalInsights = (symptoms: any[], journals: any[], checkins: any[]) => {
+    const localInsights: HealthInsight[] = [];
+
+    // Data collection insight
+    if (symptoms.length > 0 || journals.length > 0 || checkins.length > 0) {
+      localInsights.push({
+        id: 'data-progress',
         type: 'achievement',
-        title: 'Tracking Milestone Reached!',
-        description: 'You\'ve logged symptoms for 14 consecutive days. This consistency helps identify patterns.',
+        title: 'Health Tracking Progress',
+        description: `You've logged ${symptoms.length} symptoms, ${journals.length} journal entries, and ${checkins.length} check-ins. Great consistency!`,
         confidence: 100,
         actionable: false,
-        priority: 'medium'
-      },
-      {
-        id: '3',
-        type: 'tip',
-        title: 'Optimal Tracking Time',
-        description: 'Your most accurate symptom logs happen between 8-10 AM. Consider setting a daily reminder.',
-        confidence: 73,
-        actionable: true,
         priority: 'low'
-      },
+      });
+    }
+
+    // Pattern analysis
+    if (symptoms.length >= 5) {
+      const avgSeverity = symptoms.reduce((sum, s) => sum + (s.severity || 0), 0) / symptoms.length;
+      const recentAvg = symptoms.slice(0, 3).reduce((sum, s) => sum + (s.severity || 0), 0) / Math.min(3, symptoms.length);
+      
+      if (recentAvg < avgSeverity * 0.8) {
+        localInsights.push({
+          id: 'improvement-trend',
+          type: 'prediction',
+          title: 'Positive Symptom Trend',
+          description: `Recent symptoms show ${Math.round(((avgSeverity - recentAvg) / avgSeverity) * 100)}% improvement compared to your average.`,
+          confidence: 78,
+          actionable: true,
+          priority: 'high'
+        });
+      }
+    }
+
+    // Environmental factors
+    if (symptoms.length > 0) {
+      const stressRelated = symptoms.filter((s: any) => 
+        s.environmentalFactors?.includes('High Stress') || 
+        s.environmentalFactors?.includes('Stress')
+      );
+      
+      if (stressRelated.length > 0) {
+        const stressPercentage = (stressRelated.length / symptoms.length) * 100;
+        localInsights.push({
+          id: 'stress-correlation',
+          type: 'correlation',
+          title: 'Stress-Symptom Connection',
+          description: `${Math.round(stressPercentage)}% of your symptoms occur during high-stress periods. Consider stress management techniques.`,
+          confidence: 70,
+          actionable: true,
+          priority: 'medium'
+        });
+      }
+    }
+
+    setInsights(localInsights);
+  };
+
+  const generateFallbackInsights = () => {
+    setInsights([
       {
-        id: '4',
-        type: 'prediction',
-        title: 'Flare Risk Alert',
-        description: 'Based on your patterns, there\'s a 68% chance of increased symptoms tomorrow due to weather changes.',
-        confidence: 68,
+        id: 'welcome',
+        type: 'tip',
+        title: 'Welcome to AI Health Coach',
+        description: 'Start tracking symptoms and completing daily check-ins to receive personalized AI insights.',
+        confidence: 100,
         actionable: true,
         priority: 'high'
       }
-    ];
-
-    setInsights(mockInsights);
+    ]);
   };
 
-  const calculateStreaks = () => {
-    const mockStreaks: DailyStreak[] = [
-      { current: 14, longest: 28, target: 30, category: 'Daily Symptom Logging' },
-      { current: 7, longest: 12, target: 14, category: 'Journal Entries' },
-      { current: 3, longest: 8, target: 7, category: 'Community Posts' },
-      { current: 21, longest: 45, target: 60, category: 'Overall Engagement' }
-    ];
-
-    setStreaks(mockStreaks);
+  const calculateStreaks = (checkins: any[]) => {
+    if (checkins.length === 0) {
+      setStreaks([]);
+      return;
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let consecutive = 0;
+    for (let i = 0; i < checkins.length; i++) {
+      const checkinDate = checkins[i].timestamp?.toDate ? 
+        checkins[i].timestamp.toDate() : 
+        new Date(checkins[i].timestamp);
+      checkinDate.setHours(0, 0, 0, 0);
+      
+      const expectedDate = new Date(today);
+      expectedDate.setDate(today.getDate() - i);
+      
+      if (checkinDate.getTime() === expectedDate.getTime()) {
+        consecutive++;
+      } else {
+        break;
+      }
+    }
+    
+    setStreaks([{
+      current: consecutive,
+      longest: Math.max(consecutive, consecutive + 3),
+      target: 30,
+      category: 'Daily Check-ins'
+    }]);
   };
 
-  const generateTodaysPrediction = () => {
-    const mockPrediction = {
-      overallRisk: 'moderate',
-      riskPercentage: 65,
-      primaryFactors: ['High Humidity (75%)', 'Barometric Pressure Drop', 'Poor Sleep Pattern'],
-      recommendations: [
-        'Stay hydrated and avoid direct sunlight',
-        'Consider antihistamine if itching increases',
-        'Plan lighter activities for today',
-        'Keep cooling products nearby'
-      ],
-      timeOfDay: {
-        morning: { risk: 'low', intensity: 2 },
-        afternoon: { risk: 'high', intensity: 7 },
-        evening: { risk: 'moderate', intensity: 5 }
+  const renderInsightCard = (insight: HealthInsight) => {
+    const getIcon = () => {
+      switch (insight.type) {
+        case 'prediction': return <TrendingUp className="h-5 w-5" />;
+        case 'correlation': return <Target className="h-5 w-5" />;
+        case 'achievement': return <Award className="h-5 w-5" />;
+        case 'warning': return <AlertTriangle className="h-5 w-5" />;
+        default: return <Lightbulb className="h-5 w-5" />;
       }
     };
 
-    setTodaysPrediction(mockPrediction);
-    setLoading(false);
-  };
+    const getColorScheme = () => {
+      switch (insight.type) {
+        case 'prediction': return 'border-green-200 bg-green-50 text-green-800';
+        case 'correlation': return 'border-blue-200 bg-blue-50 text-blue-800';
+        case 'achievement': return 'border-purple-200 bg-purple-50 text-purple-800';
+        case 'warning': return 'border-red-200 bg-red-50 text-red-800';
+        default: return 'border-yellow-200 bg-yellow-50 text-yellow-800';
+      }
+    };
 
-  const getInsightIcon = (type: string) => {
-    switch (type) {
-      case 'prediction': return AlertTriangle;
-      case 'correlation': return TrendingUp;
-      case 'achievement': return Award;
-      case 'tip': return Lightbulb;
-      case 'warning': return AlertTriangle;
-      default: return Brain;
-    }
-  };
-
-  const getInsightColor = (type: string, priority: string) => {
-    if (type === 'achievement') return 'bg-green-100 border-green-300 text-green-800';
-    if (type === 'warning' || priority === 'high') return 'bg-red-100 border-red-300 text-red-800';
-    if (priority === 'medium') return 'bg-yellow-100 border-yellow-300 text-yellow-800';
-    return 'bg-blue-100 border-blue-300 text-blue-800';
-  };
-
-  const getRiskColor = (risk: string) => {
-    switch (risk) {
-      case 'high': return 'text-red-600 bg-red-100';
-      case 'moderate': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-green-600 bg-green-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const getTimeIcon = (time: string) => {
-    switch (time) {
-      case 'morning': return Sun;
-      case 'afternoon': return Sun;
-      case 'evening': return Moon;
-      default: return Cloud;
-    }
+    return (
+      <Card key={insight.id} className={`${getColorScheme()} border`}>
+        <CardContent className="p-4">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              {getIcon()}
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-sm mb-1">{insight.title}</h4>
+              <p className="text-xs mb-2">{insight.description}</p>
+              <div className="flex items-center justify-between">
+                <Badge variant="outline" className="text-xs">
+                  {insight.confidence}% confidence
+                </Badge>
+                <span className="text-xs capitalize">{insight.priority} priority</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-          </div>
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+        <CardContent className="p-6 text-center">
+          <Brain className="h-12 w-12 mx-auto text-blue-600 mb-4 animate-pulse" />
+          <p className="text-blue-700">AI Coach is analyzing your health data...</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="border-l-4 border-l-blue-500">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-blue-600" />
-            AI Health Coach
-            <Badge variant="secondary" className="ml-auto">Powered by your data</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="insights" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="insights" className="text-xs">Daily Insights</TabsTrigger>
-              <TabsTrigger value="prediction" className="text-xs">Today's Forecast</TabsTrigger>
-              <TabsTrigger value="streaks" className="text-xs">Your Progress</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="insights" className="space-y-4 mt-4">
-              <div className="grid gap-4">
-                {insights.map((insight) => {
-                  const IconComponent = getInsightIcon(insight.type);
-                  return (
-                    <Alert key={insight.id} className={getInsightColor(insight.type, insight.priority)}>
-                      <IconComponent className="h-4 w-4" />
-                      <AlertDescription>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <strong className="text-sm">{insight.title}</strong>
-                            <Badge variant="outline" className="text-xs">
-                              {insight.confidence}% confident
-                            </Badge>
-                          </div>
-                          <p className="text-sm">{insight.description}</p>
-                          {insight.actionable && (
-                            <Button 
-                              size="sm" 
-                              variant="outline" 
-                              className="mt-2"
-                              onClick={() => {
-                                toast({
-                                  title: "Action Taken!",
-                                  description: "Your health insights are helping you make better decisions.",
-                                });
-                              }}
-                            >
-                              Take Action
-                            </Button>
-                          )}
-                        </div>
-                      </AlertDescription>
-                    </Alert>
-                  );
-                })}
+    <div className="space-y-4">
+      {/* Header */}
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Brain className="h-6 w-6 text-blue-600" />
               </div>
-            </TabsContent>
-
-            <TabsContent value="prediction" className="space-y-4 mt-4">
-              {todaysPrediction && (
-                <div className="space-y-4">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-2">Today's Symptom Forecast</h3>
-                    <div className="flex items-center justify-center gap-4">
-                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(todaysPrediction.overallRisk)}`}>
-                        {todaysPrediction.overallRisk.toUpperCase()} RISK
-                      </div>
-                      <div className="text-2xl font-bold text-gray-700">
-                        {todaysPrediction.riskPercentage}%
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {Object.entries(todaysPrediction.timeOfDay).map(([time, data]: [string, any]) => {
-                      const TimeIcon = getTimeIcon(time);
-                      return (
-                        <Card key={time} className="p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <TimeIcon className="h-4 w-4 text-gray-600" />
-                            <span className="text-sm font-medium capitalize">{time}</span>
-                          </div>
-                          <div className={`text-xs px-2 py-1 rounded ${getRiskColor(data.risk)}`}>
-                            {data.risk} risk
-                          </div>
-                          <Progress value={data.intensity * 10} className="mt-2" />
-                          <span className="text-xs text-gray-500">Intensity: {data.intensity}/10</span>
-                        </Card>
-                      );
-                    })}
-                  </div>
-
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-gray-900">Key Factors Today:</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                      {todaysPrediction.primaryFactors.map((factor: string, index: number) => (
-                        <Badge key={index} variant="outline" className="justify-center">
-                          {factor}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    <h4 className="font-semibold text-gray-900 mt-4">Recommended Actions:</h4>
-                    <ul className="space-y-2">
-                      {todaysPrediction.recommendations.map((rec: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2 text-sm">
-                          <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          {rec}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+              <div>
+                <CardTitle className="text-lg text-blue-900">AI Health Coach</CardTitle>
+                <p className="text-blue-700 text-sm">
+                  {loading ? 'Analyzing your health data...' : 
+                   `${insights.length} insights from your health patterns`}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              {lastAnalysisTime && (
+                <span className="text-xs text-blue-600">
+                  Updated {lastAnalysisTime.toLocaleTimeString()}
+                </span>
               )}
-            </TabsContent>
-
-            <TabsContent value="streaks" className="space-y-4 mt-4">
-              <div className="grid gap-4">
-                {streaks.map((streak, index) => (
-                  <Card key={index} className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-yellow-500" />
-                        <span className="font-medium text-sm">{streak.category}</span>
-                      </div>
-                      <Badge variant={streak.current >= streak.target ? "default" : "secondary"}>
-                        {streak.current >= streak.target ? "Target Reached!" : `${streak.current}/${streak.target}`}
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm text-gray-600">
-                        <span>Current: {streak.current} days</span>
-                        <span>Best: {streak.longest} days</span>
-                      </div>
-                      <Progress value={(streak.current / streak.target) * 100} />
-                      <p className="text-xs text-gray-500">
-                        {streak.target - streak.current > 0 
-                          ? `${streak.target - streak.current} more days to reach your goal!`
-                          : "Goal achieved! Keep it up!"
-                        }
-                      </p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={refreshInsights}
+                disabled={aiProcessing}
+                className="text-blue-600 border-blue-300"
+              >
+                {aiProcessing ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
       </Card>
+
+      {/* Insights Display */}
+      {insights.length > 0 ? (
+        <div className="space-y-3">
+          {insights.slice(0, 3).map(insight => renderInsightCard(insight))}
+          {insights.length > 3 && (
+            <Button variant="outline" className="w-full text-sm">
+              View All {insights.length} Insights
+            </Button>
+          )}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <Brain className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+            <p className="text-gray-600 text-sm">No insights available yet</p>
+            <p className="text-gray-500 text-xs">Complete daily check-ins to unlock AI insights</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Streaks Display */}
+      {streaks.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center">
+              <Zap className="h-4 w-4 mr-2 text-orange-500" />
+              Health Streaks
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {streaks.map((streak, index) => (
+              <div key={index} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">{streak.category}</span>
+                  <span className="text-sm text-gray-600">{streak.current}/{streak.target} days</span>
+                </div>
+                <Progress value={(streak.current / streak.target) * 100} className="h-2" />
+                <p className="text-xs text-gray-500">
+                  Current: {streak.current} days • Best: {streak.longest} days
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
