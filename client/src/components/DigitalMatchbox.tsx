@@ -283,7 +283,7 @@ export const DigitalMatchbox = () => {
                   </Button>
                 </div>
 
-                <div className="flex items-center text-sm text-gray-600 pt-3">
+                <div className="flex items-center justify-center text-sm text-gray-600 pt-3">
                   <Lock className="mr-2 h-4 w-4" />
                   <span>End-to-end encrypted and secure</span>
                 </div>
