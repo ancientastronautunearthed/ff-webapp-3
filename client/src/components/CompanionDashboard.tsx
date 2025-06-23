@@ -23,6 +23,7 @@ import { CompanionInsights } from './CompanionInsights';
 import { CompanionTierSystem } from './CompanionTierSystem';
 import { CompanionFunctionality } from './CompanionFunctionality';
 import { ProgressTracker } from './ProgressTracker';
+import { DynamicFunctionGating } from './DynamicFunctionGating';
 
 export const CompanionDashboard = () => {
   const { user } = useAuth();
@@ -95,17 +96,21 @@ export const CompanionDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="progress" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Progress
+          </TabsTrigger>
+          <TabsTrigger value="access" className="flex items-center gap-2">
+            <Zap className="w-4 h-4" />
+            Access
           </TabsTrigger>
           <TabsTrigger value="chat" className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4" />
             Chat
           </TabsTrigger>
           <TabsTrigger value="functions" className="flex items-center gap-2">
-            <Zap className="w-4 h-4" />
+            <Heart className="w-4 h-4" />
             Functions
           </TabsTrigger>
           <TabsTrigger value="tier" className="flex items-center gap-2">
@@ -124,6 +129,10 @@ export const CompanionDashboard = () => {
 
         <TabsContent value="progress" className="space-y-4">
           <ProgressTracker />
+        </TabsContent>
+
+        <TabsContent value="access" className="space-y-4">
+          <DynamicFunctionGating />
         </TabsContent>
 
         <TabsContent value="chat" className="space-y-4">
