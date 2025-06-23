@@ -49,7 +49,7 @@ const medicalProfileSchema = z.object({
   foodAllergies: z.array(z.string()).optional(),
   
   // Morgellons Specific
-  symptomOnsetDate: z.string(),
+  symptomOnsetYear: z.number().min(1950).max(new Date().getFullYear()).optional(),
   initialSymptoms: z.array(z.string()),
   currentSymptomSeverity: z.number().min(1).max(10),
   fiberObservations: z.array(z.string()).optional(),
@@ -153,17 +153,6 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
     onComplete();
   };
 
-  // Show companion creator if flag is set
-  if (showCompanionCreator) {
-    console.log('Rendering CompanionCreatorStep');
-    return (
-      <CompanionCreatorStep
-        onComplete={handleCompanionCreated}
-        onSkip={handleSkipCompanion}
-      />
-    );
-  }
-
   const form = useForm<MedicalProfileData>({
     resolver: zodResolver(medicalProfileSchema),
     defaultValues: {
@@ -234,7 +223,7 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
           allergies: data.allergies
         },
         morgellonsProfile: {
-          onsetDate: data.symptomOnsetDate,
+          onsetYear: data.symptomOnsetYear,
           severity: data.currentSymptomSeverity,
           symptoms: data.initialSymptoms,
           affectedAreas: data.lesionLocations
@@ -305,6 +294,17 @@ export const MedicalProfileForm = ({ onComplete, isNewUser = true }: MedicalProf
     { number: 4, title: 'Lifestyle & Environment', icon: MapPin },
     { number: 5, title: 'Research Consent', icon: ShieldCheck }
   ];
+
+  // Show companion creator if flag is set
+  if (showCompanionCreator) {
+    console.log('Rendering CompanionCreatorStep');
+    return (
+      <CompanionCreatorStep
+        onComplete={handleCompanionCreated}
+        onSkip={handleSkipCompanion}
+      />
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

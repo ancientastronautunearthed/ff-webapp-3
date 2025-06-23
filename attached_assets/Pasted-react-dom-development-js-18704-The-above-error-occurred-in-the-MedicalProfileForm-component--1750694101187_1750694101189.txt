@@ -1,0 +1,24 @@
+react-dom.development.js:18704 The above error occurred in the <MedicalProfileForm> component:
+
+    at MedicalProfileForm (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/components/MedicalProfileForm.tsx:80:38)
+    at Onboarding (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/components/Onboarding.tsx:30:20)
+    at AppContent (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/App.tsx?v=eGkhkFwZG7mFqP8FKGZ3F:53:29)
+    at Provider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.…unner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=b85888b5:38:15)
+    at TooltipProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=b85888b5:68:5)
+    at AuthProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.dev/src/contexts/AuthContext.tsx:33:32)
+    at QueryClientProvider (https://4a9f61db-3360-49cf-b224-e2cfae133b7b-00-ezlag288x3c.janeway.replit.…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=b85888b5:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+react-dom.development.js:15562 Uncaught Error: Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+    at renderWithHooks (react-dom.development.js:15562:11)
+    at updateFunctionComponent (react-dom.development.js:19617:20)
+    at beginWork (react-dom.development.js:21640:16)
+    at beginWork$1 (react-dom.development.js:27465:14)
+    at performUnitOfWork (react-dom.development.js:26596:12)
+    at workLoopSync (react-dom.development.js:26505:5)
+    at renderRootSync (react-dom.development.js:26473:7)
+    at recoverFromConcurrentError (react-dom.development.js:25889:20)
+    at performSyncWorkOnRoot (react-dom.development.js:26135:20)
+    at flushSyncCallbacks (react-dom.development.js:12042:22)
