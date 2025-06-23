@@ -14,7 +14,8 @@ import {
   LogOut,
   Menu,
   X,
-  Microscope
+  Microscope,
+  Video
 } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
