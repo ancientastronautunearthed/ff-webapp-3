@@ -224,7 +224,9 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   // Navigate to appropriate page when step changes
   useEffect(() => {
     const currentTourStep = tourSteps[currentStep];
+    console.log('Navigation useEffect triggered, currentStep:', currentStep, 'route:', currentTourStep.route, 'location:', location);
     if (currentTourStep.route && location !== currentTourStep.route) {
+      console.log('Navigating to:', currentTourStep.route);
       navigate(currentTourStep.route);
     }
   }, [currentStep, navigate, location]);
@@ -232,10 +234,12 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
   // Add highlighting effects for specific elements
   useEffect(() => {
     const currentTourStep = tourSteps[currentStep];
+    console.log('Highlighting useEffect triggered, currentStep:', currentStep, 'highlightElements:', currentTourStep.highlightElements);
     if (currentTourStep.highlightElements) {
       // Add highlighting class to elements
       currentTourStep.highlightElements.forEach(selector => {
         const elements = document.querySelectorAll(selector);
+        console.log('Found', elements.length, 'elements for selector:', selector);
         elements.forEach(el => {
           el.classList.add('tour-highlight');
         });
@@ -243,6 +247,7 @@ export const WelcomeTour = ({ onComplete, onSkip }: WelcomeTourProps) => {
 
       // Cleanup function to remove highlights
       return () => {
+        console.log('Cleaning up highlights for step:', currentStep);
         currentTourStep.highlightElements.forEach(selector => {
           const elements = document.querySelectorAll(selector);
           elements.forEach(el => {
