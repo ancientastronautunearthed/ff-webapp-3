@@ -25,6 +25,19 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  collection, 
+  doc, 
+  getDoc, 
+  getDocs, 
+  setDoc, 
+  updateDoc, 
+  query, 
+  where, 
+  orderBy, 
+  limit 
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface Achievement {
   id: string;
@@ -86,21 +99,51 @@ export const GamifiedProgress = () => {
     }
   }, [user]);
 
-  const loadGameProgress = () => {
-    // Load user's gaming progress from localStorage or API
-    const savedPoints = parseInt(localStorage.getItem('totalPoints') || '340');
-    const savedLevel = parseInt(localStorage.getItem('userLevel') || '3');
+  const loadGameProgress = async () => {
+    if (!user) return;
     
-    setTotalPoints(savedPoints);
-    setLevel(savedLevel);
-    
-    // Calculate progress to next level (every 200 points = new level)
-    const pointsInCurrentLevel = savedPoints % 200;
-    setProgressToNext(pointsInCurrentLevel);
+    try {
+      // Load user's gaming progress from Firebase
+      const userProgressDoc = await getDoc(doc(db, 'userProgress', user.uid));
+      
+      if (userProgressDoc.exists()) {
+        const data = userProgressDoc.data();
+        setTotalPoints(data.totalPoints || 0);
+        setLevel(data.level || 1);
+        setProgressToNext(data.progressToNext || 0);
+      } else {
+        // Initialize new user progress
+        const initialProgress = {
+          totalPoints: 0,
+          level: 1,
+          progressToNext: 0,
+          createdAt: new Date()
+        };
+        await setDoc(doc(db, 'userProgress', user.uid), initialProgress);
+        setTotalPoints(0);
+        setLevel(1);
+        setProgressToNext(0);
+      }
+    } catch (error) {
+      console.error('Error loading game progress:', error);
+      setTotalPoints(0);
+      setLevel(1);
+      setProgressToNext(0);
+    }
   };
 
-  const loadAchievements = () => {
-    const mockAchievements: Achievement[] = [
+  const loadAchievements = async () => {
+    if (!user) return;
+    
+    try {
+      // Load user's achievements from Firebase
+      const achievementsSnapshot = await getDocs(
+        query(collection(db, 'userAchievements'), where('userId', '==', user.uid))
+      );
+      
+      if (achievementsSnapshot.empty) {
+        // Initialize default achievements for new users
+        const defaultAchievements: Achievement[] = [
       {
         id: 'first_entry',
         title: 'First Steps',
@@ -112,7 +155,7 @@ export const GamifiedProgress = () => {
         maxProgress: 1,
         reward: '10 points',
         rarity: 'common',
-        earnedDate: new Date('2024-06-15')
+        earnedDate: null
       },
       {
         id: 'week_warrior',
@@ -120,12 +163,12 @@ export const GamifiedProgress = () => {
         description: 'Log symptoms for 7 consecutive days',
         category: 'tracking',
         icon: Flame,
-        earned: true,
-        progress: 7,
+        earned: false,
+        progress: 0,
         maxProgress: 7,
         reward: '50 points',
         rarity: 'rare',
-        earnedDate: new Date('2024-06-20')
+        earnedDate: null
       },
       {
         id: 'pattern_detective',
@@ -133,11 +176,12 @@ export const GamifiedProgress = () => {
         description: 'AI discovers your first correlation pattern',
         category: 'patterns',
         icon: Brain,
-        earned: true,
-        progress: 1,
+        earned: false,
+        progress: 0,
         maxProgress: 1,
         reward: '75 points + Special Badge',
-        rarity: 'epic'
+        rarity: 'epic',
+        earnedDate: null
       },
       {
         id: 'community_helper',
@@ -173,55 +217,129 @@ export const GamifiedProgress = () => {
         progress: 6,
         maxProgress: 10,
         reward: '100 points',
-        rarity: 'epic'
+        rarity: 'epic',
+        earnedDate: null
       }
     ];
 
-    setAchievements(mockAchievements);
+        // Save default achievements to Firebase
+        for (const achievement of defaultAchievements) {
+          await setDoc(doc(db, 'userAchievements', `${user.uid}_${achievement.id}`), {
+            ...achievement,
+            userId: user.uid,
+            createdAt: new Date()
+          });
+        }
+        
+        setAchievements(defaultAchievements);
+      } else {
+        // Load existing achievements
+        const userAchievements = achievementsSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            ...data,
+            earnedDate: data.earnedDate?.toDate() || null
+          } as Achievement;
+        });
+        setAchievements(userAchievements);
+      }
+    } catch (error) {
+      console.error('Error loading achievements:', error);
+      setAchievements([]);
+    }
   };
 
-  const loadStreaks = () => {
-    const mockStreaks: Streak[] = [
+  const loadStreaks = async () => {
+    if (!user) return;
+    
+    try {
+      // Load user's streaks from Firebase
+      const streaksSnapshot = await getDocs(
+        query(collection(db, 'userStreaks'), where('userId', '==', user.uid))
+      );
+      
+      if (streaksSnapshot.empty) {
+        // Initialize default streaks
+        const defaultStreaks: Streak[] = [
       {
         type: 'daily_logging',
-        current: 14,
-        longest: 28,
-        target: 30,
+        current: 0,
+        longest: 0,
+        target: 7,
         title: 'Daily Tracking Streak',
         description: 'Consecutive days of symptom logging',
         lastActive: new Date(),
-        nextMilestone: 30,
-        encouragement: "You're on fire! Just 16 more days to reach your monthly goal!"
+        nextMilestone: 7,
+        encouragement: "Start tracking daily to build your streak!"
       },
       {
         type: 'journal_entries',
-        current: 5,
-        longest: 12,
+        current: 0,
+        longest: 0,
         target: 7,
         title: 'Digital Matchbox Streak',
         description: 'Regular journal documentation',
         lastActive: new Date(),
         nextMilestone: 7,
-        encouragement: "Great progress! 2 more entries to complete your weekly goal."
+        encouragement: "Start journaling to track your progress!"
       },
       {
         type: 'community_posts',
-        current: 3,
-        longest: 8,
+        current: 0,
+        longest: 0,
         target: 5,
         title: 'Community Engagement',
         description: 'Active forum participation',
-        lastActive: new Date(Date.now() - 86400000), // Yesterday
+        lastActive: new Date(),
         nextMilestone: 5,
-        encouragement: "Share your experience! Connect with others to maintain your streak."
+        encouragement: "Share your experience! Connect with others to build your streak."
       }
     ];
 
-    setStreaks(mockStreaks);
+        // Save default streaks to Firebase
+        for (const streak of defaultStreaks) {
+          await setDoc(doc(db, 'userStreaks', `${user.uid}_${streak.type}`), {
+            ...streak,
+            userId: user.uid,
+            createdAt: new Date()
+          });
+        }
+        
+        setStreaks(defaultStreaks);
+      } else {
+        // Load existing streaks
+        const userStreaks = streaksSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            ...data,
+            lastActive: data.lastActive?.toDate() || new Date()
+          } as Streak;
+        });
+        setStreaks(userStreaks);
+      }
+    } catch (error) {
+      console.error('Error loading streaks:', error);
+      setStreaks([]);
+    }
   };
 
-  const loadChallenges = () => {
-    const mockChallenges: CommunityChallenge[] = [
+  const loadChallenges = async () => {
+    if (!user) return;
+    
+    try {
+      // Load active challenges from Firebase
+      const challengesSnapshot = await getDocs(
+        query(
+          collection(db, 'communityChallenges'),
+          where('status', '==', 'active'),
+          orderBy('startDate', 'desc'),
+          limit(5)
+        )
+      );
+      
+      if (challengesSnapshot.empty) {
+        // Create sample challenges if none exist
+        const sampleChallenges: CommunityChallenge[] = [
       {
         id: 'june_tracking',
         title: 'June Tracking Challenge',
@@ -234,37 +352,27 @@ export const GamifiedProgress = () => {
         participants: 1247,
         reward: 'Special June Champion Badge + 300 points',
         status: 'active',
-        userRank: 156
-      },
-      {
-        id: 'pattern_hunters',
-        title: 'Pattern Hunters',
-        description: 'Help AI discover 1000 new correlations this month',
-        type: 'group',
-        startDate: new Date('2024-06-01'),
-        endDate: new Date('2024-06-30'),
-        progress: 687,
-        target: 1000,
-        participants: 892,
-        reward: 'Research Contribution Certificate',
-        status: 'active'
-      },
-      {
-        id: 'community_builder',
-        title: 'Community Builder',
-        description: 'Make 20 helpful forum posts',
-        type: 'individual',
-        startDate: new Date('2024-06-15'),
-        endDate: new Date('2024-07-15'),
-        progress: 8,
-        target: 20,
-        participants: 234,
-        reward: 'Community Leader Badge + 150 points',
-        status: 'active'
+        userRank: undefined
       }
     ];
 
-    setChallenges(mockChallenges);
+        setChallenges(sampleChallenges);
+      } else {
+        // Load existing challenges
+        const challenges = challengesSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            ...data,
+            startDate: data.startDate?.toDate() || new Date(),
+            endDate: data.endDate?.toDate() || new Date()
+          } as CommunityChallenge;
+        });
+        setChallenges(challenges);
+      }
+    } catch (error) {
+      console.error('Error loading challenges:', error);
+      setChallenges([]);
+    }
   };
 
   const getRarityColor = (rarity: string) => {
@@ -287,30 +395,51 @@ export const GamifiedProgress = () => {
     return colors[rarity] || colors.common;
   };
 
-  const claimReward = (achievementId: string) => {
+  const claimReward = async (achievementId: string) => {
+    if (!user) return;
+    
     const achievement = achievements.find(a => a.id === achievementId);
     if (!achievement || !achievement.earned) return;
 
-    // Award points based on achievement rarity
-    const pointValues = { common: 25, rare: 50, epic: 100, legendary: 250 };
-    const pointsEarned = pointValues[achievement.rarity];
-    
-    const currentPoints = parseInt(localStorage.getItem('totalPoints') || '340');
-    const newTotal = currentPoints + pointsEarned;
-    localStorage.setItem('totalPoints', newTotal.toString());
-    
-    // Update level if necessary
-    const newLevel = Math.floor(newTotal / 200) + 1;
-    localStorage.setItem('userLevel', newLevel.toString());
-    
-    setTotalPoints(newTotal);
-    setLevel(newLevel);
-    setProgressToNext(newTotal % 200);
+    try {
+      // Award points based on achievement rarity
+      const pointValues = { common: 25, rare: 50, epic: 100, legendary: 250 };
+      const pointsEarned = pointValues[achievement.rarity];
+      
+      const newTotal = totalPoints + pointsEarned;
+      const newLevel = Math.floor(newTotal / 200) + 1;
+      const newProgressToNext = newTotal % 200;
+      
+      // Update Firebase
+      await updateDoc(doc(db, 'userProgress', user.uid), {
+        totalPoints: newTotal,
+        level: newLevel,
+        progressToNext: newProgressToNext,
+        lastUpdated: new Date()
+      });
+      
+      // Mark achievement as claimed
+      await updateDoc(doc(db, 'userAchievements', `${user.uid}_${achievementId}`), {
+        claimed: true,
+        claimedAt: new Date()
+      });
+      
+      setTotalPoints(newTotal);
+      setLevel(newLevel);
+      setProgressToNext(newProgressToNext);
 
-    toast({
-      title: "Achievement Unlocked!",
-      description: `${achievement.title} - You earned ${pointsEarned} points! ${achievement.reward}`,
-    });
+      toast({
+        title: "Achievement Unlocked!",
+        description: `${achievement.title} - You earned ${pointsEarned} points! ${achievement.reward}`,
+      });
+    } catch (error) {
+      console.error('Error claiming reward:', error);
+      toast({
+        title: "Error",
+        description: "Unable to claim reward. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const joinChallenge = (challengeId: string) => {

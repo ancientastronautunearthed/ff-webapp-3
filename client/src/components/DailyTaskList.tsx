@@ -22,6 +22,18 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'wouter';
+import { 
+  collection, 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  query, 
+  where, 
+  getDocs,
+  addDoc
+} from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface DailyTask {
   id: string;
@@ -61,9 +73,15 @@ export const DailyTaskList = () => {
     calculateProgress();
   }, []);
 
-  const loadDailyTasks = () => {
+  const loadDailyTasks = async () => {
+    if (!user) return;
+    
     const today = new Date().toDateString();
-    const completedTasks = JSON.parse(localStorage.getItem(`completedTasks_${today}`) || '[]');
+    
+    try {
+      // Load completed tasks from Firebase
+      const userTasksDoc = await getDoc(doc(db, 'userTasks', `${user.uid}_${today}`));
+      const completedTasks = userTasksDoc.exists() ? userTasksDoc.data().completedTasks || [] : [];
     
     const taskCategories: TaskCategory[] = [
       {
@@ -259,9 +277,15 @@ export const DailyTaskList = () => {
     });
 
     setCategories(taskCategories);
+    } catch (error) {
+      console.error('Error loading daily tasks:', error);
+      setCategories([]);
+    }
   };
 
-  const calculateProgress = () => {
+  const calculateProgress = async () => {
+    if (!user) return;
+    
     const allTasks = categories.flatMap(cat => cat.tasks);
     const completedTasks = allTasks.filter(task => task.completed);
     const progress = allTasks.length > 0 ? (completedTasks.length / allTasks.length) * 100 : 0;
@@ -270,20 +294,38 @@ export const DailyTaskList = () => {
     setTotalProgress(progress);
     setTotalPoints(points);
     
-    // Load streak from localStorage
-    const currentStreak = parseInt(localStorage.getItem('dailyTaskStreak') || '0');
-    setStreak(currentStreak);
+    try {
+      // Load streak from Firebase
+      const streakDoc = await getDoc(doc(db, 'userStreaks', `${user.uid}_daily_logging`));
+      const currentStreak = streakDoc.exists() ? streakDoc.data().current || 0 : 0;
+      setStreak(currentStreak);
+    } catch (error) {
+      console.error('Error loading streak:', error);
+      setStreak(0);
+    }
   };
 
   const toggleTask = async (taskId: string) => {
+    if (!user) return;
+    
     const today = new Date().toDateString();
-    const completedTasks = JSON.parse(localStorage.getItem(`completedTasks_${today}`) || '[]');
     
-    const newCompletedTasks = completedTasks.includes(taskId)
-      ? completedTasks.filter((id: string) => id !== taskId)
-      : [...completedTasks, taskId];
-    
-    localStorage.setItem(`completedTasks_${today}`, JSON.stringify(newCompletedTasks));
+    try {
+      // Get current completed tasks from Firebase
+      const userTasksDoc = await getDoc(doc(db, 'userTasks', `${user.uid}_${today}`));
+      const completedTasks = userTasksDoc.exists() ? userTasksDoc.data().completedTasks || [] : [];
+      
+      const newCompletedTasks = completedTasks.includes(taskId)
+        ? completedTasks.filter((id: string) => id !== taskId)
+        : [...completedTasks, taskId];
+      
+      // Update Firebase
+      await setDoc(doc(db, 'userTasks', `${user.uid}_${today}`), {
+        userId: user.uid,
+        date: today,
+        completedTasks: newCompletedTasks,
+        lastUpdated: new Date()
+      });
     
     // Update state
     setCategories(prev => prev.map(category => ({
@@ -295,21 +337,50 @@ export const DailyTaskList = () => {
       completedCount: category.tasks.filter(task => newCompletedTasks.includes(task.id)).length
     })));
     
-    // Award points if completing task
-    if (!completedTasks.includes(taskId)) {
-      const task = categories.flatMap(cat => cat.tasks).find(t => t.id === taskId);
-      if (task) {
-        const currentPoints = parseInt(localStorage.getItem('totalPoints') || '340');
-        localStorage.setItem('totalPoints', (currentPoints + task.points).toString());
-        
-        toast({
-          title: "Task Completed!",
-          description: `Great job! You earned ${task.points} points for "${task.title}"`
-        });
+      // Award points if completing task
+      if (!completedTasks.includes(taskId)) {
+        const task = categories.flatMap(cat => cat.tasks).find(t => t.id === taskId);
+        if (task) {
+          // Update user progress in Firebase
+          const userProgressDoc = await getDoc(doc(db, 'userProgress', user.uid));
+          const currentPoints = userProgressDoc.exists() ? userProgressDoc.data().totalPoints || 0 : 0;
+          const newTotal = currentPoints + task.points;
+          const newLevel = Math.floor(newTotal / 200) + 1;
+          const newProgressToNext = newTotal % 200;
+          
+          await updateDoc(doc(db, 'userProgress', user.uid), {
+            totalPoints: newTotal,
+            level: newLevel,
+            progressToNext: newProgressToNext,
+            lastUpdated: new Date()
+          });
+          
+          // Log task completion
+          await addDoc(collection(db, 'taskCompletions'), {
+            userId: user.uid,
+            taskId: taskId,
+            taskTitle: task.title,
+            pointsEarned: task.points,
+            completedAt: new Date(),
+            date: today
+          });
+          
+          toast({
+            title: "Task Completed!",
+            description: `Great job! You earned ${task.points} points for "${task.title}"`
+          });
+        }
       }
+      
+      calculateProgress();
+    } catch (error) {
+      console.error('Error toggling task:', error);
+      toast({
+        title: "Error",
+        description: "Unable to update task. Please try again.",
+        variant: "destructive"
+      });
     }
-    
-    calculateProgress();
   };
 
   const scrollToElement = (elementId: string) => {
