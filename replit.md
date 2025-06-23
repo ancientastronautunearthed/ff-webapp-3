@@ -118,6 +118,9 @@ The application uses a comprehensive database schema with the following core ent
 - June 23, 2025. Fixed Digital Matchbox submit functionality and community platform real data integration
 
 ## Recent Changes
+- ✓ Enhanced AI Insights system with real Firebase data integration and personalized analysis
+- ✓ AI Health Coach now generates insights from actual user symptom and journal entries
+- ✓ Pattern detection, correlation analysis, and predictions based on real user data
 - ✓ Made Community Forum completely functional with real Firebase integration
 - ✓ Added post creation, reply system, like functionality, and real-time updates
 - ✓ Implemented category filtering, tag support, and anonymous posting options
