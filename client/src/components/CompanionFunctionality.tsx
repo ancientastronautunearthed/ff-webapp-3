@@ -37,9 +37,12 @@ export const CompanionFunctionality = ({
   // Tier 3+ Function: Personalized Meal Suggestions
   const generateMealSuggestions = async () => {
     if (companionTier < 3) {
+      console.log(`🔒 Function blocked: Meal suggestions require Level 3. Current: Level ${companionTier}`);
       alert(`Meal suggestions unlock at Level 3. You are currently Level ${companionTier}.`);
       return;
     }
+    
+    console.log(`✅ Function unlocked: Meal suggestions available at Level ${companionTier}`);
     
     setActiveFunction('meals');
     // AI-powered meal suggestions based on symptoms and dietary needs
@@ -74,9 +77,12 @@ export const CompanionFunctionality = ({
   // Tier 5+ Function: Supplement Recommendations
   const generateSupplementPlan = async () => {
     if (companionTier < 5) {
+      console.log(`🔒 Function blocked: Supplement recommendations require Level 5. Current: Level ${companionTier}`);
       alert(`Supplement recommendations unlock at Level 5. You are currently Level ${companionTier}.`);
       return;
     }
+    
+    console.log(`✅ Function unlocked: Supplement recommendations available at Level ${companionTier}`);
     
     setActiveFunction('supplements');
     const recommendations = {
@@ -113,9 +119,12 @@ export const CompanionFunctionality = ({
   // Tier 6+ Function: Predictive Symptom Modeling
   const generateSymptomPredictions = async () => {
     if (companionTier < 6) {
+      console.log(`🔒 Function blocked: Symptom predictions require Level 6. Current: Level ${companionTier}`);
       alert(`Symptom predictions unlock at Level 6. You are currently Level ${companionTier}.`);
       return;
     }
+    
+    console.log(`✅ Function unlocked: Symptom predictions available at Level ${companionTier}`);
     
     setActiveFunction('predictions');
     const predictions = {
@@ -148,9 +157,12 @@ export const CompanionFunctionality = ({
   // Tier 7+ Function: Treatment Timeline Optimization
   const optimizeTreatmentSchedule = async () => {
     if (companionTier < 7) {
+      console.log(`🔒 Function blocked: Treatment optimization requires Level 7. Current: Level ${companionTier}`);
       alert(`Treatment optimization unlocks at Level 7. You are currently Level ${companionTier}.`);
       return;
     }
+    
+    console.log(`✅ Function unlocked: Treatment optimization available at Level ${companionTier}`);
     
     setActiveFunction('schedule');
     const timeline = {
@@ -183,9 +195,12 @@ export const CompanionFunctionality = ({
   // Tier 8+ Function: Research Study Matching
   const findRelevantStudies = async () => {
     if (companionTier < 8) {
+      console.log(`🔒 Function blocked: Research study matching requires Level 8. Current: Level ${companionTier}`);
       alert(`Research study matching unlocks at Level 8. You are currently Level ${companionTier}.`);
       return;
     }
+    
+    console.log(`✅ Function unlocked: Research study matching available at Level ${companionTier}`);
     
     setActiveFunction('research');
     const studies = {

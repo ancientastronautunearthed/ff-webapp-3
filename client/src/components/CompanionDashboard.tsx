@@ -24,6 +24,7 @@ import { CompanionTierSystem } from './CompanionTierSystem';
 import { CompanionFunctionality } from './CompanionFunctionality';
 import { ProgressTracker } from './ProgressTracker';
 import { DynamicFunctionGating } from './DynamicFunctionGating';
+import { CompanionDemo } from './CompanionDemo';
 
 export const CompanionDashboard = () => {
   const { user } = useAuth();
@@ -96,10 +97,14 @@ export const CompanionDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="progress" className="flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
             Progress
+          </TabsTrigger>
+          <TabsTrigger value="demo" className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            Demo
           </TabsTrigger>
           <TabsTrigger value="access" className="flex items-center gap-2">
             <Zap className="w-4 h-4" />
@@ -129,6 +134,10 @@ export const CompanionDashboard = () => {
 
         <TabsContent value="progress" className="space-y-4">
           <ProgressTracker />
+        </TabsContent>
+
+        <TabsContent value="demo" className="space-y-4">
+          <CompanionDemo />
         </TabsContent>
 
         <TabsContent value="access" className="space-y-4">
