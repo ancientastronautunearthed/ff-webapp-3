@@ -90,9 +90,12 @@ peerRecommendationsRoutes.get('/connection-analytics/:userId', async (req, res) 
 
 async function buildUserProfile(userId: string): Promise<UserProfile | null> {
   try {
-    // Get user basic info
-    const userDoc = await db.collection('users').doc(userId).get();
-    const userData = userDoc.data();
+    // Get user basic info from Firebase
+    const userSnapshot = await getDocs(
+      query(collection(db, 'users'), limit(100))
+    );
+    const userDoc = userSnapshot.docs.find(doc => doc.id === userId);
+    const userData = userDoc?.data();
     
     if (!userData) return null;
 
@@ -227,7 +230,7 @@ async function buildRecommendationContext(userId: string): Promise<Recommendatio
       )
     );
     
-    const previousConnections = connectionsSnapshot.docs.map(doc => doc.data().toUserId);
+    const previousConnections = connectionsSnapshot.docs.map(doc => doc.data().toUserId || '');
 
     return {
       recentSymptomChanges,

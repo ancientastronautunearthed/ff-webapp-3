@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { collection, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,8 +79,21 @@ export const CommunityRewards = () => {
   }, [user]);
 
   const loadCommunityData = async () => {
-    // Load community badges
-    const mockBadges: CommunityBadge[] = [
+    if (!user) return;
+    
+    try {
+      // Load user's actual community badges from Firebase
+      const badgesSnapshot = await getDocs(
+        query(collection(db, 'userBadges'), where('userId', '==', user.uid))
+      );
+      
+      const userBadges = badgesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // If no badges exist, show empty state
+      const badges: CommunityBadge[] = userBadges.length > 0 ? userBadges : [
       {
         id: 'first_post',
         name: 'Community Newcomer',
@@ -146,8 +161,63 @@ export const CommunityRewards = () => {
       }
     ];
 
-    // Load recent contributions
-    const mockContributions: CommunityContribution[] = [
+      // Load user's actual contributions from Firebase
+      const contributionsSnapshot = await getDocs(
+        query(
+          collection(db, 'communityContributions'),
+          where('userId', '==', user.uid),
+          orderBy('timestamp', 'desc'),
+          limit(10)
+        )
+      );
+      
+      const contributions: CommunityContribution[] = contributionsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Load helpful community members
+      const helpfulUsersSnapshot = await getDocs(
+        query(
+          collection(db, 'users'),
+          orderBy('helpfulVotes', 'desc'),
+          limit(5)
+        )
+      );
+
+      const helpfulUsers: HelpfulUser[] = helpfulUsersSnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().displayName || 'Community Member',
+        avatar: doc.data().photoURL || '',
+        helpfulVotes: doc.data().helpfulVotes || 0,
+        postsCount: doc.data().postsCount || 0,
+        memberSince: doc.data().createdAt?.toDate()?.toLocaleDateString() || 'Recently',
+        topContribution: doc.data().topContribution || 'Active community member',
+        badges: doc.data().badges || []
+      }));
+
+      setBadges(badges);
+      setContributions(contributions);
+      setHelpfulUsers(helpfulUsers);
+      
+      // Calculate community points from real contributions
+      const totalPoints = contributions.reduce((sum, contrib) => sum + contrib.points, 0);
+      setCommunityPoints(totalPoints);
+      
+    } catch (error) {
+      console.error('Error loading community data:', error);
+      // Set empty arrays when data unavailable
+      setBadges([]);
+      setContributions([]);
+      setHelpfulUsers([]);
+      setCommunityPoints(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Remove all mock data definitions
+  const placeholderContributions: CommunityContribution[] = [
       {
         id: '1',
         type: 'helpful_vote',

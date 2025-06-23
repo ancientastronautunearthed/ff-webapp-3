@@ -78,91 +78,53 @@ export const TelemedicineScheduling = () => {
   const [specialtyFilter, setSpecialtyFilter] = useState('all');
   const [morgellonsOnly, setMorgellonsOnly] = useState(true);
 
-  // Mock provider data - in production, this would come from an API
-  const providers: Provider[] = [
-    {
-      id: '1',
-      name: 'Dr. Sarah Chen',
-      specialty: 'Dermatology',
-      credentials: ['MD', 'Board Certified Dermatologist'],
-      rating: 4.9,
-      reviewCount: 127,
-      experience: '15 years',
-      location: 'San Francisco, CA',
-      languages: ['English', 'Mandarin'],
-      consultationFee: 250,
-      availableSlots: ['9:00 AM', '11:00 AM', '2:00 PM', '4:00 PM'],
-      telehealth: true,
-      inPerson: true,
-      morgellonsExperience: true,
-      image: '/api/placeholder/150/150',
-      bio: 'Specialized in complex skin conditions with extensive experience treating Morgellons disease. Published researcher in fiber-based dermatological conditions.',
-      education: ['Harvard Medical School', 'UCSF Dermatology Residency'],
-      certifications: ['American Board of Dermatology', 'Mohs Surgery Certification']
-    },
-    {
-      id: '2',
-      name: 'Dr. Michael Rodriguez',
-      specialty: 'Internal Medicine',
-      credentials: ['MD', 'Internal Medicine Specialist'],
-      rating: 4.8,
-      reviewCount: 89,
-      experience: '12 years',
-      location: 'Austin, TX',
-      languages: ['English', 'Spanish'],
-      consultationFee: 200,
-      availableSlots: ['8:00 AM', '10:00 AM', '1:00 PM', '3:00 PM', '5:00 PM'],
-      telehealth: true,
-      inPerson: false,
-      morgellonsExperience: true,
-      image: '/api/placeholder/150/150',
-      bio: 'Integrative medicine approach to complex conditions. Strong advocate for patient-centered care in Morgellons treatment.',
-      education: ['UT Southwestern Medical School', 'Mayo Clinic Internal Medicine'],
-      certifications: ['American Board of Internal Medicine', 'Integrative Medicine Certification']
-    },
-    {
-      id: '3',
-      name: 'Dr. Jennifer Park',
-      specialty: 'Psychiatry',
-      credentials: ['MD', 'Psychiatrist'],
-      rating: 4.7,
-      reviewCount: 156,
-      experience: '10 years',
-      location: 'Seattle, WA',
-      languages: ['English', 'Korean'],
-      consultationFee: 300,
-      availableSlots: ['9:30 AM', '11:30 AM', '2:30 PM', '4:30 PM'],
-      telehealth: true,
-      inPerson: true,
-      morgellonsExperience: true,
-      image: '/api/placeholder/150/150',
-      bio: 'Mental health support for patients with complex medical conditions. Specializes in the psychological aspects of chronic illness.',
-      education: ['Stanford Medical School', 'UCSF Psychiatry Residency'],
-      certifications: ['American Board of Psychiatry', 'Addiction Medicine Certification']
-    },
-    {
-      id: '4',
-      name: 'Dr. Robert Kim',
-      specialty: 'Infectious Disease',
-      credentials: ['MD', 'PhD', 'Infectious Disease Specialist'],
-      rating: 4.9,
-      reviewCount: 203,
-      experience: '18 years',
-      location: 'Boston, MA',
-      languages: ['English'],
-      consultationFee: 350,
-      availableSlots: ['10:00 AM', '12:00 PM', '3:00 PM'],
-      telehealth: true,
-      inPerson: true,
-      morgellonsExperience: true,
-      image: '/api/placeholder/150/150',
-      bio: 'Leading researcher in unusual infectious conditions. Extensive experience with difficult-to-diagnose illnesses including Morgellons.',
-      education: ['Johns Hopkins Medical School', 'Harvard School of Public Health PhD'],
-      certifications: ['American Board of Internal Medicine', 'Infectious Disease Society of America']
-    }
-  ];
+  // Real provider data from Firebase
+  const [providers, setProviders] = useState<Provider[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProviders = providers.filter(provider => {
+  useEffect(() => {
+    loadProviders();
+  }, []);
+
+  const loadProviders = async () => {
+    try {
+      const providersSnapshot = await getDocs(collection(db, 'providers'));
+      const providersData = providersSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setProviders(providersData);
+    } catch (error) {
+      console.error('Error loading providers:', error);
+      setProviders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">Loading providers...</div>
+      </div>
+    );
+  }
+
+  if (providers.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">No Providers Available</h2>
+          <p>Providers will be listed here once they register in the system.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const availableProviders: Provider[] = providers;
+
+
+  const filteredProviders = availableProviders.filter(provider => {
     const matchesSearch = provider.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          provider.specialty.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSpecialty = specialtyFilter === 'all' || provider.specialty.toLowerCase().includes(specialtyFilter.toLowerCase());

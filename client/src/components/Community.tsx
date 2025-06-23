@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,17 +18,38 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 
-// Mock data for forum categories
-const forumCategories = [
-  {
-    id: 'itching-sensations',
-    title: 'Coping with Itching & Sensations',
-    description: 'Share strategies, remedies, and support for managing skin symptoms',
-    postCount: 248,
-    lastPost: {
-      author: 'SarahM',
-      time: '2 hours ago'
-    },
+export const Community = () => {
+  const [forumCategories, setForumCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadCategoriesWithRealData();
+  }, []);
+
+  const getLastPostForCategory = (posts: any[], categoryId: string) => {
+    const categoryPosts = posts.filter(p => p.category === categoryId);
+    if (categoryPosts.length === 0) return { author: 'No posts yet', time: 'Be the first!' };
+    
+    const latest = categoryPosts.sort((a, b) => b.createdAt?.toDate() - a.createdAt?.toDate())[0];
+    return {
+      author: latest.authorName || 'Anonymous',
+      time: latest.createdAt?.toDate()?.toLocaleDateString() || 'Recently'
+    };
+  };
+
+  const loadCategoriesWithRealData = async () => {
+    try {
+      // Load real post counts from Firebase
+      const postsSnapshot = await getDocs(collection(db, 'forumPosts'));
+      const posts = postsSnapshot.docs.map(doc => doc.data());
+      
+      // Calculate real stats for each category
+      const categories = [
+    {
+      id: 'itching-sensations',
+      title: 'Coping with Itching & Sensations',
+      description: 'Share strategies, remedies, and support for managing skin symptoms',
+      postCount: posts.filter(p => p.category === 'itching-sensations').length,
+      lastPost: getLastPostForCategory(posts, 'itching-sensations'),
     icon: '🤚',
     color: 'bg-primary-50 border-primary-200 text-primary-800'
   },
@@ -65,18 +88,42 @@ const forumCategories = [
     },
     icon: '❤️',
     color: 'bg-red-50 border-red-200 text-red-800'
-  },
+  }
 ];
 
-// Mock data for active members
-const activeMembers = [
-  { name: 'SarahM', initial: 'S', lastActive: '2h ago', color: 'bg-primary-500' },
-  { name: 'DrAdvocate', initial: 'D', lastActive: '5h ago', color: 'bg-secondary-500' },
-  { name: 'HopeSeeker', initial: 'H', lastActive: '30m ago', color: 'bg-purple-500' },
-  { name: 'ClearMind', initial: 'C', lastActive: '1d ago', color: 'bg-blue-500' },
-];
+      setForumCategories(categories);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+      setForumCategories([]);
+    }
+  };
 
-export const Community = () => {
+  // Load active members from Firebase
+  const [activeMembers, setActiveMembers] = useState<any[]>([]);
+
+  const loadActiveMembers = async () => {
+    try {
+      const usersSnapshot = await getDocs(
+        query(collection(db, 'users'), orderBy('lastLogin', 'desc'), limit(4))
+      );
+      
+      const members = usersSnapshot.docs.map(doc => ({
+        name: doc.data().displayName || 'Anonymous',
+        initial: (doc.data().displayName || 'A')[0].toUpperCase(),
+        lastActive: doc.data().lastLogin?.toDate()?.toLocaleDateString() || 'Recently',
+        color: 'bg-primary-500'
+      }));
+      
+      setActiveMembers(members);
+    } catch (error) {
+      console.error('Error loading active members:', error);
+      setActiveMembers([]);
+    }
+  };
+
+  useEffect(() => {
+    loadActiveMembers();
+  }, []);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const handleCategoryClick = (categoryId: string) => {

@@ -29,40 +29,53 @@ export const PeerMatchingWidget = () => {
   const [totalMatches, setTotalMatches] = useState(0);
 
   useEffect(() => {
-    loadQuickMatches();
-  }, []);
+    if (user) {
+      loadQuickMatches();
+    }
+  }, [user]);
 
-  const loadQuickMatches = () => {
-    // Quick preview of top matches
-    const matches: QuickMatch[] = [
-      {
-        id: '1',
-        name: 'Sarah J.',
-        avatar: '/avatars/sarah.jpg',
-        matchPercentage: 92,
-        commonSymptoms: ['Crawling sensations', 'Fatigue'],
-        isOnline: true
-      },
-      {
-        id: '2',
-        name: 'Michael R.',
-        avatar: '/avatars/michael.jpg',
-        matchPercentage: 87,
-        commonSymptoms: ['Skin lesions', 'Joint pain'],
-        isOnline: false
-      },
-      {
-        id: '3',
-        name: 'Jennifer L.',
-        avatar: '/avatars/jennifer.jpg',
-        matchPercentage: 84,
-        commonSymptoms: ['Fatigue', 'Sleep issues'],
-        isOnline: true
+  const loadQuickMatches = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/ai/peer-recommendations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to load peer recommendations');
+        setQuickMatches([]);
+        setTotalMatches(0);
+        return;
       }
-    ];
 
-    setQuickMatches(matches);
-    setTotalMatches(47);
+      const data = await response.json();
+      const recommendations = data.recommendations || [];
+      
+      // Convert AI recommendations to quick matches format
+      const quickMatches: QuickMatch[] = recommendations.slice(0, 3).map((rec: any, index: number) => ({
+        id: rec.targetUserId,
+        name: `User ${index + 1}`, // Anonymous display for privacy
+        avatar: '',
+        matchPercentage: Math.round(rec.score),
+        commonSymptoms: rec.reasons.slice(0, 2),
+        isOnline: false // Real online status would require presence system
+      }));
+
+      setQuickMatches(quickMatches);
+      setTotalMatches(data.totalEvaluated || 0);
+      
+    } catch (error) {
+      console.error('Error loading quick matches:', error);
+      setQuickMatches([]);
+      setTotalMatches(0);
+    }
   };
 
   return (

@@ -89,30 +89,11 @@ export default function ResearchDashboard() {
     { factor: 'Poor Sleep', correlation: 0.62, sampleSize: 267, pValue: 0.01 }
   ];
 
-  const mockDemographics = [
-    { ageGroup: '18-29', count: 45, percentage: 12 },
-    { ageGroup: '30-39', count: 78, percentage: 21 },
-    { ageGroup: '40-49', count: 112, percentage: 30 },
-    { ageGroup: '50-59', count: 89, percentage: 24 },
-    { ageGroup: '60+', count: 48, percentage: 13 }
-  ];
-
-  const mockTreatmentData = [
-    { treatment: 'Ivermectin', effectiveness: 3.2, sampleSize: 89, sideEffects: 2.1 },
-    { treatment: 'Antibiotics', effectiveness: 2.8, sampleSize: 156, sideEffects: 2.4 },
-    { treatment: 'Anti-inflammatories', effectiveness: 3.5, sampleSize: 234, sideEffects: 1.8 },
-    { treatment: 'Antifungals', effectiveness: 2.9, sampleSize: 67, sideEffects: 2.2 },
-    { treatment: 'Dietary Changes', effectiveness: 4.1, sampleSize: 198, sideEffects: 0.5 },
-    { treatment: 'Stress Management', effectiveness: 3.8, sampleSize: 176, sideEffects: 0.2 }
-  ];
-
-  const mockGeographicData = [
-    { region: 'California', cases: 89, prevalence: 2.1 },
-    { region: 'Texas', cases: 67, prevalence: 1.8 },
-    { region: 'Florida', cases: 78, prevalence: 2.3 },
-    { region: 'New York', cases: 45, prevalence: 1.9 },
-    { region: 'Arizona', cases: 34, prevalence: 2.0 }
-  ];
+  // Real data from Firebase/research API
+  const [demographics, setDemographics] = useState<any[]>([]);
+  const [treatmentData, setTreatmentData] = useState<any[]>([]);
+  const [geographicData, setGeographicData] = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

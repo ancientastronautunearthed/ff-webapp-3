@@ -115,22 +115,43 @@ export default function Dashboard() {
     completionRate: weeklyData?.completionRate || 0
   };
 
-  const recentInsights = [
-    {
-      type: 'correlation',
-      title: 'Sugar intake may correlate with increased itching',
-      description: 'Analysis shows 65% increase in itching severity on high-sugar days',
-      color: 'blue',
-      icon: Lightbulb
-    },
-    {
-      type: 'improvement',
-      title: 'Sleep quality improved 30% this week',
-      description: 'Consistent bedtime routine showing positive results',
-      color: 'green',
-      icon: TrendingUp
+  // Load real insights from AI analysis
+  const [recentInsights, setRecentInsights] = useState<any[]>([]);
+  
+  useEffect(() => {
+    loadAIInsights();
+  }, [user, symptomEntries, journalEntries]);
+
+  const loadAIInsights = async () => {
+    if (!user || !symptomEntries || !journalEntries) return;
+    
+    try {
+      const response = await fetch('/api/ai/analyze-health-patterns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          symptoms: symptomEntries.slice(0, 30),
+          journals: journalEntries.slice(0, 20)
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const insights = (data.insights || []).slice(0, 3).map((insight: any) => ({
+          type: insight.type,
+          title: insight.title,
+          description: insight.description,
+          color: insight.priority === 'high' ? 'blue' : 'green',
+          icon: insight.type === 'prediction' ? TrendingUp : Lightbulb
+        }));
+        setRecentInsights(insights);
+      }
+    } catch (error) {
+      console.error('Error loading AI insights:', error);
+      setRecentInsights([]); // Empty array when AI unavailable
     }
-  ];
+  };
 
   const quickActions = [
     {
@@ -443,40 +464,49 @@ export default function Dashboard() {
               <CardTitle className="text-lg">Recent Insights</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {recentInsights.map((insight, index) => {
-                const Icon = insight.icon;
-                return (
-                  <div key={index} className={`p-3 rounded-lg ${
-                    insight.color === 'blue' ? 'bg-blue-50 border-blue-200' :
-                    insight.color === 'green' ? 'bg-green-50 border-green-200' :
-                    'bg-gray-50 border-gray-200'
-                  } border`}>
-                    <div className="flex items-start space-x-3">
-                      <Icon className={`h-5 w-5 mt-0.5 ${
-                        insight.color === 'blue' ? 'text-blue-600' :
-                        insight.color === 'green' ? 'text-green-600' :
-                        'text-gray-600'
-                      }`} />
-                      <div>
-                        <p className={`font-medium text-sm ${
-                          insight.color === 'blue' ? 'text-blue-800' :
-                          insight.color === 'green' ? 'text-green-800' :
-                          'text-gray-800'
-                        }`}>
-                          {insight.title}
-                        </p>
-                        <p className={`text-xs mt-1 ${
+              {recentInsights.length > 0 ? (
+                recentInsights.map((insight, index) => {
+                  const Icon = insight.icon;
+                  return (
+                    <div key={index} className={`p-3 rounded-lg ${
+                      insight.color === 'blue' ? 'bg-blue-50 border-blue-200' :
+                      insight.color === 'green' ? 'bg-green-50 border-green-200' :
+                      'bg-gray-50 border-gray-200'
+                    } border`}>
+                      <div className="flex items-start space-x-3">
+                        <Icon className={`h-5 w-5 mt-0.5 ${
                           insight.color === 'blue' ? 'text-blue-600' :
                           insight.color === 'green' ? 'text-green-600' :
                           'text-gray-600'
-                        }`}>
-                          {insight.description}
-                        </p>
+                        }`} />
+                        <div>
+                          <p className={`font-medium text-sm ${
+                            insight.color === 'blue' ? 'text-blue-800' :
+                            insight.color === 'green' ? 'text-green-800' :
+                            'text-gray-800'
+                          }`}>
+                            {insight.title}
+                          </p>
+                          <p className={`text-xs mt-1 ${
+                            insight.color === 'blue' ? 'text-blue-600' :
+                            insight.color === 'green' ? 'text-green-600' :
+                            'text-gray-600'
+                          }`}>
+                            {insight.description}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div className="text-center py-8">
+                  <Lightbulb className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 text-sm">
+                    Start tracking to generate AI insights
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
