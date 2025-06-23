@@ -62,7 +62,7 @@ const MEDICAL_SPECIALTIES = [
 ];
 
 export default function DoctorLogin() {
-  const { loginWithEmail, registerWithEmail } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -90,6 +90,7 @@ export default function DoctorLogin() {
   const handleLogin = async (data: { email: string; password: string }) => {
     setIsLoading(true);
     try {
+      const { loginWithEmail } = await import('@/lib/auth');
       await loginWithEmail(data.email, data.password);
       
       // Set doctor role in localStorage
@@ -114,6 +115,7 @@ export default function DoctorLogin() {
     setIsLoading(true);
     try {
       // Register with Firebase
+      const { registerWithEmail } = await import('@/lib/auth');
       await registerWithEmail(data.email, data.password);
       
       // Save doctor profile to Firestore
