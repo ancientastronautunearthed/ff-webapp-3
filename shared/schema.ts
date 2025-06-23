@@ -159,6 +159,36 @@ export const userStudyParticipation = pgTable("user_study_participation", {
   notes: text("notes"),
 });
 
+export const doctors = pgTable("doctors", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  firebaseUid: text("firebase_uid").notNull().unique(),
+  email: text("email").notNull().unique(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  medicalLicense: text("medical_license").notNull(),
+  specialty: text("specialty").notNull(),
+  yearsExperience: integer("years_experience").notNull(),
+  practiceStates: jsonb("practice_states").notNull(),
+  institution: text("institution").notNull(),
+  morgellonsExperience: boolean("morgellons_experience").default(false),
+  morgellonsDescription: text("morgellons_description"),
+  isVerified: boolean("is_verified").default(false),
+  verificationDate: timestamp("verification_date"),
+  profileImage: text("profile_image"),
+  bio: text("bio"),
+  consultationFee: integer("consultation_fee"),
+  telehealth: boolean("telehealth").default(true),
+  inPerson: boolean("in_person").default(false),
+  languages: jsonb("languages").default(['English']),
+  credentials: jsonb("credentials").default([]),
+  rating: integer("rating").default(0),
+  reviewCount: integer("review_count").default(0),
+  location: text("location"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Zod schemas for validation
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
@@ -271,6 +301,27 @@ export const insertUserStudyParticipationSchema = createInsertSchema(userStudyPa
   notes: true,
 });
 
+export const insertDoctorSchema = createInsertSchema(doctors).pick({
+  firebaseUid: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  medicalLicense: true,
+  specialty: true,
+  yearsExperience: true,
+  practiceStates: true,
+  institution: true,
+  morgellonsExperience: true,
+  morgellonsDescription: true,
+  bio: true,
+  consultationFee: true,
+  telehealth: true,
+  inPerson: true,
+  languages: true,
+  credentials: true,
+  location: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertSymptomEntry = z.infer<typeof insertSymptomEntrySchema>;
@@ -295,3 +346,5 @@ export type InsertMatchingPreferences = z.infer<typeof insertMatchingPreferences
 export type MatchingPreferences = typeof matchingPreferences.$inferSelect;
 export type InsertPeerMessage = z.infer<typeof insertPeerMessageSchema>;
 export type PeerMessage = typeof peerMessages.$inferSelect;
+export type InsertDoctor = z.infer<typeof insertDoctorSchema>;
+export type Doctor = typeof doctors.$inferSelect;

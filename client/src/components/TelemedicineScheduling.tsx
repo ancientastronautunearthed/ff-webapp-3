@@ -88,14 +88,41 @@ export const TelemedicineScheduling = () => {
 
   const loadProviders = async () => {
     try {
-      const providersSnapshot = await getDocs(collection(db, 'providers'));
-      const providersData = providersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setProviders(providersData);
+      // Load only verified and active doctors from Firebase
+      const doctorsSnapshot = await getDocs(
+        query(
+          collection(db, 'doctors'), 
+          where('isVerified', '==', true),
+          where('isActive', '==', true)
+        )
+      );
+      
+      const doctorsData: Provider[] = doctorsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: `Dr. ${data.firstName} ${data.lastName}`,
+          specialty: data.specialty,
+          credentials: data.credentials || [data.medicalLicense],
+          experience: `${data.yearsExperience} years`,
+          location: data.location || data.practiceStates?.[0] || 'Not specified',
+          rating: data.rating || 4.8,
+          reviewCount: data.reviewCount || 0,
+          bio: data.bio || `Experienced ${data.specialty} physician with ${data.yearsExperience} years of practice.`,
+          telehealth: data.telehealth !== false,
+          inPerson: data.inPerson === true,
+          consultationFee: data.consultationFee || 150,
+          languages: data.languages || ['English'],
+          morgellonsExperience: data.morgellonsExperience === true,
+          image: data.profileImage || '',
+          education: [],
+          certifications: []
+        };
+      });
+      
+      setProviders(doctorsData);
     } catch (error) {
-      console.error('Error loading providers:', error);
+      console.error('Error loading doctors:', error);
       setProviders([]);
     } finally {
       setLoading(false);
@@ -110,12 +137,20 @@ export const TelemedicineScheduling = () => {
     );
   }
 
-  if (providers.length === 0) {
+  if (providers.length === 0 && !loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">No Providers Available</h2>
-          <p>Providers will be listed here once they register in the system.</p>
+        <div className="text-center py-12">
+          <Stethoscope className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <h2 className="text-2xl font-bold mb-4">No Verified Doctors Available</h2>
+          <p className="text-gray-600 mb-6">
+            Only verified medical professionals who have registered with Fiber Friends will appear here.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+            <p className="text-sm text-blue-800">
+              Medical professionals can register through our doctor portal to provide consultations to Morgellons patients.
+            </p>
+          </div>
         </div>
       </div>
     );
