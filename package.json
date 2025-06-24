@@ -3,13 +3,16 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+{
   "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/index.js",
-    "check": "tsc",
-    "db:push": "drizzle-kit push"
-  },
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsx build server/index.ts",
+    "deploy": "npm run build && firebase deploy",
+    "serve": "firebase serve",
+    "postbuild": "cp -r public/* dist/ 2>/dev/null || :"
+  }
+}
   "dependencies": {
     "@genkit-ai/ai": "^1.13.0",
     "@genkit-ai/firebase": "^1.13.0",
