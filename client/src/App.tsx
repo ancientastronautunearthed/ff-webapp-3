@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { CompanionProgressProvider } from "@/contexts/CompanionProgressContext";
+import { AccessibilityProvider, SkipLinks, AccessibilityStyles } from "@/components/AccessibilityManager";
 import { WelcomeTour } from "@/components/WelcomeTour";
 import { Layout } from "@/components/Layout";
 import { SymptomTracker } from "@/components/SymptomTracker";
@@ -36,6 +37,7 @@ import LandingPage from "@/pages/LandingPage";
 import { CommunityForum } from "@/components/CommunityForum";
 import { CompanionDashboard } from "@/components/CompanionDashboard";
 import { UserSettings } from "@/pages/UserSettings";
+import VoiceNavigationWidget from "@/components/VoiceNavigationWidget";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -88,7 +90,9 @@ function AppContent() {
 
   return (
     <Layout>
-      <Switch>
+      <SkipLinks />
+      <main id="main-content">
+        <Switch>
         <Route path="/" component={Dashboard} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/tracker" component={SymptomTracker} />
@@ -124,6 +128,9 @@ function AppContent() {
       }} onSkip={() => {
         localStorage.removeItem('tourActive');
       }} />}
+      </main>
+      
+      <VoiceNavigationWidget position="bottom-right" />
     </Layout>
   );
 }
@@ -133,10 +140,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CompanionProgressProvider>
-          <TooltipProvider>
-            <Toaster />
-            <AppContent />
-          </TooltipProvider>
+          <AccessibilityProvider>
+            <TooltipProvider>
+              <AccessibilityStyles />
+              <Toaster />
+              <AppContent />
+            </TooltipProvider>
+          </AccessibilityProvider>
         </CompanionProgressProvider>
       </AuthProvider>
     </QueryClientProvider>
