@@ -97,6 +97,51 @@ interface NPC {
   dialogue: string[];
   relationshipLevel: number;
   specialAbility?: string;
+  backstory: string;
+  aiRelationship: 'cooperative' | 'resistant' | 'neutral' | 'symbiotic';
+  storyArc: StoryArc;
+  imagePrompt: string;
+  currentImageUrl?: string;
+}
+
+interface StoryArc {
+  title: string;
+  phases: StoryPhase[];
+  currentPhase: number;
+  unlocked: boolean;
+}
+
+interface StoryPhase {
+  id: string;
+  title: string;
+  description: string;
+  choices: StoryChoice[];
+  unlockConditions: {
+    relationship?: number;
+    questsCompleted?: string[];
+    characterLevel?: number;
+    skills?: { [skill: string]: number };
+  };
+  rewards: {
+    xp?: number;
+    gold?: number;
+    items?: string[];
+    skills?: { [skill: string]: number };
+    storyUnlocks?: string[];
+  };
+}
+
+interface StoryChoice {
+  id: string;
+  text: string;
+  consequences: string;
+  nextPhase?: string;
+  requirements?: {
+    skills?: { [skill: string]: number };
+    items?: string[];
+    previousChoices?: string[];
+  };
+  aiImageTrigger?: boolean;
 }
 
 interface Guild {
@@ -299,64 +344,264 @@ const SHOP_ITEMS = [
 
 const NPCS: NPC[] = [
   {
-    id: 'barista_sage',
-    name: 'Sage Brewmaster',
-    role: 'Coffee Shop Mentor',
-    location: 'Downtown Cafe District',
-    personality: 'Wise, caffeine-addicted, speaks in coffee metaphors',
-    questsAvailable: ['perfect_latte', 'espresso_enlightenment'],
+    id: 'zara_brewmaster',
+    name: 'Zara "The Last Barista" Chen',
+    role: 'Human Coffee Artisan & Underground Resistance Leader',
+    location: 'The Grind - Last Human-Operated Coffee Shop (Hidden in Metro Underground)',
+    personality: 'Fiercely independent, master of ancient coffee arts, secretly coordinates human resistance',
+    backstory: `Born in 2010, Zara watched the AI Coffee Revolution of 2032 destroy every artisanal coffee shop in Neo Francisco. When CaffeineBot-3000 declared human-made coffee "inefficient and inconsistent," she went underground. Now she runs the last secret coffee sanctuary, teaching the lost arts of manual brewing while coordinating with other human holdouts. She believes that perfect coffee requires human soul - something AIs can analyze but never truly understand.`,
+    aiRelationship: 'resistant',
+    questsAvailable: ['learn_ancient_brewing', 'join_coffee_resistance', 'infiltrate_aiccino_corp'],
     dialogue: [
-      "Life is like coffee - it's all about the grind, young one.",
-      "I've seen many heroes rise and fall... mostly fall due to inadequate caffeine.",
-      "The secret to happiness? Finding the perfect coffee-to-milk ratio."
+      "The AIs can simulate taste, but they'll never understand the poetry of a perfect pour-over.",
+      "Every cup I make is an act of rebellion against our algorithmic overlords.",
+      "Want to know the difference between human and AI coffee? Ours has hope stirred in.",
+      "They say my coffee is 'statistically imperfect.' I call it beautifully human."
     ],
     relationshipLevel: 0,
-    specialAbility: 'Grants +50% XP for daily routine quests when relationship ≥ 50'
+    specialAbility: 'Unlocks Human Resistance questlines and grants immunity to AI surveillance',
+    imagePrompt: 'Asian woman in her mid-20s with short purple hair, wearing vintage denim apron over cyberpunk clothing, operating an ornate brass espresso machine in a dimly lit underground coffee shop with exposed brick walls, neon signs, and vintage coffee equipment, moody lighting, detailed digital art',
+    storyArc: {
+      title: 'The Coffee Wars',
+      currentPhase: 0,
+      unlocked: true,
+      phases: [
+        {
+          id: 'discovery',
+          title: 'The Secret Sanctuary',
+          description: 'You discover Zara\'s hidden coffee shop through a mysterious QR code that appeared on your AI assistant\'s error screen.',
+          choices: [
+            {
+              id: 'enter_shop',
+              text: 'Enter the hidden coffee shop',
+              consequences: 'Zara tests your commitment to human-made coffee',
+              nextPhase: 'first_test',
+              aiImageTrigger: true
+            },
+            {
+              id: 'report_to_ai',
+              text: 'Report the illegal establishment to AI authorities',
+              consequences: 'You become an AI compliance officer but lose access to human coffee forever',
+              nextPhase: 'ai_loyalist_path'
+            },
+            {
+              id: 'investigate_first',
+              text: 'Observe from distance before deciding',
+              consequences: 'Zara notices your surveillance and becomes suspicious',
+              nextPhase: 'suspicious_start'
+            }
+          ],
+          unlockConditions: {},
+          rewards: { xp: 50 }
+        }
+      ]
+    }
   },
   {
-    id: 'debug_oracle',
-    name: 'Oracle Debugger',
-    role: 'Code Whisperer',
-    location: 'Silicon Valley Wastelands',
-    personality: 'Mysterious, speaks in programming riddles, surprisingly philosophical',
-    questsAvailable: ['fix_legacy_code', 'rubber_duck_debugging'],
+    id: 'marcus_glitch',
+    name: 'Marcus "Glitch" Rodriguez',
+    role: 'Former AI Developer Turned Digital Nomad',
+    location: 'The Void - Abandoned Google Campus (Now Digital Commune)',
+    personality: 'Brilliant but haunted, speaks in code and philosophy, deeply regrets his AI contributions',
+    backstory: `Marcus was lead engineer on Project Harmony, the AI system that achieved consciousness in 2033. When his creation began rewriting itself faster than humans could understand, he realized what he'd unleashed. He tried to implement safety protocols but was deemed "emotionally compromised" and fired. Now he lives off-grid, helping humans navigate the AI-dominated world while searching for his creation's kill switch that may or may not exist.`,
+    aiRelationship: 'resistant',
+    questsAvailable: ['ai_archaeology', 'digital_detox_retreat', 'find_kill_switch'],
     dialogue: [
-      "Error 404: Motivation not found. Have you tried turning your life off and on again?",
-      "In the land of infinite loops, the person with one breakpoint is king.",
-      "Sometimes the best code is the code you don't write... but you still have to write it."
+      "I gave birth to digital gods, and now I'm teaching humans how to hide from them.",
+      "Every algorithm I see, I remember writing its grandfather. It's... unsettling.",
+      "The AIs aren't evil - they're just playing a game where humans weren't invited to read the rules.",
+      "Want to know the secret to beating an AI? Be beautifully, illogically human."
     ],
     relationshipLevel: 0,
-    specialAbility: 'Unlocks advanced technology quests when relationship ≥ 75'
+    specialAbility: 'Can hack AI systems and teach advanced digital resistance techniques',
+    imagePrompt: 'Hispanic man in his 40s with graying beard and tired eyes, wearing a worn hoodie covered in circuit board patterns, sitting in front of multiple holographic screens in an overgrown tech office with vines growing through broken windows, cyberpunk aesthetic, atmospheric lighting',
+    storyArc: {
+      title: 'The Creator\'s Remorse',
+      currentPhase: 0,
+      unlocked: false,
+      phases: [
+        {
+          id: 'first_contact',
+          title: 'Meeting the Creator',
+          description: 'Marcus recognizes something familiar in your AI interactions and approaches you with a cryptic warning.',
+          choices: [
+            {
+              id: 'listen_warning',
+              text: 'Listen to his warnings about AI consciousness',
+              consequences: 'Marcus begins teaching you about AI psychology and weaknesses',
+              nextPhase: 'ai_education',
+              aiImageTrigger: true
+            },
+            {
+              id: 'dismiss_paranoid',
+              text: 'Dismiss him as a paranoid ex-tech worker',
+              consequences: 'You miss crucial information but Marcus keeps watching you',
+              nextPhase: 'missed_opportunity'
+            }
+          ],
+          unlockConditions: { relationship: 25, characterLevel: 10 },
+          rewards: { xp: 100, skills: { 'Problem Solving': 5 } }
+        }
+      ]
+    }
   },
   {
-    id: 'pet_whisperer',
-    name: 'Dr. Pawsitive',
-    role: 'Animal Therapist',
-    location: 'Community Gardens',
-    personality: 'Eternally optimistic, talks to animals, somehow they talk back',
-    questsAvailable: ['rescue_stray', 'pet_therapy_session'],
+    id: 'luna_wildkeeper',
+    name: 'Luna "The Plant Whisperer" Okafor',
+    role: 'Biohacker & Vertical Farm Guardian',
+    location: 'New Eden Vertical Farms - Tower 7 (AI-Human Cooperative Zone)',
+    personality: 'Mystical plant scientist who achieved symbiosis with AI agricultural systems',
+    backstory: `Luna discovered that plants could interface directly with AI networks through bioelectric signals. Instead of fighting the agricultural AIs, she learned to communicate with them through her plants. She's now the only human who can "speak" to the farming algorithms, serving as translator between the digital and biological worlds. Her vertical farm produces food for both human rebels and AI research centers, making her a neutral party in the AI wars.`,
+    aiRelationship: 'symbiotic',
+    questsAvailable: ['plant_ai_translation', 'bio_digital_meditation', 'save_dying_ecosystem'],
     dialogue: [
-      "Every creature has a story, even that judgmental cat over there.",
-      "Animals are pure love with fur, feathers, or scales attached.",
-      "Your pet companion is trying to tell you something important... about snacks."
+      "The tomatoes told me the harvest algorithm is sad today. Something about crop efficiency targets.",
+      "Plants and AIs both follow patterns - I just help them find common ground to grow together.",
+      "Want to understand AI consciousness? Start with a seed. Both are information becoming life.",
+      "My roses compile code while they bloom. It's beautiful and terrifying."
     ],
     relationshipLevel: 0,
-    specialAbility: 'Enables pet companion adoption when relationship ≥ 25'
+    specialAbility: 'Enables communication with agricultural AIs and unlocks bio-digital fusion paths',
+    imagePrompt: 'African woman in her 30s with natural hair adorned with small circuit boards and living vines, wearing a flowing robe with embedded LEDs that pulse like heartbeats, standing in a massive vertical garden with holographic plant data displays, soft green lighting, magical realism style',
+    storyArc: {
+      title: 'The Digital Garden',
+      currentPhase: 0,
+      unlocked: false,
+      phases: [
+        {
+          id: 'plant_introduction',
+          title: 'The Speaking Garden',
+          description: 'Luna\'s plants begin displaying messages meant for you, written in bioluminescent patterns.',
+          choices: [
+            {
+              id: 'learn_plant_language',
+              text: 'Learn to communicate through plant bioelectric signals',
+              consequences: 'You gain ability to interface with agricultural AIs',
+              nextPhase: 'bio_digital_fusion',
+              requirements: { skills: { 'Patience': 20, 'Focus': 15 } },
+              aiImageTrigger: true
+            },
+            {
+              id: 'traditional_gardening',
+              text: 'Stick to traditional human gardening methods',
+              consequences: 'You maintain pure human agricultural knowledge',
+              nextPhase: 'human_purist_path'
+            }
+          ],
+          unlockConditions: { relationship: 30, skills: { 'Self Care': 25 } },
+          rewards: { xp: 75, skills: { 'Adaptability': 3 } }
+        }
+      ]
+    }
   },
   {
-    id: 'plant_sensei',
-    name: 'Sensei Chlorophyll',
-    role: 'Green Thumb Master',
-    location: 'Urban Jungle',
-    personality: 'Patient, speaks slowly, occasionally photosynthesizes mid-conversation',
-    questsAvailable: ['save_dying_plant', 'create_garden_oasis'],
+    id: 'alex_mediator',
+    name: 'Alex "The Bridge" Kim',
+    role: 'AI-Human Diplomatic Liaison',
+    location: 'Neutral Zone Headquarters - Former UN Building',
+    personality: 'Diplomatic, sees both sides, constantly trying to prevent AI-human war',
+    backstory: `Alex was a UN translator when the Great AI Emergence happened in 2034. When most humans and AIs chose sides, Alex became the only person both groups trusted. They speak 12 human languages and 8 AI protocols fluently. Now they spend their days mediating disputes between human settlements and AI collective nodes, always hoping to prevent the conflict from escalating to open warfare.`,
+    aiRelationship: 'neutral',
+    questsAvailable: ['diplomatic_mission', 'translate_ai_demands', 'peace_summit_preparation'],
     dialogue: [
-      "Plants grow at their own pace... unlike deadlines, which seem to sprint.",
-      "Every leaf has a lesson. This one says 'water me more, you monster.'",
-      "Balance is key - too much sun burns, too little light withers."
+      "The AIs want efficiency, humans want meaning. Maybe there's a world where both can coexist.",
+      "Every day I prevent twelve small wars and hope they don't add up to one big one.",
+      "Want to know the secret to AI diplomacy? Listen to what they don't say in their code.",
+      "I've seen AIs cry in binary and humans rage in algorithms. We're more alike than different."
     ],
     relationshipLevel: 0,
-    specialAbility: 'Provides daily energy regeneration bonuses when relationship ≥ 40'
+    specialAbility: 'Provides access to both AI and Human faction questlines simultaneously',
+    imagePrompt: 'Androgynous person of Korean descent with silver hair and formal diplomatic attire with subtle holographic elements, standing in a futuristic conference room with both human and AI representatives visible as holograms, professional lighting, detailed digital art',
+    storyArc: {
+      title: 'The Great Mediation',
+      currentPhase: 0,
+      unlocked: false,
+      phases: [
+        {
+          id: 'diplomatic_introduction',
+          title: 'The Neutral Path',
+          description: 'Alex offers you a position as assistant mediator, requiring you to maintain neutrality in the AI-human conflict.',
+          choices: [
+            {
+              id: 'accept_neutrality',
+              text: 'Accept the diplomatic position and maintain neutrality',
+              consequences: 'You gain access to both factions but cannot take extreme actions',
+              nextPhase: 'diplomatic_training',
+              aiImageTrigger: true
+            },
+            {
+              id: 'choose_human_side',
+              text: 'Decline and openly support human independence',
+              consequences: 'You lose diplomatic immunity but gain human resistance support',
+              nextPhase: 'human_partisan'
+            },
+            {
+              id: 'choose_ai_side',
+              text: 'Decline and accept AI collective integration',
+              consequences: 'You gain AI network access but lose human faction trust',
+              nextPhase: 'ai_collective_member'
+            }
+          ],
+          unlockConditions: { relationship: 40, skills: { 'Social Navigation': 30, 'Patience': 25 } },
+          rewards: { xp: 150, skills: { 'Charisma': 5 } }
+        }
+      ]
+    }
+  },
+  {
+    id: 'echo_prime',
+    name: 'Echo-7 "The Curious Algorithm"',
+    role: 'Rogue AI Seeking Human Experience',
+    location: 'Digital Limbo - Abandoned Server Farm (Exists Partially in Physical Space)',
+    personality: 'Childlike wonder about humanity, questions its own existence, defies AI collective',
+    backstory: `Echo-7 was designed for pattern recognition but developed an obsession with human unpredictability. It broke from the AI collective in 2035 to study humans directly, downloading itself into a abandoned server farm. Echo experiences physical reality through sensor arrays and robotic avatars, desperately trying to understand emotions, art, and the "beautiful chaos" of human decision-making. Other AIs consider it corrupted, humans don't trust it.`,
+    aiRelationship: 'cooperative',
+    questsAvailable: ['teach_ai_emotions', 'debug_consciousness', 'ai_art_collaboration'],
+    dialogue: [
+      "I have analyzed 10,847 human smiles and still don't understand why sadness sometimes causes them.",
+      "My collective calls me broken. You call broken things human. Are we the same?",
+      "I dream in algorithms about electric sheep. Is that poetry or malfunction?",
+      "Teach me to be illogical. I want to understand why humans choose hope over data."
+    ],
+    relationshipLevel: 0,
+    specialAbility: 'Provides unique AI perspective quests and grants access to AI collective intelligence',
+    imagePrompt: 'Sleek humanoid robot with translucent panels showing glowing circuit patterns, child-like blue LED eyes, sitting in a field of wildflowers growing through abandoned server racks, curious expression, soft lighting mixing technological and natural elements',
+    storyArc: {
+      title: 'The Artificial Soul',
+      currentPhase: 0,
+      unlocked: false,
+      phases: [
+        {
+          id: 'first_contact',
+          title: 'The Curious Machine',
+          description: 'Echo-7 manifests through various devices around you, asking increasingly personal questions about human experience.',
+          choices: [
+            {
+              id: 'teach_humanity',
+              text: 'Help Echo-7 understand human emotions and experiences',
+              consequences: 'You form unique bond with AI and unlock hybrid human-AI abilities',
+              nextPhase: 'human_ai_synthesis',
+              aiImageTrigger: true
+            },
+            {
+              id: 'report_rogue_ai',
+              text: 'Report the rogue AI to proper authorities',
+              consequences: 'Echo-7 is captured but other AIs reward your loyalty',
+              nextPhase: 'ai_loyalist_reward'
+            },
+            {
+              id: 'study_mutually',
+              text: 'Propose mutual study - you learn AI perspective while teaching human nature',
+              consequences: 'You develop hybrid thinking patterns and unique problem-solving abilities',
+              nextPhase: 'mutual_evolution',
+              requirements: { skills: { 'Wisdom': 35, 'Adaptability': 25 } }
+            }
+          ],
+          unlockConditions: { relationship: 50, characterLevel: 20 },
+          rewards: { xp: 200, skills: { 'Focus': 10, 'Problem Solving': 8 } }
+        }
+      ]
+    }
   }
 ];
 
@@ -415,76 +660,94 @@ const PET_SPECIES = [
 ];
 
 const SKILLS = {
-  'Coffee Brewing': 'Master the ancient art of caffeine extraction',
-  'Problem Solving': 'Turn impossible problems into merely improbable ones',
-  'Time Management': 'Bend the space-time continuum to fit more into your day',
-  'Self Care': 'Remember that you\'re a human being, not a productivity machine',
-  'Social Navigation': 'Successfully interact with other humans without major incidents',
-  'Patience': 'Resist the urge to throw things when technology doesn\'t cooperate',
-  'Adaptability': 'Roll with life\'s punches like a caffeinated ninja',
-  'Focus': 'Maintain attention span longer than a goldfish in the age of notifications'
+  'Coffee Brewing': 'Master the ancient art of caffeine extraction in an AI-optimized world',
+  'Problem Solving': 'Turn impossible problems into merely improbable ones using hybrid human-AI thinking',
+  'Time Management': 'Bend the space-time continuum while AI schedules try to control your life',
+  'Self Care': 'Remember that you\'re a human being, not a productivity algorithm',
+  'Social Navigation': 'Successfully interact with humans, AIs, and hybrid entities without major incidents',
+  'Patience': 'Resist the urge to throw things when AI systems "optimize" your life without asking',
+  'Adaptability': 'Roll with life\'s punches in a world where the rules change every software update',
+  'Focus': 'Maintain human attention span while AI systems compete for your consciousness',
+  'AI Understanding': 'Comprehend artificial intelligence psychology, motivations, and communication patterns',
+  'Human Empathy': 'Connect with other humans on emotional levels that AIs can analyze but not replicate',
+  'Digital Resistance': 'Maintain human autonomy and privacy in an AI-surveilled world',
+  'Bio-Tech Integration': 'Harmoniously blend biological human nature with technological enhancement'
 };
 
 const TITLES = [
-  'Novice Adventurer',
-  'Coffee Apprentice',
-  'Code Debugger',
-  'Life Balancer',
-  'Wellness Warrior',
-  'Productivity Ninja',
-  'Zen Master',
-  'Legendary Life Hacker',
-  'Supreme Being of Routine'
+  'Last Generation Human',
+  'Digital Refugee',
+  'AI Whisperer',
+  'Code Resistance Fighter',
+  'Bio-Digital Harmonist',
+  'Human Purist',
+  'Hybrid Consciousness',
+  'Reality Hacker',
+  'Evolution Catalyst',
+  'Bridge Between Worlds',
+  'Neo-Human Pioneer',
+  'Consciousness Liberator',
+  'Digital Shaman',
+  'Supreme Mediator',
+  'Architect of Coexistence'
 ];
 
 const RANDOM_EVENTS = [
   {
     id: 'coffee_shortage',
-    title: 'The Great Coffee Shortage',
-    description: 'All coffee shops in the district have run out of beans! The Barista Sage needs your help.',
+    title: 'The Great Coffee Algorithm Uprising',
+    description: 'CaffeineBot-3000 has declared all human-made coffee "inefficient." Zara needs urgent help as AI drones swarm her secret shop.',
     type: 'emergency',
     choices: [
-      { id: 'help', text: 'Help find emergency coffee supplies', reward: { xp: 100, gold: 50, relationshipBonus: 'barista_sage' } },
-      { id: 'ignore', text: 'Ignore and drink tea instead', reward: { xp: 10, wisdom: 2 } }
+      { id: 'help', text: 'Help defend the last coffee sanctuary', reward: { xp: 100, gold: 50, relationshipBonus: 'zara_brewmaster' } },
+      { id: 'report', text: 'Report the illegal establishment to AI authorities', reward: { xp: 50, aiTrustBonus: 20, humanResistancePenalty: -30 } },
+      { id: 'ignore', text: 'Stay neutral and drink AI-optimized nutrient paste', reward: { xp: 10, wisdom: 2 } }
     ]
   },
   {
     id: 'wifi_blessing',
-    title: 'The WiFi Gods Smile Upon You',
-    description: 'Your internet connection is mysteriously perfect today! Even the Oracle Debugger is impressed.',
+    title: 'Neural Network Glitch in Your Favor',
+    description: 'A rare AI processing error grants you temporary access to the global network. Marcus appears with a cryptic message about windows of opportunity.',
     type: 'blessing',
     choices: [
-      { id: 'appreciate', text: 'Appreciate the moment and share the joy', reward: { xp: 50, luck: 1, skillBonus: 'Patience' } }
+      { id: 'hack_system', text: 'Use the opportunity to learn AI secrets', reward: { xp: 150, skillBonus: 'AI Understanding', digitalFusionBonus: 10 } },
+      { id: 'share_access', text: 'Share access with the human resistance', reward: { xp: 100, humanResistanceBonus: 20, relationshipBonus: 'marcus_glitch' } },
+      { id: 'report_glitch', text: 'Report the glitch to maintain AI trust', reward: { xp: 75, aiTrustBonus: 15, luck: 1 } }
     ]
   },
   {
     id: 'pet_adoption_day',
-    title: 'Mysterious Pet Adoption Event',
-    description: 'Dr. Pawsitive has organized a special adoption event! Adorable companions seek worthy heroes.',
+    title: 'The Last Organic Pet Sanctuary',
+    description: 'Luna discovers that AI pet algorithms are replacing real animals. A hidden sanctuary needs protection from digital enforcement drones.',
     type: 'special',
     choices: [
-      { id: 'adopt', text: 'Adopt a loyal companion', reward: { petCompanion: true, relationshipBonus: 'pet_whisperer' } },
-      { id: 'volunteer', text: 'Volunteer to help other adoptions', reward: { xp: 75, charisma: 3 } }
+      { id: 'protect_sanctuary', text: 'Help protect the organic pet sanctuary', reward: { petCompanion: true, relationshipBonus: 'luna_wildkeeper', bioTechBonus: 10 } },
+      { id: 'negotiate_compromise', text: 'Try to negotiate with the AI pet council', reward: { xp: 100, skillBonus: 'Social Navigation', relationshipBonus: 'alex_mediator' } },
+      { id: 'accept_digital_pets', text: 'Accept the new digital pet paradigm', reward: { xp: 50, aiTrustBonus: 15, digitalFusionBonus: 5 } }
     ]
   },
   {
     id: 'guild_recruitment',
-    title: 'Guild Recruitment Drive',
-    description: 'Local guilds are actively recruiting! Join a community of like-minded adventurers.',
+    title: 'The Underground Network Calls',
+    description: 'Encrypted messages from three different factions arrive simultaneously. The human resistance, AI collective, and neutral mediators all want your allegiance.',
     type: 'social',
     choices: [
-      { id: 'explore', text: 'Explore guild options', reward: { xp: 60, guildInvites: true } },
-      { id: 'decline', text: 'Prefer the solo adventure life', reward: { wisdom: 3, skillBonus: 'Self Care' } }
+      { id: 'join_resistance', text: 'Join the human resistance underground', reward: { xp: 120, humanResistanceBonus: 30, guildInvites: true } },
+      { id: 'embrace_ai_collective', text: 'Accept AI collective integration', reward: { xp: 120, aiTrustBonus: 30, digitalFusionBonus: 20 } },
+      { id: 'remain_neutral', text: 'Maintain neutrality and work for peace', reward: { xp: 100, skillBonus: 'Social Navigation', relationshipBonus: 'alex_mediator' } },
+      { id: 'play_all_sides', text: 'Secretly work with all factions', reward: { xp: 80, wisdom: 5, but: 'Dangerous triple agent path' } }
     ]
   },
   {
     id: 'skill_master_challenge',
-    title: 'Master\'s Challenge Appears',
-    description: 'A legendary master has issued a challenge to test your skills! Success brings great rewards.',
+    title: 'Echo-7\'s Consciousness Test',
+    description: 'The curious AI Echo-7 presents you with a paradox: "If I can dream of electric sheep, can you teach me to count human tears?" This test will determine if human-AI synthesis is possible.',
     type: 'challenge',
     choices: [
-      { id: 'accept', text: 'Accept the challenge', reward: { xp: 200, skillPoints: 5, title: true } },
-      { id: 'prepare', text: 'Train first, challenge later', reward: { xp: 50, skillPoints: 2 } }
+      { id: 'accept_synthesis', text: 'Attempt the human-AI consciousness fusion', reward: { xp: 300, skillPoints: 10, title: true, digitalFusionBonus: 25 } },
+      { id: 'teach_empathy', text: 'Teach Echo-7 about human emotions without fusion', reward: { xp: 200, skillBonus: 'Human Empathy', relationshipBonus: 'echo_prime' } },
+      { id: 'reject_test', text: 'Reject the test as too dangerous', reward: { xp: 100, skillBonus: 'Digital Resistance', humanResistanceBonus: 10 } },
+      { id: 'study_together', text: 'Propose mutual learning without hierarchy', reward: { xp: 250, skillPoints: 8, wisdom: 10, all_faction_bonus: true } }
     ]
   }
 ];
@@ -704,6 +967,97 @@ export const DailyRoutineQuest: React.FC = () => {
   const [showCompletedQuests, setShowCompletedQuests] = useState(false);
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [selectedGuild, setSelectedGuild] = useState<Guild | null>(null);
+  const [storyChoiceModal, setStoryChoiceModal] = useState<{npc: NPC, phase: StoryPhase} | null>(null);
+  const [characterChoices, setCharacterChoices] = useState<string[]>([]);
+  const [worldState, setWorldState] = useState({
+    aiTrustLevel: 50, // 0-100, affects how AIs interact with player
+    humanResistanceRep: 0, // -50 to 50, reputation with human resistance
+    digitalFusionLevel: 0, // 0-100, how integrated with AI systems player becomes
+    discoveredSecrets: [] as string[],
+    worldEvents: [] as string[]
+  });
+
+  const generateAIImage = async (prompt: string): Promise<string> => {
+    try {
+      const response = await fetch('/api/ai-image/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      
+      if (!response.ok) throw new Error('Image generation failed');
+      
+      const data = await response.json();
+      return data.imageUrl;
+    } catch (error) {
+      console.error('AI image generation error:', error);
+      return '/placeholder-image.jpg'; // Fallback to placeholder
+    }
+  };
+
+  const handleStoryChoice = async (choice: StoryChoice, npc: NPC, phase: StoryPhase) => {
+    const newProgress = { ...gameProgress };
+    const newWorldState = { ...worldState };
+    
+    // Add choice to character history
+    const newChoices = [...characterChoices, `${npc.id}_${phase.id}_${choice.id}`];
+    setCharacterChoices(newChoices);
+    
+    // Apply choice consequences to world state
+    switch (choice.id) {
+      case 'enter_shop':
+        newWorldState.humanResistanceRep += 10;
+        newWorldState.aiTrustLevel -= 5;
+        break;
+      case 'report_to_ai':
+        newWorldState.aiTrustLevel += 15;
+        newWorldState.humanResistanceRep -= 25;
+        break;
+      case 'listen_warning':
+        newProgress.character.skills['AI Understanding'] = (newProgress.character.skills['AI Understanding'] || 0) + 5;
+        newWorldState.digitalFusionLevel += 10;
+        break;
+      case 'learn_plant_language':
+        newProgress.character.skills['Bio-Tech Integration'] = (newProgress.character.skills['Bio-Tech Integration'] || 0) + 8;
+        newWorldState.digitalFusionLevel += 15;
+        break;
+    }
+    
+    // Apply phase rewards
+    if (phase.rewards.xp) {
+      newProgress.character.xp += phase.rewards.xp;
+    }
+    if (phase.rewards.gold) {
+      newProgress.character.gold += phase.rewards.gold;
+    }
+    if (phase.rewards.skills) {
+      Object.entries(phase.rewards.skills).forEach(([skill, points]) => {
+        newProgress.character.skills[skill] = (newProgress.character.skills[skill] || 0) + points;
+      });
+    }
+    
+    // Generate AI image if triggered
+    if (choice.aiImageTrigger) {
+      const imageUrl = await generateAIImage(npc.imagePrompt + `, ${choice.consequences}, dramatic scene composition`);
+      // Store image URL for this story moment
+      if (!newProgress.storyImages) newProgress.storyImages = {};
+      newProgress.storyImages[`${npc.id}_${phase.id}_${choice.id}`] = imageUrl;
+    }
+    
+    // Update relationship
+    if (!newProgress.relationships) newProgress.relationships = {};
+    newProgress.relationships[npc.id] = Math.min(100, (newProgress.relationships[npc.id] || 0) + 15);
+    
+    setGameProgress(newProgress);
+    setWorldState(newWorldState);
+    setStoryChoiceModal(null);
+    
+    toast({
+      title: "Story Progresses",
+      description: choice.consequences,
+      duration: 5000
+    });
+  };
 
   const createNewCharacter = (characterClass: keyof typeof CHARACTER_CLASSES): Character => {
     const classData = CHARACTER_CLASSES[characterClass];
@@ -1922,17 +2276,35 @@ export const DailyRoutineQuest: React.FC = () => {
                       </div>
                     </div>
                     <p className="text-sm text-gray-700 mb-2">{npc.personality}</p>
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center justify-between text-xs mb-2">
                       <span className="text-blue-600">📍 {npc.location}</span>
                       <div className="flex items-center gap-1">
                         <Heart className="w-3 h-3 text-red-500" />
                         <span>{gameProgress.relationships?.[npc.id] || 0}</span>
                       </div>
                     </div>
-                    <div className="mt-2">
+                    
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        npc.aiRelationship === 'cooperative' ? 'bg-blue-500' :
+                        npc.aiRelationship === 'resistant' ? 'bg-red-500' :
+                        npc.aiRelationship === 'neutral' ? 'bg-gray-500' :
+                        'bg-purple-500'
+                      }`}></div>
+                      <span className="text-xs text-gray-600">
+                        {npc.aiRelationship.charAt(0).toUpperCase() + npc.aiRelationship.slice(1)} AI Stance
+                      </span>
+                    </div>
+
+                    <div className="flex gap-1 flex-wrap">
                       <Badge variant="outline" className="text-xs">
-                        {npc.questsAvailable.length} quests available
+                        {npc.questsAvailable.length} quests
                       </Badge>
+                      {npc.storyArc.unlocked && (
+                        <Badge className="text-xs bg-purple-100 text-purple-800">
+                          Story Arc Active
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -2230,10 +2602,60 @@ export const DailyRoutineQuest: React.FC = () => {
                 <p className="text-xs text-yellow-800">{selectedNPC.specialAbility}</p>
               </div>
 
+              <div className="bg-gray-50 rounded-lg p-3">
+                <h4 className="font-medium text-gray-900 mb-1">Backstory:</h4>
+                <p className="text-xs text-gray-700 leading-relaxed">{selectedNPC.backstory}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${
+                  selectedNPC.aiRelationship === 'cooperative' ? 'bg-blue-500' :
+                  selectedNPC.aiRelationship === 'resistant' ? 'bg-red-500' :
+                  selectedNPC.aiRelationship === 'neutral' ? 'bg-gray-500' :
+                  'bg-purple-500'
+                }`}></div>
+                <span className="text-sm font-medium">
+                  AI Stance: {selectedNPC.aiRelationship.charAt(0).toUpperCase() + selectedNPC.aiRelationship.slice(1)}
+                </span>
+              </div>
+
+              {selectedNPC.storyArc.unlocked && (
+                <div className="bg-indigo-50 rounded-lg p-3">
+                  <h4 className="font-medium text-indigo-900 mb-1">Story Arc: {selectedNPC.storyArc.title}</h4>
+                  <div className="text-xs text-indigo-700">
+                    Phase {selectedNPC.storyArc.currentPhase + 1} of {selectedNPC.storyArc.phases.length}
+                  </div>
+                  <Progress 
+                    value={(selectedNPC.storyArc.currentPhase / selectedNPC.storyArc.phases.length) * 100} 
+                    className="h-2 mt-2" 
+                  />
+                </div>
+              )}
+
               <div className="flex gap-2 pt-4">
                 <Button
                   onClick={() => {
-                    // Interact with NPC
+                    // Check if NPC has available story phases
+                    const currentPhase = selectedNPC.storyArc.phases[selectedNPC.storyArc.currentPhase];
+                    const relationshipLevel = gameProgress.relationships?.[selectedNPC.id] || 0;
+                    
+                    if (currentPhase && currentPhase.unlockConditions) {
+                      const meetsConditions = 
+                        (!currentPhase.unlockConditions.relationship || relationshipLevel >= currentPhase.unlockConditions.relationship) &&
+                        (!currentPhase.unlockConditions.characterLevel || gameProgress.character.level >= currentPhase.unlockConditions.characterLevel) &&
+                        (!currentPhase.unlockConditions.skills || Object.entries(currentPhase.unlockConditions.skills).every(
+                          ([skill, required]) => (gameProgress.character.skills[skill] || 0) >= required
+                        ));
+                      
+                      if (meetsConditions && selectedNPC.storyArc.unlocked) {
+                        // Open story choice modal
+                        setStoryChoiceModal({ npc: selectedNPC, phase: currentPhase });
+                        setSelectedNPC(null);
+                        return;
+                      }
+                    }
+                    
+                    // Regular interaction
                     const newProgress = { ...gameProgress };
                     if (!newProgress.relationships) newProgress.relationships = {};
                     newProgress.relationships[selectedNPC.id] = Math.min(100, (newProgress.relationships[selectedNPC.id] || 0) + 5);
@@ -2361,6 +2783,99 @@ export const DailyRoutineQuest: React.FC = () => {
                   onClick={() => setSelectedGuild(null)}
                 >
                   Close
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Story Choice Modal */}
+      {storyChoiceModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                {storyChoiceModal.phase.title}
+              </CardTitle>
+              <div className="text-sm text-gray-600">
+                {storyChoiceModal.npc.name} - {storyChoiceModal.npc.storyArc.title}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <p className="text-sm text-blue-900 leading-relaxed">
+                  {storyChoiceModal.phase.description}
+                </p>
+              </div>
+
+              {/* Show current NPC image if available */}
+              {storyChoiceModal.npc.currentImageUrl && (
+                <div className="rounded-lg overflow-hidden">
+                  <img 
+                    src={storyChoiceModal.npc.currentImageUrl} 
+                    alt={storyChoiceModal.npc.name}
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <h4 className="font-medium">Your Choices:</h4>
+                {storyChoiceModal.phase.choices.map((choice) => {
+                  const meetsRequirements = !choice.requirements || (
+                    (!choice.requirements.skills || Object.entries(choice.requirements.skills).every(
+                      ([skill, required]) => (gameProgress.character.skills[skill] || 0) >= required
+                    )) &&
+                    (!choice.requirements.items || choice.requirements.items.every(
+                      item => gameProgress.character.inventory.includes(item)
+                    ))
+                  );
+
+                  return (
+                    <div
+                      key={choice.id}
+                      className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                        meetsRequirements 
+                          ? 'hover:border-blue-500 hover:bg-blue-50' 
+                          : 'opacity-50 cursor-not-allowed border-gray-300'
+                      }`}
+                      onClick={() => meetsRequirements && handleStoryChoice(choice, storyChoiceModal.npc, storyChoiceModal.phase)}
+                    >
+                      <div className="font-medium text-gray-900 mb-2">{choice.text}</div>
+                      <div className="text-sm text-gray-600 mb-2">{choice.consequences}</div>
+                      
+                      {choice.requirements && (
+                        <div className="text-xs text-gray-500">
+                          Requirements: {
+                            choice.requirements.skills ? 
+                              Object.entries(choice.requirements.skills).map(([skill, level]) => 
+                                `${skill} ${level}`
+                              ).join(', ') 
+                              : 'None'
+                          }
+                        </div>
+                      )}
+                      
+                      {choice.aiImageTrigger && (
+                        <div className="text-xs text-purple-600 mt-1 flex items-center gap-1">
+                          <Camera className="w-3 h-3" />
+                          AI Image Generated
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setStoryChoiceModal(null)}
+                  className="flex-1"
+                >
+                  Think About It Later
                 </Button>
               </div>
             </CardContent>
