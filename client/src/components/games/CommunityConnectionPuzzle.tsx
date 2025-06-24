@@ -454,36 +454,73 @@ export const CommunityConnectionPuzzle: React.FC = () => {
 
         {/* Puzzle Pieces Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {pieces.map((piece) => (
-            <div
-              key={piece.id}
-              className={`border rounded-lg p-3 transition-all duration-300 ${
-                piece.unlocked
-                  ? `${piece.color} text-white shadow-md transform scale-105`
-                  : 'border-gray-200 bg-gray-50'
-              }`}
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className={`p-1 rounded ${piece.unlocked ? 'bg-white bg-opacity-20' : 'bg-gray-200'}`}>
-                  {piece.unlocked ? piece.icon : <Lock className="w-4 h-4 text-gray-400" />}
-                </div>
-                <div className="text-right">
-                  <div className={`text-xs ${piece.unlocked ? 'text-white' : 'text-gray-500'}`}>
-                    +{piece.points} pts
+          {pieces.map((piece) => {
+            const getRedirectUrl = (piece: PuzzlePiece) => {
+              switch (piece.type) {
+                case 'forum_post':
+                  return '/community';
+                case 'forum_reply':
+                  return '/community';
+                case 'peer_connection':
+                  return '/peer-matching';
+                case 'helpful_vote':
+                  return '/community';
+                case 'support_message':
+                  return '/peer-matching';
+                case 'encouragement':
+                  return '/community';
+                default:
+                  return '/community';
+              }
+            };
+
+            return (
+              <div
+                key={piece.id}
+                className={`border rounded-lg p-3 transition-all duration-300 cursor-pointer hover:scale-105 ${
+                  piece.unlocked
+                    ? `${piece.color} text-white shadow-md transform scale-105 hover:shadow-lg`
+                    : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100'
+                }`}
+                onClick={() => {
+                  if (piece.unlocked) {
+                    window.location.href = getRedirectUrl(piece);
+                  } else {
+                    toast({
+                      title: "Piece Locked",
+                      description: `Complete community activities to unlock "${piece.title}"`,
+                      variant: "default"
+                    });
+                  }
+                }}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className={`p-1 rounded ${piece.unlocked ? 'bg-white bg-opacity-20' : 'bg-gray-200'}`}>
+                    {piece.unlocked ? piece.icon : <Lock className="w-4 h-4 text-gray-400" />}
                   </div>
-                  {piece.unlocked && (
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  )}
+                  <div className="text-right">
+                    <div className={`text-xs ${piece.unlocked ? 'text-white' : 'text-gray-500'}`}>
+                      +{piece.points} pts
+                    </div>
+                    {piece.unlocked && (
+                      <CheckCircle className="w-4 h-4 text-white" />
+                    )}
+                  </div>
                 </div>
+                <h4 className={`font-medium text-sm ${piece.unlocked ? 'text-white' : 'text-gray-700'}`}>
+                  {piece.title}
+                </h4>
+                <p className={`text-xs mt-1 ${piece.unlocked ? 'text-white text-opacity-90' : 'text-gray-500'}`}>
+                  {piece.description}
+                </p>
+                {piece.unlocked && (
+                  <div className="mt-2 text-xs text-white text-opacity-80 font-medium">
+                    Click to visit →
+                  </div>
+                )}
               </div>
-              <h4 className={`font-medium text-sm ${piece.unlocked ? 'text-white' : 'text-gray-700'}`}>
-                {piece.title}
-              </h4>
-              <p className={`text-xs mt-1 ${piece.unlocked ? 'text-white text-opacity-90' : 'text-gray-500'}`}>
-                {piece.description}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Quick Actions */}
