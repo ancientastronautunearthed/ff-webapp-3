@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { PatientCommunicationHub } from '@/components/PatientCommunicationHub';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DoctorProfileForm } from '@/components/DoctorProfileForm';
 import { 
