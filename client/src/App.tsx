@@ -38,6 +38,7 @@ import { CommunityForum } from "@/components/CommunityForum";
 import { CompanionDashboard } from "@/components/CompanionDashboard";
 import { UserSettings } from "@/pages/UserSettings";
 import VoiceNavigationWidget from "@/components/VoiceNavigationWidget";
+import { TechAssistantDashboard } from "@/components/TechAssistantDashboard";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -117,6 +118,7 @@ function AppContent() {
         <Route path="/ask-doctor" component={AskDoctorForum} />
         <Route path="/peer-matching" component={PeerMatching} />
         <Route path="/companion" component={CompanionDashboard} />
+        <Route path="/tech-assistant" component={TechAssistantDashboard} />
         <Route path="/settings" component={UserSettings} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
