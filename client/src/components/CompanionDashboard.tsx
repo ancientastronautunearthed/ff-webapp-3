@@ -6,6 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCompanionProgress } from '@/contexts/CompanionProgressContext';
+import { therapeuticAI, TherapeuticResponse, ConversationContext } from '@/lib/therapeuticAI';
+import { ttsService } from '@/lib/textToSpeech';
+import { TherapeuticModeSelector } from './TherapeuticModeSelector';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
