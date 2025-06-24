@@ -502,7 +502,10 @@ export const DailyRoutineQuest: React.FC = () => {
               {/* Health and Mana */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-red-600">Health</span>
+                  <span className="text-sm font-medium text-red-600 flex items-center gap-1">
+                    <Heart className="w-3 h-3" />
+                    Health
+                  </span>
                   <span className="text-sm">{gameProgress.character.health}/{gameProgress.character.maxHealth}</span>
                 </div>
                 <Progress value={(gameProgress.character.health / gameProgress.character.maxHealth) * 100} className="h-2" />
@@ -510,7 +513,10 @@ export const DailyRoutineQuest: React.FC = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-blue-600">Mana</span>
+                  <span className="text-sm font-medium text-blue-600 flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    Mana
+                  </span>
                   <span className="text-sm">{gameProgress.character.mana}/{gameProgress.character.maxMana}</span>
                 </div>
                 <Progress value={(gameProgress.character.mana / gameProgress.character.maxMana) * 100} className="h-2" />
@@ -518,25 +524,55 @@ export const DailyRoutineQuest: React.FC = () => {
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-600">Experience</span>
+                  <span className="text-sm font-medium text-purple-600 flex items-center gap-1">
+                    <Star className="w-3 h-3" />
+                    Experience
+                  </span>
                   <span className="text-sm">{gameProgress.character.xp}/{gameProgress.character.xpToNext}</span>
                 </div>
                 <Progress value={(gameProgress.character.xp / gameProgress.character.xpToNext) * 100} className="h-2" />
               </div>
 
+              {/* Equipment */}
+              {Object.keys(gameProgress.character.equipment).length > 0 && (
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Equipment</h4>
+                  <div className="space-y-1">
+                    {gameProgress.character.equipment.weapon && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Sword className="w-3 h-3 text-orange-600" />
+                        <span>{gameProgress.character.equipment.weapon}</span>
+                      </div>
+                    )}
+                    {gameProgress.character.equipment.armor && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Shield className="w-3 h-3 text-blue-600" />
+                        <span>{gameProgress.character.equipment.armor}</span>
+                      </div>
+                    )}
+                    {gameProgress.character.equipment.accessory && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <Gem className="w-3 h-3 text-purple-600" />
+                        <span>{gameProgress.character.equipment.accessory}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4 pt-4">
-                <div className="text-center">
+                <div className="text-center bg-red-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-red-600">{gameProgress.character.strength}</div>
-                  <div className="text-xs text-gray-600">Strength</div>
+                  <div className="text-xs text-red-800">Strength</div>
                 </div>
-                <div className="text-center">
+                <div className="text-center bg-blue-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-blue-600">{gameProgress.character.wisdom}</div>
-                  <div className="text-xs text-gray-600">Wisdom</div>
+                  <div className="text-xs text-blue-800">Wisdom</div>
                 </div>
-                <div className="text-center">
+                <div className="text-center bg-green-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-green-600">{gameProgress.character.vitality}</div>
-                  <div className="text-xs text-gray-600">Vitality</div>
+                  <div className="text-xs text-green-800">Vitality</div>
                 </div>
               </div>
             </CardContent>
@@ -580,22 +616,32 @@ export const DailyRoutineQuest: React.FC = () => {
                       character: {
                         ...gameProgress.character,
                         level: 8,
-                        xp: 45,
-                        xpToNext: 180,
+                        xp: 145,
+                        xpToNext: 200,
+                        health: 180,
+                        maxHealth: 180,
+                        mana: 85,
+                        maxMana: 85,
                         strength: 18,
                         wisdom: 16,
                         vitality: 15,
-                        inventory: ['Health Potion', 'Wisdom Pearl', 'Strength Charm', 'Companion Crystal', 'Pattern Lens']
+                        equipment: {
+                          weapon: 'Sword of Wellness',
+                          armor: 'Shield of Recovery',
+                          accessory: 'Ring of Vitality'
+                        },
+                        inventory: ['Health Potion', 'Wisdom Pearl', 'Strength Charm', 'Companion Crystal', 'Pattern Lens', 'Journal Scroll', 'Crystal Vial', 'Friendship Token']
                       },
+                      completedQuests: ['daily-0', 'daily-1', 'daily-2', 'story-0'],
                       dailyStreak: 14,
                       totalQuestsCompleted: 32,
-                      achievementsUnlocked: ['First Steps', 'Daily Warrior', 'Knowledge Seeker', 'Community Builder'],
-                      unlockedZones: ['Healing Village', 'Wisdom Temple', 'Strength Peaks']
+                      achievementsUnlocked: ['First Steps', 'Daily Warrior', 'Knowledge Seeker', 'Community Builder', 'Level Master'],
+                      unlockedZones: ['Healing Village', 'Wisdom Temple', 'Strength Peaks', 'Community Gardens']
                     };
                     setGameProgress(demoProgress);
                     toast({
                       title: "Demo Progress Applied",
-                      description: "Character now has advanced stats and achievements!"
+                      description: "Character now has advanced stats, equipment, and completed quests!"
                     });
                   }}
                   className="text-xs"
