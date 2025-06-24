@@ -429,7 +429,13 @@ export const MedicalBillsTowerDefense: React.FC = () => {
       enemies: newEnemies,
       waveActive: true
     }));
-  }, [gameState.wave]);
+
+    toast({
+      title: `Wave ${gameState.wave} Started!`,
+      description: `${waveSize} financial attacks incoming!`,
+      duration: 2000
+    });
+  }, [gameState.wave, toast]);
 
   const updateGame = useCallback(() => {
     setGameState(prev => {
@@ -690,13 +696,29 @@ export const MedicalBillsTowerDefense: React.FC = () => {
 
           {/* Game Status */}
           {!gameState.gameActive && gameState.wave > 1 && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <div className="bg-white rounded-lg p-6 text-center">
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+              <div className="bg-white rounded-lg p-6 text-center shadow-2xl">
                 <Skull className="w-12 h-12 text-red-600 mx-auto mb-4" />
                 <h3 className="text-lg font-bold mb-2">Financial Bankruptcy!</h3>
-                <p className="text-gray-600 mb-4">Survived {gameState.wave - 1} waves</p>
-                <p className="text-sm text-gray-500">Total Bills: ${gameState.score.toLocaleString()}</p>
+                <p className="text-gray-600 mb-2">Survived {gameState.wave - 1} waves</p>
+                <p className="text-sm text-gray-500 mb-2">Total Medical Bills: ${gameState.score.toLocaleString()}</p>
+                <p className="text-xs text-blue-600">Bills Stacked: {gameState.billTowerHeight}</p>
+                <Button 
+                  onClick={startGame} 
+                  className="mt-4 bg-green-600 hover:bg-green-700"
+                  size="sm"
+                >
+                  Try Again
+                </Button>
               </div>
+            </div>
+          )}
+          
+          {gameState.gameActive && !gameState.waveActive && gameState.enemies.length === 0 && gameState.wave > 1 && (
+            <div className="absolute top-2 right-2">
+              <Badge className="bg-green-600 text-white">
+                Wave {gameState.wave - 1} Complete!
+              </Badge>
             </div>
           )}
         </div>
