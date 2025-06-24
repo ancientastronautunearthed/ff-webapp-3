@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { CommunityConnectionPuzzle } from './CommunityConnectionPuzzle';
 import { BreathingGarden } from './BreathingGarden';
 import { SymptomMemoryMatch } from './SymptomMemoryMatch';
+import { MedicalBillsTowerDefense } from './MedicalBillsTowerDefense';
 import { 
   Gamepad2, 
   Puzzle, 
@@ -72,6 +73,16 @@ const WELLNESS_GAMES: GameInfo[] = [
     comingSoon: true
   },
   {
+    id: 'medical_bills_tower',
+    title: 'Medical Bills Tower Defense',
+    description: 'Defend against financial attacks while stacking medical bills',
+    icon: <Star className="w-5 h-5" />,
+    color: 'from-green-500 to-emerald-600',
+    difficulty: 'Hard',
+    category: 'Cognitive',
+    available: true
+  },
+  {
     id: 'mindful_focus',
     title: 'Mindful Fiber Focus',
     description: 'Meditation game with calming fiber art visualization and progressive relaxation',
@@ -125,6 +136,8 @@ export const WellnessGamesHub: React.FC = () => {
         return <BreathingGarden />;
       case 'memory_patterns':
         return <SymptomMemoryMatch />;
+      case 'medical_bills_tower':
+        return <MedicalBillsTowerDefense />;
       default:
         return (
           <Card className="w-full max-w-2xl mx-auto">
