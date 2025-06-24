@@ -65,6 +65,51 @@ interface Character {
   totalScore: number;
   prestige: number;
   rebornCount: number;
+  skills: {
+    [skillName: string]: number;
+  };
+  titles: string[];
+  currentTitle?: string;
+  petCompanion?: PetCompanion;
+  guildMembership?: string;
+}
+
+interface PetCompanion {
+  id: string;
+  name: string;
+  species: string;
+  level: number;
+  xp: number;
+  abilities: string[];
+  loyalty: number;
+  hunger: number;
+  happiness: number;
+  lastFed: Date;
+}
+
+interface NPC {
+  id: string;
+  name: string;
+  role: string;
+  location: string;
+  personality: string;
+  questsAvailable: string[];
+  dialogue: string[];
+  relationshipLevel: number;
+  specialAbility?: string;
+}
+
+interface Guild {
+  id: string;
+  name: string;
+  description: string;
+  memberCount: number;
+  requirements: {
+    level: number;
+    skills?: { [skillName: string]: number };
+  };
+  benefits: string[];
+  weeklyQuests: string[];
 }
 
 interface Quest {
@@ -252,35 +297,194 @@ const SHOP_ITEMS = [
   }
 ];
 
+const NPCS: NPC[] = [
+  {
+    id: 'barista_sage',
+    name: 'Sage Brewmaster',
+    role: 'Coffee Shop Mentor',
+    location: 'Downtown Cafe District',
+    personality: 'Wise, caffeine-addicted, speaks in coffee metaphors',
+    questsAvailable: ['perfect_latte', 'espresso_enlightenment'],
+    dialogue: [
+      "Life is like coffee - it's all about the grind, young one.",
+      "I've seen many heroes rise and fall... mostly fall due to inadequate caffeine.",
+      "The secret to happiness? Finding the perfect coffee-to-milk ratio."
+    ],
+    relationshipLevel: 0,
+    specialAbility: 'Grants +50% XP for daily routine quests when relationship ≥ 50'
+  },
+  {
+    id: 'debug_oracle',
+    name: 'Oracle Debugger',
+    role: 'Code Whisperer',
+    location: 'Silicon Valley Wastelands',
+    personality: 'Mysterious, speaks in programming riddles, surprisingly philosophical',
+    questsAvailable: ['fix_legacy_code', 'rubber_duck_debugging'],
+    dialogue: [
+      "Error 404: Motivation not found. Have you tried turning your life off and on again?",
+      "In the land of infinite loops, the person with one breakpoint is king.",
+      "Sometimes the best code is the code you don't write... but you still have to write it."
+    ],
+    relationshipLevel: 0,
+    specialAbility: 'Unlocks advanced technology quests when relationship ≥ 75'
+  },
+  {
+    id: 'pet_whisperer',
+    name: 'Dr. Pawsitive',
+    role: 'Animal Therapist',
+    location: 'Community Gardens',
+    personality: 'Eternally optimistic, talks to animals, somehow they talk back',
+    questsAvailable: ['rescue_stray', 'pet_therapy_session'],
+    dialogue: [
+      "Every creature has a story, even that judgmental cat over there.",
+      "Animals are pure love with fur, feathers, or scales attached.",
+      "Your pet companion is trying to tell you something important... about snacks."
+    ],
+    relationshipLevel: 0,
+    specialAbility: 'Enables pet companion adoption when relationship ≥ 25'
+  },
+  {
+    id: 'plant_sensei',
+    name: 'Sensei Chlorophyll',
+    role: 'Green Thumb Master',
+    location: 'Urban Jungle',
+    personality: 'Patient, speaks slowly, occasionally photosynthesizes mid-conversation',
+    questsAvailable: ['save_dying_plant', 'create_garden_oasis'],
+    dialogue: [
+      "Plants grow at their own pace... unlike deadlines, which seem to sprint.",
+      "Every leaf has a lesson. This one says 'water me more, you monster.'",
+      "Balance is key - too much sun burns, too little light withers."
+    ],
+    relationshipLevel: 0,
+    specialAbility: 'Provides daily energy regeneration bonuses when relationship ≥ 40'
+  }
+];
+
+const GUILDS: Guild[] = [
+  {
+    id: 'coffee_connoisseurs',
+    name: 'The Caffeine Crusaders',
+    description: 'United in our quest for the perfect brew and conquering Monday mornings',
+    memberCount: 1247,
+    requirements: { level: 5, skills: { 'Coffee Brewing': 10 } },
+    benefits: ['Double gold from morning quests', '+25% XP from daily routines', 'Access to rare coffee items'],
+    weeklyQuests: ['Guild Latte Art Contest', 'Monday Morning Survival Challenge']
+  },
+  {
+    id: 'debug_masters',
+    name: 'The Infinite Loop Society',
+    description: 'Where bugs go to die and developers go to cry (but in solidarity)',
+    memberCount: 892,
+    requirements: { level: 15, skills: { 'Problem Solving': 25, 'Patience': 20 } },
+    benefits: ['Access to legendary debugging tools', 'Stack Overflow privileges', '+50% wisdom gain'],
+    weeklyQuests: ['Fix the Unfixable Bug', 'Explain Code to Rubber Duck']
+  },
+  {
+    id: 'life_balancers',
+    name: 'The Equilibrium Masters',
+    description: 'Seeking the mythical work-life balance through ancient techniques and modern memes',
+    memberCount: 2156,
+    requirements: { level: 25, skills: { 'Self Care': 30, 'Time Management': 25 } },
+    benefits: ['Weekly wellness bonuses', 'Stress reduction abilities', 'Unlimited sick days (in-game)'],
+    weeklyQuests: ['Perfect Day Challenge', 'Digital Detox Adventure']
+  }
+];
+
+const PET_SPECIES = [
+  {
+    id: 'desk_cat',
+    name: 'Keyboard Cat',
+    description: 'Mysteriously appears on your keyboard during important video calls',
+    abilities: ['Typo Generation', 'Meeting Disruption', 'Infinite Purring'],
+    baseStats: { loyalty: 60, intelligence: 85, cuteness: 95 }
+  },
+  {
+    id: 'stress_duck',
+    name: 'Rubber Duck',
+    description: 'The ultimate debugging companion and existential crisis counselor',
+    abilities: ['Problem Solving', 'Silent Judgment', 'Bathroom Motivation'],
+    baseStats: { loyalty: 90, intelligence: 70, cuteness: 80 }
+  },
+  {
+    id: 'energy_hamster',
+    name: 'Productivity Hamster',
+    description: 'Runs endlessly on a wheel, generating pure motivation energy',
+    abilities: ['Energy Boost', 'Deadline Reminder', 'Midnight Snack Procurement'],
+    baseStats: { loyalty: 75, intelligence: 65, cuteness: 88 }
+  }
+];
+
+const SKILLS = {
+  'Coffee Brewing': 'Master the ancient art of caffeine extraction',
+  'Problem Solving': 'Turn impossible problems into merely improbable ones',
+  'Time Management': 'Bend the space-time continuum to fit more into your day',
+  'Self Care': 'Remember that you\'re a human being, not a productivity machine',
+  'Social Navigation': 'Successfully interact with other humans without major incidents',
+  'Patience': 'Resist the urge to throw things when technology doesn\'t cooperate',
+  'Adaptability': 'Roll with life\'s punches like a caffeinated ninja',
+  'Focus': 'Maintain attention span longer than a goldfish in the age of notifications'
+};
+
+const TITLES = [
+  'Novice Adventurer',
+  'Coffee Apprentice',
+  'Code Debugger',
+  'Life Balancer',
+  'Wellness Warrior',
+  'Productivity Ninja',
+  'Zen Master',
+  'Legendary Life Hacker',
+  'Supreme Being of Routine'
+];
+
 const RANDOM_EVENTS = [
   {
     id: 'coffee_shortage',
     title: 'The Great Coffee Shortage',
-    description: 'All coffee shops in the district have run out of beans! Emergency quest available.',
+    description: 'All coffee shops in the district have run out of beans! The Barista Sage needs your help.',
     type: 'emergency',
     choices: [
-      { id: 'help', text: 'Help find emergency coffee supplies', reward: { xp: 100, gold: 50 } },
+      { id: 'help', text: 'Help find emergency coffee supplies', reward: { xp: 100, gold: 50, relationshipBonus: 'barista_sage' } },
       { id: 'ignore', text: 'Ignore and drink tea instead', reward: { xp: 10, wisdom: 2 } }
     ]
   },
   {
     id: 'wifi_blessing',
     title: 'The WiFi Gods Smile Upon You',
-    description: 'Your internet connection is mysteriously perfect today!',
+    description: 'Your internet connection is mysteriously perfect today! Even the Oracle Debugger is impressed.',
     type: 'blessing',
     choices: [
-      { id: 'appreciate', text: 'Appreciate the moment', reward: { xp: 50, luck: 1 } }
+      { id: 'appreciate', text: 'Appreciate the moment and share the joy', reward: { xp: 50, luck: 1, skillBonus: 'Patience' } }
     ]
   },
   {
-    id: 'social_media_drama',
-    title: 'Social Media Drama Unfolds',
-    description: 'A heated debate about pineapple on pizza threatens to tear the community apart!',
+    id: 'pet_adoption_day',
+    title: 'Mysterious Pet Adoption Event',
+    description: 'Dr. Pawsitive has organized a special adoption event! Adorable companions seek worthy heroes.',
+    type: 'special',
+    choices: [
+      { id: 'adopt', text: 'Adopt a loyal companion', reward: { petCompanion: true, relationshipBonus: 'pet_whisperer' } },
+      { id: 'volunteer', text: 'Volunteer to help other adoptions', reward: { xp: 75, charisma: 3 } }
+    ]
+  },
+  {
+    id: 'guild_recruitment',
+    title: 'Guild Recruitment Drive',
+    description: 'Local guilds are actively recruiting! Join a community of like-minded adventurers.',
     type: 'social',
     choices: [
-      { id: 'mediate', text: 'Try to mediate the conflict', reward: { xp: 75, charisma: 3 } },
-      { id: 'avoid', text: 'Stay out of it entirely', reward: { wisdom: 2 } },
-      { id: 'stir', text: 'Add fuel to the fire', reward: { xp: 25, luck: -1 } }
+      { id: 'explore', text: 'Explore guild options', reward: { xp: 60, guildInvites: true } },
+      { id: 'decline', text: 'Prefer the solo adventure life', reward: { wisdom: 3, skillBonus: 'Self Care' } }
+    ]
+  },
+  {
+    id: 'skill_master_challenge',
+    title: 'Master\'s Challenge Appears',
+    description: 'A legendary master has issued a challenge to test your skills! Success brings great rewards.',
+    type: 'challenge',
+    choices: [
+      { id: 'accept', text: 'Accept the challenge', reward: { xp: 200, skillPoints: 5, title: true } },
+      { id: 'prepare', text: 'Train first, challenge later', reward: { xp: 50, skillPoints: 2 } }
     ]
   }
 ];
@@ -493,11 +697,13 @@ export const DailyRoutineQuest: React.FC = () => {
   const [gameProgress, setGameProgress] = useState<GameProgress | null>(null);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story' | 'shop'>('character');
+  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story' | 'shop' | 'npcs' | 'guilds' | 'pets'>('character');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('totalScore');
   const [questFilter, setQuestFilter] = useState<'all' | 'daily' | 'epic'>('all');
   const [showCompletedQuests, setShowCompletedQuests] = useState(false);
+  const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
+  const [selectedGuild, setSelectedGuild] = useState<Guild | null>(null);
 
   const createNewCharacter = (characterClass: keyof typeof CHARACTER_CLASSES): Character => {
     const classData = CHARACTER_CLASSES[characterClass];
@@ -523,7 +729,19 @@ export const DailyRoutineQuest: React.FC = () => {
       gold: 100,
       totalScore: 0,
       prestige: 0,
-      rebornCount: 0
+      rebornCount: 0,
+      skills: {
+        'Coffee Brewing': 1,
+        'Problem Solving': 1,
+        'Time Management': 1,
+        'Self Care': 1,
+        'Social Navigation': 1,
+        'Patience': 1,
+        'Adaptability': 1,
+        'Focus': 1
+      },
+      titles: ['Novice Adventurer'],
+      currentTitle: 'Novice Adventurer'
     };
   };
 
@@ -693,6 +911,74 @@ export const DailyRoutineQuest: React.FC = () => {
           title: "PRESTIGE ASCENSION!",
           description: `You have transcended to Prestige ${newProgress.character.prestige}! All future gains are enhanced!`,
           duration: 8000
+        });
+      }
+    }
+
+    // Skill progression based on quest type
+    const skillGains: { [key: string]: number } = {};
+    switch (quest.category) {
+      case 'wellness':
+        skillGains['Self Care'] = Math.floor(Math.random() * 3) + 1;
+        skillGains['Time Management'] = Math.floor(Math.random() * 2) + 1;
+        break;
+      case 'community':
+        skillGains['Social Navigation'] = Math.floor(Math.random() * 3) + 1;
+        skillGains['Patience'] = Math.floor(Math.random() * 2) + 1;
+        break;
+      case 'tracking':
+        skillGains['Focus'] = Math.floor(Math.random() * 3) + 1;
+        skillGains['Problem Solving'] = Math.floor(Math.random() * 2) + 1;
+        break;
+      default:
+        const randomSkill = Object.keys(SKILLS)[Math.floor(Math.random() * Object.keys(SKILLS).length)];
+        skillGains[randomSkill] = Math.floor(Math.random() * 2) + 1;
+    }
+
+    // Apply skill gains
+    Object.entries(skillGains).forEach(([skill, gain]) => {
+      newProgress.character.skills[skill] = (newProgress.character.skills[skill] || 0) + gain;
+    });
+
+    // Title progression
+    const totalSkillPoints = Object.values(newProgress.character.skills).reduce((sum, val) => sum + val, 0);
+    let newTitle = '';
+    if (totalSkillPoints >= 200) newTitle = 'Supreme Being of Routine';
+    else if (totalSkillPoints >= 150) newTitle = 'Legendary Life Hacker';
+    else if (totalSkillPoints >= 120) newTitle = 'Zen Master';
+    else if (totalSkillPoints >= 90) newTitle = 'Productivity Ninja';
+    else if (totalSkillPoints >= 60) newTitle = 'Wellness Warrior';
+    else if (totalSkillPoints >= 40) newTitle = 'Life Balancer';
+    else if (totalSkillPoints >= 25) newTitle = 'Code Debugger';
+    else if (totalSkillPoints >= 15) newTitle = 'Coffee Apprentice';
+
+    if (newTitle && !newProgress.character.titles.includes(newTitle)) {
+      newProgress.character.titles.push(newTitle);
+      newProgress.character.currentTitle = newTitle;
+      toast({
+        title: "New Title Earned!",
+        description: `You are now known as: ${newTitle}`,
+        duration: 5000
+      });
+    }
+
+    // Pet companion care
+    if (newProgress.character.petCompanion) {
+      const hoursSinceLastFed = (Date.now() - new Date(newProgress.character.petCompanion.lastFed).getTime()) / (1000 * 60 * 60);
+      if (hoursSinceLastFed > 12) {
+        newProgress.character.petCompanion.hunger = Math.max(0, newProgress.character.petCompanion.hunger - 10);
+        newProgress.character.petCompanion.happiness = Math.max(0, newProgress.character.petCompanion.happiness - 5);
+      }
+      
+      // Pet gains XP too
+      newProgress.character.petCompanion.xp += Math.floor(xpGained * 0.2);
+      if (newProgress.character.petCompanion.xp >= newProgress.character.petCompanion.level * 100) {
+        newProgress.character.petCompanion.level += 1;
+        newProgress.character.petCompanion.xp = 0;
+        toast({
+          title: "Pet Level Up!",
+          description: `${newProgress.character.petCompanion.name} reached level ${newProgress.character.petCompanion.level}!`,
+          duration: 3000
         });
       }
     }
@@ -882,6 +1168,30 @@ export const DailyRoutineQuest: React.FC = () => {
           <Gem className="w-4 h-4" />
           Shop
         </Button>
+        <Button
+          variant={activeTab === 'npcs' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('npcs')}
+          className="flex items-center gap-2"
+        >
+          <Users className="w-4 h-4" />
+          NPCs
+        </Button>
+        <Button
+          variant={activeTab === 'guilds' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('guilds')}
+          className="flex items-center gap-2"
+        >
+          <Crown className="w-4 h-4" />
+          Guilds
+        </Button>
+        <Button
+          variant={activeTab === 'pets' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('pets')}
+          className="flex items-center gap-2"
+        >
+          <Heart className="w-4 h-4" />
+          Pets
+        </Button>
       </div>
 
       {/* Character Tab */}
@@ -973,7 +1283,7 @@ export const DailyRoutineQuest: React.FC = () => {
                 </div>
               )}
 
-              {/* Stats */}
+              {/* Core Stats */}
               <div className="grid grid-cols-5 gap-2 pt-4">
                 <div className="text-center bg-red-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-red-600">{gameProgress.character.strength}</div>
@@ -994,6 +1304,54 @@ export const DailyRoutineQuest: React.FC = () => {
                 <div className="text-center bg-yellow-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-yellow-600">{gameProgress.character.luck}</div>
                   <div className="text-xs text-yellow-800">Luck</div>
+                </div>
+              </div>
+
+              {/* Current Title */}
+              {gameProgress.character.currentTitle && (
+                <div className="text-center bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3 mt-4">
+                  <div className="text-sm font-medium text-purple-900">Current Title</div>
+                  <div className="text-lg font-bold text-purple-600">{gameProgress.character.currentTitle}</div>
+                </div>
+              )}
+
+              {/* Pet Companion Status */}
+              {gameProgress.character.petCompanion && (
+                <div className="bg-green-50 rounded-lg p-3 mt-4">
+                  <h4 className="font-medium text-green-900 mb-2 flex items-center gap-2">
+                    <Heart className="w-4 h-4" />
+                    {gameProgress.character.petCompanion.name} (Lv.{gameProgress.character.petCompanion.level})
+                  </h4>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div className="text-center">
+                      <div className="font-bold text-green-600">{gameProgress.character.petCompanion.loyalty}</div>
+                      <div className="text-green-800">Loyalty</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-orange-600">{gameProgress.character.petCompanion.hunger}</div>
+                      <div className="text-orange-800">Hunger</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-pink-600">{gameProgress.character.petCompanion.happiness}</div>
+                      <div className="text-pink-800">Happy</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Skills Preview */}
+              <div className="bg-gray-50 rounded-lg p-3 mt-4">
+                <h4 className="font-medium text-gray-900 mb-2">Top Skills</h4>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {Object.entries(gameProgress.character.skills)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 4)
+                    .map(([skill, level]) => (
+                      <div key={skill} className="flex justify-between">
+                        <span className="text-gray-600">{skill}</span>
+                        <span className="font-bold text-blue-600">{level}</span>
+                      </div>
+                    ))}
                 </div>
               </div>
             </CardContent>
@@ -1069,7 +1427,32 @@ export const DailyRoutineQuest: React.FC = () => {
                           ring: 'Band of Infinite Patience',
                           necklace: 'Amulet of Work-Life Balance'
                         },
-                        inventory: ['Survival Kit', 'Motivation Potion', 'Caffeinated Elixir', 'Wisdom Scroll', 'Aqua Crystal', 'Mobility Rune', 'Social Bond', 'Dream Essence', 'Efficiency Crystal', 'Karma Coin']
+                        inventory: ['Survival Kit', 'Motivation Potion', 'Caffeinated Elixir', 'Wisdom Scroll', 'Aqua Crystal', 'Mobility Rune', 'Social Bond', 'Dream Essence', 'Efficiency Crystal', 'Karma Coin'],
+                        skills: {
+                          'Coffee Brewing': 45,
+                          'Problem Solving': 38,
+                          'Time Management': 42,
+                          'Self Care': 35,
+                          'Social Navigation': 29,
+                          'Patience': 41,
+                          'Adaptability': 33,
+                          'Focus': 37
+                        },
+                        titles: ['Novice Adventurer', 'Coffee Apprentice', 'Code Debugger', 'Life Balancer', 'Wellness Warrior', 'Productivity Ninja'],
+                        currentTitle: 'Productivity Ninja',
+                        petCompanion: {
+                          id: 'demo-pet',
+                          name: 'Byte',
+                          species: 'Keyboard Cat',
+                          level: 8,
+                          xp: 45,
+                          abilities: ['Typo Generation', 'Meeting Disruption', 'Infinite Purring'],
+                          loyalty: 85,
+                          hunger: 70,
+                          happiness: 90,
+                          lastFed: new Date()
+                        },
+                        guildMembership: 'coffee_connoisseurs'
                       },
                       completedQuests: ['epic-0', 'epic-1', 'epic-2'],
                       dailyStreak: 37,
@@ -1077,7 +1460,13 @@ export const DailyRoutineQuest: React.FC = () => {
                       achievementsUnlocked: ['First Steps', 'Daily Warrior', 'Coffee Master', 'Social Butterfly', 'Level Crusher', 'Gold Hoarder'],
                       unlockedZones: ['Downtown Cafe District', 'Corporate Office Towers', 'Silicon Valley Wastelands'],
                       chapterUnlocked: 3,
-                      storyProgress: 45
+                      storyProgress: 45,
+                      relationships: {
+                        'barista_sage': 75,
+                        'debug_oracle': 45,
+                        'pet_whisperer': 60,
+                        'plant_sensei': 30
+                      }
                     };
                     setGameProgress(demoProgress);
                     toast({
@@ -1502,14 +1891,280 @@ export const DailyRoutineQuest: React.FC = () => {
         </Card>
       )}
 
+      {/* NPCs Tab */}
+      {activeTab === 'npcs' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5" />
+                Characters of the Realm
+                <Badge className="bg-blue-100 text-blue-800">
+                  {NPCS.length} Available
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {NPCS.map((npc) => (
+                  <div
+                    key={npc.id}
+                    className="border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md hover:border-blue-300"
+                    onClick={() => setSelectedNPC(npc)}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {npc.name.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="font-bold">{npc.name}</h3>
+                        <p className="text-sm text-gray-600">{npc.role}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-2">{npc.personality}</p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-blue-600">📍 {npc.location}</span>
+                      <div className="flex items-center gap-1">
+                        <Heart className="w-3 h-3 text-red-500" />
+                        <span>{gameProgress.relationships?.[npc.id] || 0}</span>
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="text-xs">
+                        {npc.questsAvailable.length} quests available
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Guilds Tab */}
+      {activeTab === 'guilds' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="w-5 h-5" />
+                Guild Directory
+                <Badge className="bg-purple-100 text-purple-800">
+                  {GUILDS.length} Guilds
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {GUILDS.map((guild) => {
+                  const meetsRequirements = gameProgress.character.level >= guild.requirements.level &&
+                    (!guild.requirements.skills || Object.entries(guild.requirements.skills).every(
+                      ([skill, required]) => (gameProgress.character.skills[skill] || 0) >= required
+                    ));
+                  
+                  return (
+                    <div
+                      key={guild.id}
+                      className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
+                        meetsRequirements ? 'hover:border-purple-300' : 'opacity-60 border-gray-300'
+                      }`}
+                      onClick={() => meetsRequirements && setSelectedGuild(guild)}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white">
+                          <Crown className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold">{guild.name}</h3>
+                          <p className="text-sm text-gray-600">{guild.memberCount.toLocaleString()} members</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-3">{guild.description}</p>
+                      
+                      <div className="space-y-2">
+                        <div className="text-xs">
+                          <span className="font-medium">Requirements:</span>
+                          <div className="text-gray-600 ml-2">
+                            Level {guild.requirements.level}
+                            {guild.requirements.skills && Object.entries(guild.requirements.skills).map(([skill, level]) => (
+                              <div key={skill} className={`text-xs ${
+                                (gameProgress.character.skills[skill] || 0) >= level ? 'text-green-600' : 'text-red-600'
+                              }`}>
+                                {skill}: {level} (have: {gameProgress.character.skills[skill] || 0})
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="text-xs">
+                          <span className="font-medium">Benefits:</span>
+                          <ul className="text-gray-600 ml-2">
+                            {guild.benefits.slice(0, 2).map((benefit, idx) => (
+                              <li key={idx}>• {benefit}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      
+                      {!meetsRequirements && (
+                        <div className="mt-2 text-xs text-red-600 bg-red-50 rounded p-2">
+                          Requirements not met
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Pets Tab */}
+      {activeTab === 'pets' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Heart className="w-5 h-5" />
+              Pet Companions
+              {gameProgress.character.petCompanion ? (
+                <Badge className="bg-green-100 text-green-800">
+                  {gameProgress.character.petCompanion.name} Active
+                </Badge>
+              ) : (
+                <Badge className="bg-gray-100 text-gray-800">
+                  No Pet
+                </Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {gameProgress.character.petCompanion ? (
+              <div className="space-y-4">
+                <div className="bg-green-50 rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white text-2xl">
+                      🐾
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold">{gameProgress.character.petCompanion.name}</h3>
+                      <p className="text-sm text-gray-600">{gameProgress.character.petCompanion.species}</p>
+                      <p className="text-xs text-green-600">Level {gameProgress.character.petCompanion.level}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-green-600">{gameProgress.character.petCompanion.loyalty}</div>
+                      <div className="text-xs text-green-800">Loyalty</div>
+                      <Progress value={gameProgress.character.petCompanion.loyalty} className="h-1 mt-1" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-orange-600">{gameProgress.character.petCompanion.hunger}</div>
+                      <div className="text-xs text-orange-800">Hunger</div>
+                      <Progress value={gameProgress.character.petCompanion.hunger} className="h-1 mt-1" />
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-pink-600">{gameProgress.character.petCompanion.happiness}</div>
+                      <div className="text-xs text-pink-800">Happiness</div>
+                      <Progress value={gameProgress.character.petCompanion.happiness} className="h-1 mt-1" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Abilities:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {gameProgress.character.petCompanion.abilities.map((ability, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {ability}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        const newProgress = { ...gameProgress };
+                        newProgress.character.petCompanion!.hunger = Math.min(100, newProgress.character.petCompanion!.hunger + 20);
+                        newProgress.character.petCompanion!.happiness = Math.min(100, newProgress.character.petCompanion!.happiness + 10);
+                        newProgress.character.petCompanion!.lastFed = new Date();
+                        setGameProgress(newProgress);
+                        toast({
+                          title: "Pet Fed!",
+                          description: `${newProgress.character.petCompanion!.name} is happy and well-fed!`,
+                          duration: 3000
+                        });
+                      }}
+                    >
+                      🍖 Feed Pet
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const newProgress = { ...gameProgress };
+                        newProgress.character.petCompanion!.happiness = Math.min(100, newProgress.character.petCompanion!.happiness + 15);
+                        newProgress.character.petCompanion!.loyalty = Math.min(100, newProgress.character.petCompanion!.loyalty + 5);
+                        setGameProgress(newProgress);
+                        toast({
+                          title: "Play Time!",
+                          description: `${newProgress.character.petCompanion!.name} loves playing with you!`,
+                          duration: 3000
+                        });
+                      }}
+                    >
+                      🎾 Play
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">🐾</div>
+                <h3 className="text-lg font-bold mb-2">No Pet Companion Yet</h3>
+                <p className="text-gray-600 mb-4">Build relationships with NPCs or participate in special events to adopt a loyal companion!</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {PET_SPECIES.map((species) => (
+                    <div key={species.id} className="border rounded-lg p-4">
+                      <h4 className="font-bold mb-2">{species.name}</h4>
+                      <p className="text-sm text-gray-600 mb-3">{species.description}</p>
+                      <div className="space-y-1 text-xs">
+                        {species.abilities.map((ability, idx) => (
+                          <div key={idx} className="flex items-center gap-1">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            {ability}
+                          </div>
+                        ))}
+                      </div>
+                      <Button
+                        size="sm"
+                        className="w-full mt-3"
+                        disabled
+                      >
+                        Requires Special Event
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Inventory Tab */}
       {activeTab === 'inventory' && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Gem className="w-5 h-5" />
-              Inventory
+              Inventory & Skills
               <Badge>{gameProgress.character.inventory.length} Items</Badge>
+              <Badge variant="outline">{Object.keys(gameProgress.character.skills).length} Skills</Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -1525,6 +2180,192 @@ export const DailyRoutineQuest: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* NPC Detail Modal */}
+      {selectedNPC && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  {selectedNPC.name.charAt(0)}
+                </div>
+                <div>
+                  <div>{selectedNPC.name}</div>
+                  <div className="text-sm font-normal text-gray-600">{selectedNPC.role}</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-blue-50 rounded-lg p-3">
+                <h4 className="font-medium text-blue-900 mb-1">Location:</h4>
+                <p className="text-sm text-blue-800">{selectedNPC.location}</p>
+              </div>
+
+              <div className="bg-purple-50 rounded-lg p-3">
+                <h4 className="font-medium text-purple-900 mb-1">Personality:</h4>
+                <p className="text-sm text-purple-800">{selectedNPC.personality}</p>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Random Dialogue:</h4>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm italic">
+                    "{selectedNPC.dialogue[Math.floor(Math.random() * selectedNPC.dialogue.length)]}"
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium">Relationship Level:</h4>
+                <div className="flex items-center gap-2">
+                  <Progress value={(gameProgress.relationships?.[selectedNPC.id] || 0)} className="flex-1" />
+                  <span className="text-sm font-bold">{gameProgress.relationships?.[selectedNPC.id] || 0}/100</span>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 rounded-lg p-3">
+                <h4 className="font-medium text-yellow-900 mb-1">Special Ability:</h4>
+                <p className="text-xs text-yellow-800">{selectedNPC.specialAbility}</p>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => {
+                    // Interact with NPC
+                    const newProgress = { ...gameProgress };
+                    if (!newProgress.relationships) newProgress.relationships = {};
+                    newProgress.relationships[selectedNPC.id] = Math.min(100, (newProgress.relationships[selectedNPC.id] || 0) + 5);
+                    setGameProgress(newProgress);
+                    
+                    toast({
+                      title: "Pleasant Conversation!",
+                      description: `Your relationship with ${selectedNPC.name} improved!`,
+                      duration: 3000
+                    });
+                    setSelectedNPC(null);
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  Chat (+5 Relationship)
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedNPC(null)}
+                >
+                  Leave
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Guild Detail Modal */}
+      {selectedGuild && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white">
+                  <Crown className="w-6 h-6" />
+                </div>
+                <div>
+                  <div>{selectedGuild.name}</div>
+                  <div className="text-sm font-normal text-gray-600">{selectedGuild.memberCount.toLocaleString()} members</div>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-gray-700">{selectedGuild.description}</p>
+
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-medium mb-2">Requirements:</h4>
+                  <div className="text-sm space-y-1">
+                    <div className="flex justify-between">
+                      <span>Level:</span>
+                      <span className={gameProgress.character.level >= selectedGuild.requirements.level ? 'text-green-600' : 'text-red-600'}>
+                        {selectedGuild.requirements.level} (you: {gameProgress.character.level})
+                      </span>
+                    </div>
+                    {selectedGuild.requirements.skills && Object.entries(selectedGuild.requirements.skills).map(([skill, required]) => (
+                      <div key={skill} className="flex justify-between">
+                        <span>{skill}:</span>
+                        <span className={(gameProgress.character.skills[skill] || 0) >= required ? 'text-green-600' : 'text-red-600'}>
+                          {required} (you: {gameProgress.character.skills[skill] || 0})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Member Benefits:</h4>
+                  <ul className="text-sm space-y-1">
+                    {selectedGuild.benefits.map((benefit, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <Star className="w-3 h-3 text-yellow-500" />
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-medium mb-2">Weekly Guild Quests:</h4>
+                  <ul className="text-sm space-y-1">
+                    {selectedGuild.weeklyQuests.map((quest, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <Target className="w-3 h-3 text-blue-500" />
+                        {quest}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => {
+                    const meetsRequirements = gameProgress.character.level >= selectedGuild.requirements.level &&
+                      (!selectedGuild.requirements.skills || Object.entries(selectedGuild.requirements.skills).every(
+                        ([skill, required]) => (gameProgress.character.skills[skill] || 0) >= required
+                      ));
+                    
+                    if (meetsRequirements) {
+                      const newProgress = { ...gameProgress };
+                      newProgress.character.guildMembership = selectedGuild.id;
+                      setGameProgress(newProgress);
+                      
+                      toast({
+                        title: "Guild Joined!",
+                        description: `Welcome to ${selectedGuild.name}!`,
+                        duration: 5000
+                      });
+                      setSelectedGuild(null);
+                    }
+                  }}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  disabled={gameProgress.character.guildMembership === selectedGuild.id ||
+                    gameProgress.character.level < selectedGuild.requirements.level ||
+                    (selectedGuild.requirements.skills && Object.entries(selectedGuild.requirements.skills).some(
+                      ([skill, required]) => (gameProgress.character.skills[skill] || 0) < required
+                    ))}
+                >
+                  {gameProgress.character.guildMembership === selectedGuild.id ? 'Already Member' : 'Join Guild'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedGuild(null)}
+                >
+                  Close
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Quest Detail Modal */}
