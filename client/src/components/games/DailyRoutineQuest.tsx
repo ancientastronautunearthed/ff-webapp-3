@@ -1087,6 +1087,9 @@ export const DailyRoutineQuest: React.FC = () => {
   const [selectedNPC, setSelectedNPC] = useState<NPC | null>(null);
   const [selectedGuild, setSelectedGuild] = useState<Guild | null>(null);
   const [storyChoiceModal, setStoryChoiceModal] = useState<{npc: NPC, phase: StoryPhase} | null>(null);
+  const [dynamicStoryModal, setDynamicStoryModal] = useState<any>(null);
+  const [currentPersonalStory, setCurrentPersonalStory] = useState<any>(null);
+  const [storyHistory, setStoryHistory] = useState<any[]>([]);
   const [characterChoices, setCharacterChoices] = useState<string[]>([]);
   const [worldState, setWorldState] = useState({
     aiTrustLevel: 50, // 0-100, affects how AIs interact with player
@@ -2643,17 +2646,10 @@ export const DailyRoutineQuest: React.FC = () => {
               <Button 
                 size="sm" 
                 variant="outline"
-                onClick={() => {
-                  // Generate AI event
-                  toast({
-                    title: "AI Life Event Generated",
-                    description: "New opportunities and challenges await in your life simulation!",
-                    duration: 4000
-                  });
-                }}
+                onClick={generatePersonalStory}
               >
                 <Zap className="w-4 h-4 mr-1" />
-                AI Event
+                AI Story
               </Button>
             </div>
           </CardContent>
@@ -2791,6 +2787,10 @@ export const DailyRoutineQuest: React.FC = () => {
                                   impact: 25
                                 });
                                 newProgress.character.cryptoCoins += 100;
+                                
+                                // Generate milestone story for marriage
+                                generateMilestoneStory('marriage');
+                                
                                 toast({
                                   title: "Marriage!",
                                   description: `You married ${relationship.name}! +100 Crypto Coins`,
@@ -2822,6 +2822,10 @@ export const DailyRoutineQuest: React.FC = () => {
                                 };
                                 newProgress.character.lifeSimulation.relationships.push(newChild);
                                 newProgress.character.cryptoCoins += 200;
+                                
+                                // Generate milestone story for birth
+                                generateMilestoneStory('birth');
+                                
                                 toast({
                                   title: "New Baby!",
                                   description: `Welcome ${childName} to the world! +200 Crypto Coins`,
@@ -2865,7 +2869,7 @@ export const DailyRoutineQuest: React.FC = () => {
         </Card>
       )}
 
-      {/* Housing Tab */}
+      {/* Real Estate & Housing Tab */}
       {activeTab === 'housing' && (
         <Card>
           <CardHeader>
@@ -2912,77 +2916,293 @@ export const DailyRoutineQuest: React.FC = () => {
               )}
             </div>
 
-            {/* Housing Market */}
-            <div>
-              <h3 className="font-bold mb-3">2035 Housing Market</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  {
-                    type: 'AI-Optimized Apartment',
-                    location: 'Neo Francisco Tech District',
-                    price: 2500,
-                    features: ['Smart Home AI', 'Neural Interface', 'Automated Cleaning'],
-                    description: 'Fully integrated with city AI systems'
-                  },
-                  {
-                    type: 'Human Sanctuary House',
-                    location: 'Underground Resistance Quarter',
-                    price: 1800,
-                    features: ['AI-Free Zone', 'Manual Controls', 'Hidden Access'],
-                    description: 'Off-grid housing for human purists'
-                  },
-                  {
-                    type: 'Hybrid Living Space',
-                    location: 'Neutral Cooperation Zone',
-                    price: 3200,
-                    features: ['Human-AI Balance', 'Organic Garden', 'Tech Workshop'],
-                    description: 'Perfect blend of human and AI conveniences'
-                  }
-                ].map((property, idx) => (
-                  <div key={idx} className="border rounded-lg p-4">
-                    <h4 className="font-bold mb-2">{property.type}</h4>
-                    <p className="text-sm text-gray-600 mb-2">{property.location}</p>
-                    <p className="text-lg font-bold text-green-600 mb-2">${property.price}/month</p>
-                    <p className="text-xs text-gray-500 mb-3">{property.description}</p>
-                    
-                    <div className="space-y-1 mb-3">
-                      {property.features.map((feature, featureIdx) => (
-                        <div key={featureIdx} className="text-xs flex items-center gap-1">
-                          <div className="w-1 h-1 bg-green-500 rounded-full"></div>
-                          {feature}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <Button
-                      size="sm"
-                      disabled={gameProgress.character.lifeSimulation?.financialStatus.savings! < property.price * 2}
-                      onClick={() => {
-                        const newProgress = { ...gameProgress };
-                        if (newProgress.character.lifeSimulation && newProgress.character.lifeSimulation.financialStatus.savings >= property.price * 2) {
-                          newProgress.character.lifeSimulation.housing = {
-                            type: 'renting',
-                            propertyType: property.type.includes('Apartment') ? 'apartment' : 'house',
-                            location: property.location,
-                            monthlyPayment: property.price,
-                            upgrades: property.features
-                          };
-                          newProgress.character.lifeSimulation.financialStatus.savings -= property.price * 2;
-                          newProgress.character.cryptoCoins += 25;
-                          setGameProgress(newProgress);
-                          
-                          toast({
-                            title: "New Home!",
-                            description: `Moved to ${property.type}! +25 Crypto Coins`,
-                            duration: 4000
-                          });
-                        }
-                      }}
-                    >
-                      {gameProgress.character.lifeSimulation?.financialStatus.savings! >= property.price * 2 ? 'Move Here' : 'Can\'t Afford'}
-                    </Button>
+            {/* Real Estate Market & Family Planning */}
+            <div className="space-y-6">
+              {/* Family Progression Status */}
+              <div className="bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg p-4">
+                <h3 className="font-bold mb-3 flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  Family Progression Tracker
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <div className="font-medium">Current Phase</div>
+                    <div className="capitalize">{gameProgress.character.lifeSimulation?.currentLifePhase.replace('_', ' ')}</div>
                   </div>
-                ))}
+                  <div>
+                    <div className="font-medium">Family Size</div>
+                    <div>{gameProgress.character.lifeSimulation?.relationships.length || 0} members</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Housing Needs</div>
+                    <div>{gameProgress.character.lifeSimulation?.relationships.filter(r => r.type === 'child').length + 1} bedrooms needed</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Budget Ready</div>
+                    <div>${gameProgress.character.lifeSimulation?.financialStatus.savings || 0}</div>
+                  </div>
+                </div>
+                
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      // Simulate family growth over 10 years
+                      const currentFamily = {
+                        currentPhase: gameProgress.character.lifeSimulation?.currentLifePhase || 'young_adult',
+                        members: gameProgress.character.lifeSimulation?.relationships || [],
+                        plannedAdditions: { children: 2, timeline: '5 years', budget: 100000 },
+                        housingNeeds: {
+                          minBedrooms: 3,
+                          minBathrooms: 2,
+                          requiredSpaces: ['office', 'family_room'],
+                          preferredFeatures: ['garden', 'garage'],
+                          maxBudget: 500000,
+                          location: 'Neo Francisco'
+                        },
+                        lifestyle: {
+                          workFromHome: true,
+                          entertainingFrequency: 'regularly',
+                          petOwnership: false,
+                          hobbiesRequiringSpace: ['crafting'],
+                          transportationNeeds: ['family_car']
+                        }
+                      };
+                      
+                      toast({
+                        title: "Family Growth Simulation",
+                        description: "Projecting your family's housing needs over the next 10 years...",
+                        duration: 3000
+                      });
+                    }}
+                  >
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    Project Growth
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      // Generate milestone story for major housing decision
+                      generateMilestoneStory('achievement');
+                    }}
+                  >
+                    <Star className="w-4 h-4 mr-1" />
+                    Housing Story
+                  </Button>
+                </div>
+              </div>
+
+              {/* Smart Property Listings */}
+              <div>
+                <h3 className="font-bold mb-3 flex items-center gap-2">
+                  <Building className="w-5 h-5" />
+                  AI-Curated Property Listings for 2035
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    {
+                      id: 'smart_family_home',
+                      type: 'Smart Family Home',
+                      location: 'Neo Francisco Family District',
+                      price: 750000,
+                      monthlyPayment: 3200,
+                      bedrooms: 4,
+                      bathrooms: 3,
+                      sqft: 2400,
+                      features: ['AI Nanny System', 'Adaptive Spaces', 'Child Safety Protocols', 'Educational Hub'],
+                      description: 'Perfect for growing families with AI assistance for childcare and education',
+                      match: 95,
+                      energyRating: 'A+',
+                      schoolRating: 9
+                    },
+                    {
+                      id: 'eco_minimalist',
+                      type: 'Eco-Minimalist Condo',
+                      location: 'Green Valley Sustainable Community',
+                      price: 450000,
+                      monthlyPayment: 2100,
+                      bedrooms: 2,
+                      bathrooms: 2,
+                      sqft: 1200,
+                      features: ['Zero Waste Systems', 'Vertical Garden', 'Solar Integration', 'Minimal AI'],
+                      description: 'Sustainable living with minimal environmental impact',
+                      match: 78,
+                      energyRating: 'A+',
+                      schoolRating: 7
+                    },
+                    {
+                      id: 'luxury_penthouse',
+                      type: 'Luxury AI Penthouse',
+                      location: 'Downtown Executive District',
+                      price: 1200000,
+                      monthlyPayment: 5800,
+                      bedrooms: 3,
+                      bathrooms: 3,
+                      sqft: 2800,
+                      features: ['Full AI Butler', 'Rooftop Garden', 'Smart Glass', 'Executive Office'],
+                      description: 'Ultimate luxury living with complete AI integration',
+                      match: 65,
+                      energyRating: 'A',
+                      schoolRating: 8
+                    },
+                    {
+                      id: 'starter_townhome',
+                      type: 'First-Time Buyer Townhome',
+                      location: 'Emerging Neighborhood',
+                      price: 380000,
+                      monthlyPayment: 1850,
+                      bedrooms: 3,
+                      bathrooms: 2,
+                      sqft: 1600,
+                      features: ['Basic Smart Home', 'Community Garden', 'Flexible Spaces', 'Growth Potential'],
+                      description: 'Perfect starter home with room to grow',
+                      match: 88,
+                      energyRating: 'B+',
+                      schoolRating: 6
+                    }
+                  ].map((property, idx) => (
+                    <div key={idx} className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-bold">{property.type}</h4>
+                        <Badge 
+                          variant={property.match >= 90 ? 'default' : property.match >= 80 ? 'secondary' : 'outline'}
+                          className="text-xs"
+                        >
+                          {property.match}% match
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-sm text-gray-600 mb-2">{property.location}</p>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-sm mb-3">
+                        <div>
+                          <span className="font-medium text-green-600">${property.price.toLocaleString()}</span>
+                          <div className="text-xs text-gray-500">${property.monthlyPayment}/month</div>
+                        </div>
+                        <div>
+                          <span className="font-medium">{property.bedrooms}bd/{property.bathrooms}ba</span>
+                          <div className="text-xs text-gray-500">{property.sqft.toLocaleString()} sqft</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 mb-3">
+                        <Badge variant="outline" className="text-xs">
+                          Energy: {property.energyRating}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          Schools: {property.schoolRating}/10
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-xs text-gray-500 mb-3">{property.description}</p>
+                      
+                      <div className="space-y-1 mb-3">
+                        {property.features.slice(0, 3).map((feature, featureIdx) => (
+                          <div key={featureIdx} className="text-xs flex items-center gap-1">
+                            <div className="w-1 h-1 bg-blue-500 rounded-full"></div>
+                            {feature}
+                          </div>
+                        ))}
+                        {property.features.length > 3 && (
+                          <div className="text-xs text-gray-400">+{property.features.length - 3} more features</div>
+                        )}
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          disabled={gameProgress.character.lifeSimulation?.financialStatus.savings! < property.price * 0.2}
+                          onClick={() => {
+                            const newProgress = { ...gameProgress };
+                            const downPayment = property.price * 0.2;
+                            
+                            if (newProgress.character.lifeSimulation && newProgress.character.lifeSimulation.financialStatus.savings >= downPayment) {
+                              // Update housing
+                              newProgress.character.lifeSimulation.housing = {
+                                type: 'owned',
+                                propertyType: property.type.includes('Condo') ? 'condo' : 'house',
+                                location: property.location,
+                                monthlyPayment: property.monthlyPayment,
+                                value: property.price,
+                                upgrades: property.features
+                              };
+                              
+                              // Update finances
+                              newProgress.character.lifeSimulation.financialStatus.savings -= downPayment;
+                              newProgress.character.lifeSimulation.financialStatus.monthlyExpenses += property.monthlyPayment;
+                              newProgress.character.lifeSimulation.financialStatus.debt += property.price - downPayment;
+                              
+                              // Reward crypto coins based on property value
+                              const cryptoReward = Math.floor(property.price / 10000);
+                              newProgress.character.cryptoCoins += cryptoReward;
+                              
+                              setGameProgress(newProgress);
+                              
+                              // Generate property purchase milestone story
+                              generateMilestoneStory('achievement');
+                              
+                              toast({
+                                title: "Property Purchased!",
+                                description: `Welcome to your new ${property.type}! +${cryptoReward} Crypto Coins`,
+                                duration: 6000
+                              });
+                            }
+                          }}
+                          className="flex-1"
+                        >
+                          {gameProgress.character.lifeSimulation?.financialStatus.savings! >= property.price * 0.2 ? 
+                            `Buy (${Math.floor(property.price * 0.2 / 1000)}k down)` : 
+                            'Insufficient Funds'
+                          }
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            toast({
+                              title: "Virtual Tour",
+                              description: `Taking a virtual tour of ${property.type}...`,
+                              duration: 3000
+                            });
+                          }}
+                        >
+                          Tour
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mortgage Calculator */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h3 className="font-bold mb-3">2035 Mortgage Calculator</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div>
+                    <div className="font-medium">Current Credit Score</div>
+                    <div className="text-lg font-bold text-green-600">
+                      {gameProgress.character.lifeSimulation?.financialStatus.creditScore || 650}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Max Loan Amount</div>
+                    <div className="text-lg font-bold text-blue-600">
+                      ${((gameProgress.character.lifeSimulation?.financialStatus.monthlyIncome || 3000) * 5).toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Available Down Payment</div>
+                    <div className="text-lg font-bold text-purple-600">
+                      ${gameProgress.character.lifeSimulation?.financialStatus.savings || 0}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Estimated Rate</div>
+                    <div className="text-lg font-bold text-orange-600">6.5%</div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>

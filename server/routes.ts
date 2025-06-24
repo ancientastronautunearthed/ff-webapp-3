@@ -22,6 +22,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/peer-recommendations", peerRecommendationsRoutes);
   app.use("/api/research", researchRoutes);
   app.use("/api/tech-assistant", techAssistantRoutes);
+  
+  // Import and use real estate routes
+  const { realEstateRoutes } = await import('./routes/real-estate');
+  app.use('/api/real-estate', realEstateRoutes);
+  
+  // Import and use dynamic stories routes
+  const { dynamicStoriesRoutes } = await import('./routes/dynamic-stories');
+  app.use('/api/dynamic-stories', dynamicStoriesRoutes);
 
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {
