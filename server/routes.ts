@@ -38,6 +38,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import and use adaptive simulation routes
   const { adaptiveSimulationRoutes } = await import('./routes/adaptive-simulation');
   app.use('/api/adaptive-simulation', adaptiveSimulationRoutes);
+  
+  // Import and use life path routes
+  const { lifePathRoutes } = await import('./routes/life-path');
+  app.use('/api/life-path', lifePathRoutes);
 
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {

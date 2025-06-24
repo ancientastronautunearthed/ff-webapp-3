@@ -1096,6 +1096,9 @@ export const DailyRoutineQuest: React.FC = () => {
   const [adaptiveCareer, setAdaptiveCareer] = useState<any>(null);
   const [relationshipAnalysis, setRelationshipAnalysis] = useState<any>(null);
   const [careerAnalysis, setCareerAnalysis] = useState<any>(null);
+  const [lifePathVisualization, setLifePathVisualization] = useState<any>(null);
+  const [pathHistory, setPathHistory] = useState<any[]>([]);
+  const [choiceAnalysis, setChoiceAnalysis] = useState<any>(null);
   const [characterChoices, setCharacterChoices] = useState<string[]>([]);
   const [worldState, setWorldState] = useState({
     aiTrustLevel: 50, // 0-100, affects how AIs interact with player
@@ -1365,6 +1368,147 @@ export const DailyRoutineQuest: React.FC = () => {
       
     } catch (error) {
       console.error('Career adaptation error:', error);
+      return null;
+    }
+  };
+
+  const generateLifePathVisualization = async () => {
+    try {
+      // Build character history from game progress
+      const characterHistory = [
+        ...storyHistory.map(story => ({
+          id: story.id,
+          type: 'story_event',
+          title: story.title,
+          description: story.content.substring(0, 100) + '...',
+          timestamp: story.timestamp,
+          significance: 6
+        })),
+        // Add relationship events
+        ...(gameProgress.character.lifeSimulation?.relationships || []).map(rel => ({
+          id: `rel_${rel.id}`,
+          type: 'relationship',
+          title: `Relationship with ${rel.name}`,
+          description: `${rel.type} relationship at level ${rel.relationshipLevel}`,
+          timestamp: new Date(),
+          significance: rel.relationshipLevel > 70 ? 8 : 5
+        })),
+        // Add career events
+        gameProgress.character.lifeSimulation?.employment ? {
+          id: 'career_current',
+          type: 'career',
+          title: gameProgress.character.lifeSimulation.employment.position,
+          description: `Working at ${gameProgress.character.lifeSimulation.employment.company}`,
+          timestamp: new Date(),
+          significance: 7
+        } : null
+      ].filter(Boolean);
+
+      const response = await fetch('/api/life-path/generate-visualization', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          characterHistory,
+          currentState: {
+            id: gameProgress.character.id || 'player',
+            age: gameProgress.character.age,
+            lifePhase: gameProgress.character.lifeSimulation?.currentLifePhase || 'adult',
+            location: gameProgress.character.lifeSimulation?.housing?.location || 'Unknown'
+          },
+          personalityTraits: gameProgress.character.lifeSimulation?.personalityTraits || ['Adaptive', 'Curious']
+        })
+      });
+
+      if (!response.ok) throw new Error('Visualization generation failed');
+      
+      const data = await response.json();
+      setLifePathVisualization(data.visualization);
+      
+      // Add to path history
+      const newHistory = [...pathHistory, {
+        timestamp: new Date(),
+        visualization: data.visualization,
+        characterState: gameProgress.character
+      }];
+      setPathHistory(newHistory);
+      
+      toast({
+        title: "Life Path Visualized",
+        description: `Generated visualization with ${data.visualization.nodes.length} life events`,
+        duration: 4000
+      });
+      
+      return data.visualization;
+      
+    } catch (error) {
+      console.error('Life path visualization error:', error);
+      return null;
+    }
+  };
+
+  const adaptPathToChoice = async (choice: any, context: any) => {
+    if (!lifePathVisualization) return null;
+    
+    try {
+      const response = await fetch('/api/life-path/adapt-path', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentVisualization: lifePathVisualization,
+          newChoice: choice,
+          choiceContext: context
+        })
+      });
+
+      if (!response.ok) throw new Error('Path adaptation failed');
+      
+      const data = await response.json();
+      setLifePathVisualization(data.updatedVisualization);
+      
+      // Add to path history
+      const newHistory = [...pathHistory, {
+        timestamp: new Date(),
+        visualization: data.updatedVisualization,
+        choice: choice,
+        pathChanges: data.pathChanges
+      }];
+      setPathHistory(newHistory);
+      
+      toast({
+        title: "Path Adapted",
+        description: `Your life path evolved: ${data.newOpportunities.length} new opportunities opened`,
+        duration: 5000
+      });
+      
+      return data;
+      
+    } catch (error) {
+      console.error('Path adaptation error:', error);
+      return null;
+    }
+  };
+
+  const analyzeChoiceImpact = async (proposedChoice: any, alternatives: any[] = []) => {
+    try {
+      const response = await fetch('/api/life-path/analyze-choice-impact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPath: lifePathVisualization?.currentPath || [],
+          proposedChoice,
+          alternativeChoices: alternatives
+        })
+      });
+
+      if (!response.ok) throw new Error('Choice analysis failed');
+      
+      const data = await response.json();
+      setChoiceAnalysis(data.choiceAnalysis);
+      
+      return data.choiceAnalysis;
+      
+    } catch (error) {
+      console.error('Choice analysis error:', error);
       return null;
     }
   };
@@ -1969,6 +2113,14 @@ export const DailyRoutineQuest: React.FC = () => {
         >
           <Briefcase className="w-4 h-4" />
           Career
+        </Button>
+        <Button
+          variant={activeTab === 'lifepath' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('lifepath')}
+          className="flex items-center gap-2"
+        >
+          <TrendingUp className="w-4 h-4" />
+          Life Path
         </Button>
       </div>
 
