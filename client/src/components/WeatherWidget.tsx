@@ -63,7 +63,7 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({
       if (errorMessage.includes('API key')) {
         toast({
           title: "Weather Service Setup Required",
-          description: "Please configure your OpenWeather API key to enable live weather tracking.",
+          description: "Please configure your WeatherAPI.com key to enable live weather tracking.",
           variant: "destructive"
         });
       } else {

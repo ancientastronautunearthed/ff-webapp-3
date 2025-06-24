@@ -65,15 +65,13 @@ interface GeolocationCoords {
   longitude: number;
 }
 
-// OpenWeatherMap API integration
+// WeatherAPI.com integration
 class WeatherService {
   private apiKey: string;
-  private baseUrl = 'https://api.openweathermap.org/data/2.5';
-  private airPollutionUrl = 'https://api.openweathermap.org/data/2.5/air_pollution';
-  private oneCallUrl = 'https://api.openweathermap.org/data/3.0/onecall';
+  private baseUrl = 'https://api.weatherapi.com/v1';
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY || '';
+    this.apiKey = import.meta.env.VITE_WEATHERAPI_KEY || '';
   }
 
   async getCurrentLocation(): Promise<GeolocationCoords> {
@@ -108,22 +106,17 @@ class WeatherService {
     }
 
     try {
-      // Get current weather and forecast
-      const [currentResponse, forecastResponse, airQualityResponse] = await Promise.all([
-        fetch(`${this.baseUrl}/weather?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`),
-        fetch(`${this.baseUrl}/forecast?lat=${lat}&lon=${lon}&appid=${this.apiKey}&units=metric`),
-        fetch(`${this.airPollutionUrl}?lat=${lat}&lon=${lon}&appid=${this.apiKey}`)
-      ]);
+      // Get current weather and forecast with air quality
+      const response = await fetch(
+        `${this.baseUrl}/forecast.json?key=${this.apiKey}&q=${lat},${lon}&days=7&aqi=yes&alerts=yes`
+      );
 
-      if (!currentResponse.ok || !forecastResponse.ok || !airQualityResponse.ok) {
-        throw new Error('Failed to fetch weather data');
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status}`);
       }
 
-      const currentData = await currentResponse.json();
-      const forecastData = await forecastResponse.json();
-      const airQualityData = await airQualityResponse.json();
-
-      return this.formatWeatherData(currentData, forecastData, airQualityData);
+      const data = await response.json();
+      return this.formatWeatherAPIData(data);
     } catch (error) {
       console.error('Weather API error:', error);
       throw error;
@@ -136,130 +129,92 @@ class WeatherService {
     }
 
     try {
-      // First get coordinates for the city
-      const geoResponse = await fetch(
-        `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${this.apiKey}`
+      const response = await fetch(
+        `${this.baseUrl}/forecast.json?key=${this.apiKey}&q=${encodeURIComponent(city)}&days=7&aqi=yes&alerts=yes`
       );
 
-      if (!geoResponse.ok) {
-        throw new Error('Failed to geocode city');
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status}`);
       }
 
-      const geoData = await geoResponse.json();
-      if (geoData.length === 0) {
-        throw new Error('City not found');
-      }
-
-      const { lat, lon } = geoData[0];
-      return this.getWeatherByCoords(lat, lon);
+      const data = await response.json();
+      return this.formatWeatherAPIData(data);
     } catch (error) {
-      console.error('Weather geocoding error:', error);
+      console.error('Weather API error:', error);
       throw error;
     }
   }
 
-  private formatWeatherData(currentData: any, forecastData: any, airQualityData: any): WeatherData {
-    const current = currentData;
-    const airQuality = airQualityData.list[0];
-
+  private formatWeatherAPIData(data: any): WeatherData {
+    const current = data.current;
+    const location = data.location;
+    const forecast = data.forecast;
+    
     return {
       current: {
-        temperature: Math.round(current.main.temp),
-        humidity: current.main.humidity,
-        pressure: current.main.pressure,
-        windSpeed: current.wind?.speed || 0,
-        windDirection: current.wind?.deg || 0,
-        uvIndex: 0, // Not available in basic API
-        visibility: current.visibility ? current.visibility / 1000 : 0, // Convert to km
-        cloudCover: current.clouds.all,
-        precipitationProbability: 0, // Not available in current weather
-        precipitationType: current.weather[0].main === 'Rain' ? 'rain' : 
-                          current.weather[0].main === 'Snow' ? 'snow' : null,
-        airQualityIndex: airQuality.main.aqi,
+        temperature: Math.round(current.temp_c),
+        humidity: current.humidity,
+        pressure: current.pressure_mb,
+        windSpeed: current.wind_kph,
+        windDirection: current.wind_degree,
+        uvIndex: current.uv,
+        visibility: current.vis_km,
+        cloudCover: current.cloud,
+        precipitationProbability: current.precip_mm > 0 ? 80 : 20,
+        precipitationType: current.precip_mm > 0 ? 
+          (current.temp_c < 0 ? 'snow' : 'rain') : null,
+        airQualityIndex: current.air_quality?.['us-epa-index'] || 1,
         pollutants: {
-          pm25: airQuality.components.pm2_5 || 0,
-          pm10: airQuality.components.pm10 || 0,
-          o3: airQuality.components.o3 || 0,
-          no2: airQuality.components.no2 || 0,
-          so2: airQuality.components.so2 || 0,
-          co: airQuality.components.co || 0,
+          pm25: current.air_quality?.pm2_5 || 0,
+          pm10: current.air_quality?.pm10 || 0,
+          o3: current.air_quality?.o3 || 0,
+          no2: current.air_quality?.no2 || 0,
+          so2: current.air_quality?.so2 || 0,
+          co: current.air_quality?.co || 0,
         },
-        conditions: current.weather[0].description,
-        feelsLike: Math.round(current.main.feels_like),
-        dewPoint: this.calculateDewPoint(current.main.temp, current.main.humidity),
+        conditions: current.condition.text,
+        feelsLike: Math.round(current.feelslike_c),
+        dewPoint: Math.round(current.dewpoint_c),
       },
       forecast: {
-        daily: this.extractDailyForecast(forecastData.list),
-        hourly: this.extractHourlyForecast(forecastData.list),
+        daily: forecast.forecastday.map((day: any) => ({
+          date: day.date,
+          high: Math.round(day.day.maxtemp_c),
+          low: Math.round(day.day.mintemp_c),
+          humidity: day.day.avghumidity,
+          pressure: current.pressure_mb, // Use current pressure as daily average not available
+          precipitationChance: Math.round(day.day.daily_chance_of_rain || day.day.daily_chance_of_snow || 0),
+          conditions: day.day.condition.text,
+          uvIndex: day.day.uv,
+          airQuality: current.air_quality?.['us-epa-index'] || 1,
+        })),
+        hourly: forecast.forecastday[0].hour.slice(0, 24).map((hour: any) => ({
+          time: hour.time,
+          temperature: Math.round(hour.temp_c),
+          humidity: hour.humidity,
+          pressure: hour.pressure_mb,
+          precipitationChance: Math.round(hour.chance_of_rain || hour.chance_of_snow || 0),
+          conditions: hour.condition.text,
+        })),
       },
       location: {
-        latitude: current.coord.lat,
-        longitude: current.coord.lon,
-        city: current.name,
-        region: current.sys.country,
-        country: current.sys.country,
+        latitude: location.lat,
+        longitude: location.lon,
+        city: location.name,
+        region: location.region,
+        country: location.country,
       },
-      alerts: [], // Would need separate API call for alerts
+      alerts: data.alerts?.alert?.map((alert: any) => ({
+        type: alert.category,
+        severity: alert.severity,
+        description: alert.desc,
+        startTime: alert.effective,
+        endTime: alert.expires,
+      })) || [],
     };
   }
 
-  private extractDailyForecast(forecastList: any[]): WeatherData['forecast']['daily'] {
-    const dailyMap = new Map();
 
-    forecastList.forEach(item => {
-      const date = new Date(item.dt * 1000).toDateString();
-      
-      if (!dailyMap.has(date)) {
-        dailyMap.set(date, {
-          date,
-          high: item.main.temp_max,
-          low: item.main.temp_min,
-          humidity: item.main.humidity,
-          pressure: item.main.pressure,
-          precipitationChance: (item.pop || 0) * 100,
-          conditions: item.weather[0].description,
-          uvIndex: 0,
-          airQuality: 0,
-          temps: [item.main.temp],
-        });
-      } else {
-        const existing = dailyMap.get(date);
-        existing.high = Math.max(existing.high, item.main.temp_max);
-        existing.low = Math.min(existing.low, item.main.temp_min);
-        existing.temps.push(item.main.temp);
-      }
-    });
-
-    return Array.from(dailyMap.values()).slice(0, 7).map(day => ({
-      date: day.date,
-      high: Math.round(day.high),
-      low: Math.round(day.low),
-      humidity: day.humidity,
-      pressure: day.pressure,
-      precipitationChance: Math.round(day.precipitationChance),
-      conditions: day.conditions,
-      uvIndex: day.uvIndex,
-      airQuality: day.airQuality,
-    }));
-  }
-
-  private extractHourlyForecast(forecastList: any[]): WeatherData['forecast']['hourly'] {
-    return forecastList.slice(0, 24).map(item => ({
-      time: new Date(item.dt * 1000).toISOString(),
-      temperature: Math.round(item.main.temp),
-      humidity: item.main.humidity,
-      pressure: item.main.pressure,
-      precipitationChance: Math.round((item.pop || 0) * 100),
-      conditions: item.weather[0].description,
-    }));
-  }
-
-  private calculateDewPoint(temp: number, humidity: number): number {
-    const a = 17.27;
-    const b = 237.7;
-    const alpha = (a * temp) / (b + temp) + Math.log(humidity / 100);
-    return Math.round((b * alpha) / (a - alpha));
-  }
 
   // Get weather factors that commonly affect Morgellons symptoms
   getSymptomRelevantFactors(weatherData: WeatherData): {
