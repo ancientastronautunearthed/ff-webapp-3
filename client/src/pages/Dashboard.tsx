@@ -39,6 +39,7 @@ import CalendarView from '@/pages/CalendarView';
 import { DataVisualization } from '@/components/DataVisualization';
 import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { CompanionWidget } from '@/components/CompanionWidget';
+import { WeatherWidget } from '@/components/WeatherWidget';
 import { TelemedicineScheduling } from '@/components/TelemedicineScheduling';
 import { ResearchDashboardEnhanced } from '@/components/ResearchDashboardEnhanced';
 
@@ -281,7 +282,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions and Weather */}
         <div className="space-y-4">
           <Card>
             <CardHeader>
@@ -314,6 +315,9 @@ export default function Dashboard() {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Live Weather Widget */}
+          <WeatherWidget showSymptomCorrelations={true} />
 
           <Card>
             <CardHeader>
