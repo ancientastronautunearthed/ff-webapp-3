@@ -45,16 +45,26 @@ interface Character {
   maxHealth: number;
   mana: number;
   maxMana: number;
+  energy: number;
+  maxEnergy: number;
   strength: number;
   wisdom: number;
   vitality: number;
+  charisma: number;
+  luck: number;
   class: 'warrior' | 'mage' | 'healer' | 'ranger';
   equipment: {
     weapon?: string;
     armor?: string;
     accessory?: string;
+    ring?: string;
+    necklace?: string;
   };
   inventory: string[];
+  gold: number;
+  totalScore: number;
+  prestige: number;
+  rebornCount: number;
 }
 
 interface Quest {
@@ -77,188 +87,317 @@ interface Quest {
 interface GameProgress {
   character: Character;
   completedQuests: string[];
+  availableQuests: string[];
   dailyStreak: number;
   totalQuestsCompleted: number;
   achievementsUnlocked: string[];
   currentZone: string;
   unlockedZones: string[];
+  storyProgress: number;
+  chapterUnlocked: number;
+  worldEvents: WorldEvent[];
+  relationships: { [npcId: string]: number };
+  discoveries: string[];
+  secrets: string[];
   lastPlayed: Date;
+  playTime: number;
+  sessionCount: number;
+}
+
+interface WorldEvent {
+  id: string;
+  title: string;
+  description: string;
+  type: 'story' | 'random' | 'seasonal' | 'emergency';
+  active: boolean;
+  expiresAt?: Date;
+  choices?: EventChoice[];
+}
+
+interface EventChoice {
+  id: string;
+  text: string;
+  consequences: string[];
+  requirements?: string[];
 }
 
 const CHARACTER_CLASSES = {
   warrior: {
-    name: 'Health Warrior',
-    description: 'Masters physical wellness and symptom tracking',
+    name: 'Coffee Shop Barista',
+    description: 'Masters the ancient art of caffeine alchemy and customer service under pressure',
     icon: <Sword className="w-6 h-6" />,
     color: 'text-red-600',
-    bonuses: { strength: 2, vitality: 1 }
+    bonuses: { strength: 2, vitality: 1, energy: 20 }
   },
   mage: {
-    name: 'Knowledge Seeker',
-    description: 'Excels at research and understanding patterns',
+    name: 'Freelance Debugger',
+    description: 'Wields mysterious powers to vanquish code bugs and IT nightmares',
     icon: <BookOpen className="w-6 h-6" />,
     color: 'text-blue-600',
-    bonuses: { wisdom: 2, mana: 20 }
+    bonuses: { wisdom: 2, mana: 20, luck: 1 }
   },
   healer: {
-    name: 'Wellness Guardian',
-    description: 'Focuses on recovery and community support',
+    name: 'Pet Cafe Owner',
+    description: 'Brings joy to the world through adorable animals and baked goods',
     icon: <Heart className="w-6 h-6" />,
     color: 'text-green-600',
-    bonuses: { vitality: 1, wisdom: 1, maxHealth: 20 }
+    bonuses: { vitality: 1, wisdom: 1, charisma: 2, maxHealth: 20 }
   },
   ranger: {
-    name: 'Balance Keeper',
-    description: 'Maintains harmony between all aspects of health',
+    name: 'Plant Whisperer',
+    description: 'Maintains the delicate balance between urban life and nature',
     icon: <Compass className="w-6 h-6" />,
     color: 'text-purple-600',
-    bonuses: { strength: 1, wisdom: 1, vitality: 1 }
+    bonuses: { strength: 1, wisdom: 1, vitality: 1, charisma: 1 }
   }
 };
 
-const DAILY_QUESTS: Omit<Quest, 'id' | 'completed'>[] = [
+const STORY_CHAPTERS = [
   {
-    title: 'Morning Symptom Check',
-    description: 'Start your day by logging how you feel',
-    category: 'tracking',
+    id: 1,
+    title: "The Great WiFi Outage",
+    description: "When the internet died, heroes emerged from the most unlikely places...",
+    requiredLevel: 1,
+    zones: ["Downtown Cafe District", "The Server Room Dungeon"]
+  },
+  {
+    id: 2,
+    title: "The Mystery of the Missing Leftovers",
+    description: "Someone has been stealing lunches from the office fridge. Justice must be served... cold.",
+    requiredLevel: 10,
+    zones: ["Corporate Office Towers", "The Breakroom of Despair"]
+  },
+  {
+    id: 3,
+    title: "The Social Media Apocalypse",
+    description: "When all social platforms merge into one terrible entity, only the chosen few can restore digital balance.",
+    requiredLevel: 25,
+    zones: ["Silicon Valley Wastelands", "The Algorithm Citadel"]
+  },
+  {
+    id: 4,
+    title: "The Last Pizza Slice",
+    description: "In a world where pizza has become extinct, one slice remains. The fate of Friday nights hangs in the balance.",
+    requiredLevel: 50,
+    zones: ["The Frozen Food Tundra", "Mount Pepperoni"]
+  },
+  {
+    id: 5,
+    title: "The Great Subscription Cancellation",
+    description: "Trapped in an endless loop of subscription services, heroes must find the mythical 'Unsubscribe' button.",
+    requiredLevel: 75,
+    zones: ["The Streaming Labyrinth", "Customer Service Purgatory"]
+  }
+];
+
+const LEADERBOARD_CATEGORIES = [
+  'totalScore',
+  'level',
+  'questsCompleted',
+  'dailyStreak',
+  'prestige',
+  'discoveries'
+];
+
+const DYNAMIC_QUESTS: Omit<Quest, 'id' | 'completed'>[] = [
+  {
+    title: 'The Morning Coffee Ritual',
+    description: 'Brew the perfect cup to start your heroic day',
+    category: 'wellness',
     difficulty: 'easy',
     xpReward: 25,
     goldReward: 10,
-    itemRewards: ['Health Potion'],
-    requirements: ['Log at least 1 symptom'],
+    itemRewards: ['Caffeinated Elixir'],
+    requirements: ['Complete morning routine'],
     dailyTask: true,
-    realWorldAction: 'Complete symptom tracker entry',
+    realWorldAction: 'Start your day with intention',
     icon: <Sun className="w-4 h-4" />,
     color: 'bg-yellow-500'
   },
   {
-    title: 'Digital Matchbox Entry',
-    description: 'Document your daily observations',
+    title: 'The Daily Chronicle',
+    description: 'Record your adventures for future generations of heroes',
     category: 'tracking',
     difficulty: 'easy',
     xpReward: 30,
     goldReward: 15,
-    itemRewards: ['Journal Scroll'],
-    requirements: ['Create journal entry'],
+    itemRewards: ['Wisdom Scroll'],
+    requirements: ['Document your day'],
     dailyTask: true,
-    realWorldAction: 'Write in Digital Matchbox',
+    realWorldAction: 'Reflect and journal',
     icon: <FileText className="w-4 h-4" />,
     color: 'bg-blue-500'
   },
   {
-    title: 'Hydration Quest',
-    description: 'Maintain proper hydration levels',
+    title: 'The Hydration Salvation',
+    description: 'Prevent the great dehydration disaster of the modern office',
     category: 'wellness',
     difficulty: 'easy',
     xpReward: 20,
     goldReward: 5,
-    itemRewards: ['Crystal Vial'],
-    requirements: ['Drink 8 glasses of water'],
+    itemRewards: ['Aqua Crystal'],
+    requirements: ['Stay properly hydrated'],
     dailyTask: true,
-    realWorldAction: 'Track water intake',
+    realWorldAction: 'Drink water regularly',
     icon: <Droplets className="w-4 h-4" />,
     color: 'bg-cyan-500'
   },
   {
-    title: 'Mindful Movement',
-    description: 'Engage in gentle physical activity',
+    title: 'Escape the Desk Prison',
+    description: 'Break free from the ergonomic shackles of modern life',
     category: 'wellness',
     difficulty: 'medium',
     xpReward: 40,
     goldReward: 20,
-    itemRewards: ['Strength Charm'],
-    requirements: ['10+ minutes of movement'],
+    itemRewards: ['Mobility Rune'],
+    requirements: ['Move your body'],
     dailyTask: true,
-    realWorldAction: 'Complete exercise or stretching',
+    realWorldAction: 'Get some physical activity',
     icon: <Dumbbell className="w-4 h-4" />,
     color: 'bg-orange-500'
   },
   {
-    title: 'Community Connection',
-    description: 'Engage with fellow adventurers',
+    title: 'The Social Network',
+    description: 'Connect with other humans in this strange digital realm',
     category: 'community',
     difficulty: 'medium',
     xpReward: 35,
     goldReward: 25,
-    itemRewards: ['Friendship Token'],
-    requirements: ['Forum post or peer interaction'],
+    itemRewards: ['Social Bond'],
+    requirements: ['Meaningful interaction'],
     dailyTask: true,
-    realWorldAction: 'Participate in community forum',
+    realWorldAction: 'Connect with others',
     icon: <Users className="w-4 h-4" />,
     color: 'bg-purple-500'
   },
   {
-    title: 'Evening Reflection',
-    description: 'End your day with mindful observation',
+    title: 'The Nighttime Wind-Down',
+    description: 'Prepare for the great sleep adventure',
     category: 'wellness',
     difficulty: 'easy',
     xpReward: 25,
     goldReward: 10,
-    itemRewards: ['Wisdom Pearl'],
-    requirements: ['Evening symptom or mood check'],
+    itemRewards: ['Dream Essence'],
+    requirements: ['Evening wind-down routine'],
     dailyTask: true,
-    realWorldAction: 'Complete evening reflection',
+    realWorldAction: 'End day mindfully',
     icon: <Moon className="w-4 h-4" />,
     color: 'bg-indigo-500'
-  }
-];
-
-const STORY_QUESTS: Omit<Quest, 'id' | 'completed'>[] = [
+  },
   {
-    title: 'The Great Health Archive',
-    description: 'Complete your medical profile to unlock ancient knowledge',
-    category: 'medical',
+    title: 'The Great Productivity Hack',
+    description: 'Discover one small way to make tomorrow slightly less chaotic',
+    category: 'wellness',
     difficulty: 'medium',
-    xpReward: 100,
-    goldReward: 50,
-    itemRewards: ['Tome of Health', 'Profile Medallion'],
-    requirements: ['Complete medical profile'],
-    dailyTask: false,
-    realWorldAction: 'Fill out complete medical information',
-    icon: <Stethoscope className="w-4 h-4" />,
-    color: 'bg-red-500'
-  },
-  {
-    title: 'The Companion Bond',
-    description: 'Create your AI companion to aid in your journey',
-    category: 'health',
-    difficulty: 'hard',
-    xpReward: 150,
-    goldReward: 75,
-    itemRewards: ['Companion Crystal', 'Bond of Trust'],
-    requirements: ['Create AI companion'],
-    dailyTask: false,
-    realWorldAction: 'Complete AI companion creation',
-    icon: <Sparkles className="w-4 h-4" />,
-    color: 'bg-pink-500'
-  },
-  {
-    title: 'Pattern Recognition Master',
-    description: 'Discover the hidden connections in your health data',
-    category: 'tracking',
-    difficulty: 'hard',
-    xpReward: 200,
-    goldReward: 100,
-    itemRewards: ['Pattern Lens', 'Insight Gem'],
-    requirements: ['Complete 30 symptom entries', 'View AI insights'],
-    dailyTask: false,
-    realWorldAction: 'Track symptoms for pattern analysis',
+    xpReward: 50,
+    goldReward: 30,
+    itemRewards: ['Efficiency Crystal'],
+    requirements: ['Plan or organize something'],
+    dailyTask: true,
+    realWorldAction: 'Improve your systems',
     icon: <Target className="w-4 h-4" />,
     color: 'bg-green-500'
   },
   {
-    title: 'Community Champion',
-    description: 'Become a beacon of support for other adventurers',
+    title: 'The Unexpected Kindness',
+    description: 'Spread a little chaos... the good kind',
+    category: 'community',
+    difficulty: 'easy',
+    xpReward: 35,
+    goldReward: 20,
+    itemRewards: ['Karma Coin'],
+    requirements: ['Do something nice'],
+    dailyTask: true,
+    realWorldAction: 'Perform random act of kindness',
+    icon: <Heart className="w-4 h-4" />,
+    color: 'bg-pink-500'
+  }
+];
+
+const EPIC_QUESTS: Omit<Quest, 'id' | 'completed'>[] = [
+  {
+    title: 'The Profile of Destiny',
+    description: 'Create a legendary profile that will echo through the ages',
+    category: 'tracking',
+    difficulty: 'medium',
+    xpReward: 100,
+    goldReward: 50,
+    itemRewards: ['Identity Medallion', 'Legacy Scroll'],
+    requirements: ['Complete personal profile'],
+    dailyTask: false,
+    realWorldAction: 'Set up your character profile',
+    icon: <Star className="w-4 h-4" />,
+    color: 'bg-red-500'
+  },
+  {
+    title: 'The Digital Familiar',
+    description: 'Summon an AI companion to guide you through the chaos of modern life',
+    category: 'tracking',
+    difficulty: 'hard',
+    xpReward: 150,
+    goldReward: 75,
+    itemRewards: ['AI Bond Crystal', 'Digital Familiar'],
+    requirements: ['Create AI companion'],
+    dailyTask: false,
+    realWorldAction: 'Set up AI companion',
+    icon: <Sparkles className="w-4 h-4" />,
+    color: 'bg-pink-500'
+  },
+  {
+    title: 'The Data Whisperer',
+    description: 'Uncover the mysterious patterns hidden in the chaos of daily life',
+    category: 'tracking',
+    difficulty: 'hard',
+    xpReward: 200,
+    goldReward: 100,
+    itemRewards: ['Pattern Decoder', 'Insight Prism'],
+    requirements: ['Track activities for 30 days', 'Discover patterns'],
+    dailyTask: false,
+    realWorldAction: 'Build tracking habits',
+    icon: <Target className="w-4 h-4" />,
+    color: 'bg-green-500'
+  },
+  {
+    title: 'The Community Guardian',
+    description: 'Rise to become a legendary figure in the realm of social connection',
     category: 'community',
     difficulty: 'epic',
     xpReward: 300,
     goldReward: 150,
-    itemRewards: ['Champion\'s Crown', 'Helping Hand Badge'],
-    requirements: ['10 forum posts', '5 peer connections', 'Help 3 new users'],
+    itemRewards: ['Guardian Crown', 'Social Nexus'],
+    requirements: ['Make meaningful connections', 'Help others', 'Build community'],
     dailyTask: false,
-    realWorldAction: 'Build strong community connections',
+    realWorldAction: 'Become a community leader',
     icon: <Crown className="w-4 h-4" />,
     color: 'bg-yellow-600'
+  },
+  {
+    title: 'The Great Rebalancing',
+    description: 'Achieve the legendary work-life balance that scholars say is impossible',
+    category: 'wellness',
+    difficulty: 'epic',
+    xpReward: 500,
+    goldReward: 250,
+    itemRewards: ['Balance Stone', 'Harmony Amulet'],
+    requirements: ['Maintain consistency for 90 days'],
+    dailyTask: false,
+    realWorldAction: 'Create sustainable life balance',
+    icon: <Compass className="w-4 h-4" />,
+    color: 'bg-purple-600'
+  },
+  {
+    title: 'The Ascension Protocol',
+    description: 'Transcend mortal limitations and unlock infinite potential',
+    category: 'wellness',
+    difficulty: 'legendary',
+    xpReward: 1000,
+    goldReward: 500,
+    itemRewards: ['Phoenix Feather', 'Rebirth Crystal'],
+    requirements: ['Reach level 100', 'Complete all epic quests'],
+    dailyTask: false,
+    realWorldAction: 'Achieve personal transformation',
+    icon: <Trophy className="w-4 h-4" />,
+    color: 'bg-gradient-to-r from-purple-600 to-pink-600'
   }
 ];
 
@@ -268,7 +407,9 @@ export const DailyRoutineQuest: React.FC = () => {
   const [gameProgress, setGameProgress] = useState<GameProgress | null>(null);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory'>('character');
+  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story'>('character');
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('totalScore');
 
   const createNewCharacter = (characterClass: keyof typeof CHARACTER_CLASSES): Character => {
     const classData = CHARACTER_CLASSES[characterClass];
@@ -281,12 +422,20 @@ export const DailyRoutineQuest: React.FC = () => {
       maxHealth: 100 + (classData.bonuses.maxHealth || 0),
       mana: 50 + (classData.bonuses.mana || 0),
       maxMana: 50 + (classData.bonuses.mana || 0),
+      energy: 100 + (classData.bonuses.energy || 0),
+      maxEnergy: 100 + (classData.bonuses.energy || 0),
       strength: 10 + (classData.bonuses.strength || 0),
       wisdom: 10 + (classData.bonuses.wisdom || 0),
       vitality: 10 + (classData.bonuses.vitality || 0),
+      charisma: 10 + (classData.bonuses.charisma || 0),
+      luck: 10 + (classData.bonuses.luck || 0),
       class: characterClass,
       equipment: {},
-      inventory: ['Health Potion', 'Beginner\'s Guide']
+      inventory: ['Survival Kit', 'Motivation Potion'],
+      gold: 100,
+      totalScore: 0,
+      prestige: 0,
+      rebornCount: 0
     };
   };
 
@@ -314,12 +463,21 @@ export const DailyRoutineQuest: React.FC = () => {
         const progress = userData.dailyQuestProgress || {
           character: createNewCharacter('warrior'),
           completedQuests: [],
+          availableQuests: [],
           dailyStreak: 0,
           totalQuestsCompleted: 0,
           achievementsUnlocked: [],
-          currentZone: 'Healing Village',
-          unlockedZones: ['Healing Village'],
-          lastPlayed: new Date()
+          currentZone: 'Downtown Cafe District',
+          unlockedZones: ['Downtown Cafe District'],
+          storyProgress: 0,
+          chapterUnlocked: 1,
+          worldEvents: [],
+          relationships: {},
+          discoveries: [],
+          secrets: [],
+          lastPlayed: new Date(),
+          playTime: 0,
+          sessionCount: 0
         };
         setGameProgress(progress);
       }
@@ -328,12 +486,21 @@ export const DailyRoutineQuest: React.FC = () => {
       const fallbackProgress: GameProgress = {
         character: createNewCharacter('warrior'),
         completedQuests: [],
+        availableQuests: [],
         dailyStreak: 0,
         totalQuestsCompleted: 0,
         achievementsUnlocked: [],
-        currentZone: 'Healing Village',
-        unlockedZones: ['Healing Village'],
-        lastPlayed: new Date()
+        currentZone: 'Downtown Cafe District',
+        unlockedZones: ['Downtown Cafe District'],
+        storyProgress: 0,
+        chapterUnlocked: 1,
+        worldEvents: [],
+        relationships: {},
+        discoveries: [],
+        secrets: [],
+        lastPlayed: new Date(),
+        playTime: 0,
+        sessionCount: 0
       };
       setGameProgress(fallbackProgress);
     } finally {
@@ -346,21 +513,41 @@ export const DailyRoutineQuest: React.FC = () => {
 
     const newProgress = { ...gameProgress };
     
+    // Calculate score bonus
+    const scoreMultiplier = 1 + (newProgress.character.level * 0.1) + (newProgress.prestige * 0.5);
+    const scoreGained = Math.floor(quest.xpReward * scoreMultiplier);
+    newProgress.character.totalScore += scoreGained;
+
     // Add XP and level up if needed
     newProgress.character.xp += quest.xpReward;
+    newProgress.character.gold += quest.goldReward;
+    
     while (newProgress.character.xp >= newProgress.character.xpToNext) {
       newProgress.character.xp -= newProgress.character.xpToNext;
       newProgress.character.level += 1;
-      newProgress.character.xpToNext = Math.floor(newProgress.character.xpToNext * 1.2);
+      newProgress.character.xpToNext = Math.floor(newProgress.character.xpToNext * 1.15);
       
-      // Level up bonuses
-      newProgress.character.maxHealth += 10;
+      // Level up bonuses - more dramatic increases
+      newProgress.character.maxHealth += 15;
       newProgress.character.health = newProgress.character.maxHealth;
-      newProgress.character.maxMana += 5;
+      newProgress.character.maxMana += 8;
       newProgress.character.mana = newProgress.character.maxMana;
-      newProgress.character.strength += 1;
-      newProgress.character.wisdom += 1;
-      newProgress.character.vitality += 1;
+      newProgress.character.maxEnergy += 10;
+      newProgress.character.energy = newProgress.character.maxEnergy;
+      
+      // Stat increases
+      newProgress.character.strength += Math.floor(Math.random() * 3) + 1;
+      newProgress.character.wisdom += Math.floor(Math.random() * 3) + 1;
+      newProgress.character.vitality += Math.floor(Math.random() * 3) + 1;
+      newProgress.character.charisma += Math.floor(Math.random() * 2) + 1;
+      newProgress.character.luck += Math.floor(Math.random() * 2) + 1;
+      
+      // Prestige system - every 100 levels
+      if (newProgress.character.level % 100 === 0) {
+        newProgress.character.prestige += 1;
+        newProgress.character.rebornCount += 1;
+        newProgress.character.totalScore += 10000;
+      }
     }
 
     // Add rewards to inventory
@@ -392,21 +579,38 @@ export const DailyRoutineQuest: React.FC = () => {
     }
   }, [gameProgress, toast]);
 
-  const getAllQuests = useCallback((): Quest[] => {
-    const dailyQuests: Quest[] = DAILY_QUESTS.map((quest, index) => ({
-      ...quest,
-      id: `daily-${index}`,
-      completed: gameProgress?.completedQuests.includes(`daily-${index}`) || false
-    }));
-
-    const storyQuests: Quest[] = STORY_QUESTS.map((quest, index) => ({
-      ...quest,
-      id: `story-${index}`,
-      completed: gameProgress?.completedQuests.includes(`story-${index}`) || false
-    }));
-
-    return [...dailyQuests, ...storyQuests];
+  const generateDailyQuests = useCallback((): Quest[] => {
+    if (!gameProgress) return [];
+    
+    // Generate 3-5 random daily quests
+    const numQuests = 3 + Math.floor(Math.random() * 3);
+    const selectedQuests: Quest[] = [];
+    const availableQuests = [...DYNAMIC_QUESTS];
+    
+    for (let i = 0; i < numQuests && availableQuests.length > 0; i++) {
+      const randomIndex = Math.floor(Math.random() * availableQuests.length);
+      const quest = availableQuests.splice(randomIndex, 1)[0];
+      selectedQuests.push({
+        ...quest,
+        id: `daily-${Date.now()}-${i}`,
+        completed: false
+      });
+    }
+    
+    return selectedQuests;
   }, [gameProgress]);
+
+  const getAllQuests = useCallback((): Quest[] => {
+    const dailyQuests = generateDailyQuests();
+    
+    const epicQuests: Quest[] = EPIC_QUESTS.map((quest, index) => ({
+      ...quest,
+      id: `epic-${index}`,
+      completed: gameProgress?.completedQuests.includes(`epic-${index}`) || false
+    }));
+
+    return [...dailyQuests, ...epicQuests];
+  }, [gameProgress, generateDailyQuests]);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -455,7 +659,7 @@ export const DailyRoutineQuest: React.FC = () => {
       </Card>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Button
           variant={activeTab === 'character' ? 'default' : 'outline'}
           onClick={() => setActiveTab('character')}
@@ -473,12 +677,28 @@ export const DailyRoutineQuest: React.FC = () => {
           Quests
         </Button>
         <Button
+          variant={activeTab === 'story' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('story')}
+          className="flex items-center gap-2"
+        >
+          <BookOpen className="w-4 h-4" />
+          Story
+        </Button>
+        <Button
           variant={activeTab === 'inventory' ? 'default' : 'outline'}
           onClick={() => setActiveTab('inventory')}
           className="flex items-center gap-2"
         >
           <Gem className="w-4 h-4" />
           Inventory
+        </Button>
+        <Button
+          variant={activeTab === 'leaderboard' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('leaderboard')}
+          className="flex items-center gap-2"
+        >
+          <Trophy className="w-4 h-4" />
+          Leaderboard
         </Button>
       </div>
 
@@ -561,7 +781,7 @@ export const DailyRoutineQuest: React.FC = () => {
               )}
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 pt-4">
+              <div className="grid grid-cols-5 gap-2 pt-4">
                 <div className="text-center bg-red-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-red-600">{gameProgress.character.strength}</div>
                   <div className="text-xs text-red-800">Strength</div>
@@ -573,6 +793,14 @@ export const DailyRoutineQuest: React.FC = () => {
                 <div className="text-center bg-green-50 rounded-lg p-2">
                   <div className="text-lg font-bold text-green-600">{gameProgress.character.vitality}</div>
                   <div className="text-xs text-green-800">Vitality</div>
+                </div>
+                <div className="text-center bg-purple-50 rounded-lg p-2">
+                  <div className="text-lg font-bold text-purple-600">{gameProgress.character.charisma}</div>
+                  <div className="text-xs text-purple-800">Charisma</div>
+                </div>
+                <div className="text-center bg-yellow-50 rounded-lg p-2">
+                  <div className="text-lg font-bold text-yellow-600">{gameProgress.character.luck}</div>
+                  <div className="text-xs text-yellow-800">Luck</div>
                 </div>
               </div>
             </CardContent>
@@ -587,21 +815,29 @@ export const DailyRoutineQuest: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
+                <div className="text-center bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-lg p-3">
+                  <div className="text-2xl font-bold">{gameProgress.character.totalScore.toLocaleString()}</div>
+                  <div className="text-xs opacity-90">Total Score</div>
+                </div>
+                <div className="text-center bg-gradient-to-br from-yellow-500 to-orange-500 text-white rounded-lg p-3">
+                  <div className="text-2xl font-bold">{gameProgress.character.gold.toLocaleString()}</div>
+                  <div className="text-xs opacity-90">Gold Coins</div>
+                </div>
                 <div className="text-center bg-blue-50 rounded-lg p-3">
                   <div className="text-lg font-bold text-blue-600">{gameProgress.dailyStreak}</div>
                   <div className="text-xs text-blue-800">Daily Streak</div>
                 </div>
                 <div className="text-center bg-green-50 rounded-lg p-3">
                   <div className="text-lg font-bold text-green-600">{gameProgress.totalQuestsCompleted}</div>
-                  <div className="text-xs text-green-800">Quests Completed</div>
+                  <div className="text-xs text-green-800">Quests Done</div>
                 </div>
                 <div className="text-center bg-purple-50 rounded-lg p-3">
-                  <div className="text-lg font-bold text-purple-600">{gameProgress.achievementsUnlocked.length}</div>
-                  <div className="text-xs text-purple-800">Achievements</div>
+                  <div className="text-lg font-bold text-purple-600">{gameProgress.character.prestige}</div>
+                  <div className="text-xs text-purple-800">Prestige</div>
                 </div>
-                <div className="text-center bg-yellow-50 rounded-lg p-3">
-                  <div className="text-lg font-bold text-yellow-600">{gameProgress.unlockedZones.length}</div>
-                  <div className="text-xs text-yellow-800">Zones Unlocked</div>
+                <div className="text-center bg-red-50 rounded-lg p-3">
+                  <div className="text-lg font-bold text-red-600">{gameProgress.character.rebornCount}</div>
+                  <div className="text-xs text-red-800">Rebirths</div>
                 </div>
               </div>
 
@@ -615,33 +851,45 @@ export const DailyRoutineQuest: React.FC = () => {
                       ...gameProgress,
                       character: {
                         ...gameProgress.character,
-                        level: 8,
-                        xp: 145,
-                        xpToNext: 200,
-                        health: 180,
-                        maxHealth: 180,
-                        mana: 85,
-                        maxMana: 85,
-                        strength: 18,
-                        wisdom: 16,
-                        vitality: 15,
+                        level: 42,
+                        xp: 1845,
+                        xpToNext: 2100,
+                        health: 680,
+                        maxHealth: 680,
+                        mana: 285,
+                        maxMana: 285,
+                        energy: 520,
+                        maxEnergy: 520,
+                        strength: 78,
+                        wisdom: 65,
+                        vitality: 82,
+                        charisma: 43,
+                        luck: 29,
+                        totalScore: 156780,
+                        gold: 8420,
+                        prestige: 0,
+                        rebornCount: 0,
                         equipment: {
-                          weapon: 'Sword of Wellness',
-                          armor: 'Shield of Recovery',
-                          accessory: 'Ring of Vitality'
+                          weapon: 'Legendary Coffee Grinder',
+                          armor: 'Ergonomic Chair of Power',
+                          accessory: 'Ring of WiFi Stability',
+                          ring: 'Band of Infinite Patience',
+                          necklace: 'Amulet of Work-Life Balance'
                         },
-                        inventory: ['Health Potion', 'Wisdom Pearl', 'Strength Charm', 'Companion Crystal', 'Pattern Lens', 'Journal Scroll', 'Crystal Vial', 'Friendship Token']
+                        inventory: ['Survival Kit', 'Motivation Potion', 'Caffeinated Elixir', 'Wisdom Scroll', 'Aqua Crystal', 'Mobility Rune', 'Social Bond', 'Dream Essence', 'Efficiency Crystal', 'Karma Coin']
                       },
-                      completedQuests: ['daily-0', 'daily-1', 'daily-2', 'story-0'],
-                      dailyStreak: 14,
-                      totalQuestsCompleted: 32,
-                      achievementsUnlocked: ['First Steps', 'Daily Warrior', 'Knowledge Seeker', 'Community Builder', 'Level Master'],
-                      unlockedZones: ['Healing Village', 'Wisdom Temple', 'Strength Peaks', 'Community Gardens']
+                      completedQuests: ['epic-0', 'epic-1', 'epic-2'],
+                      dailyStreak: 37,
+                      totalQuestsCompleted: 124,
+                      achievementsUnlocked: ['First Steps', 'Daily Warrior', 'Coffee Master', 'Social Butterfly', 'Level Crusher', 'Gold Hoarder'],
+                      unlockedZones: ['Downtown Cafe District', 'Corporate Office Towers', 'Silicon Valley Wastelands'],
+                      chapterUnlocked: 3,
+                      storyProgress: 45
                     };
                     setGameProgress(demoProgress);
                     toast({
-                      title: "Demo Progress Applied",
-                      description: "Character now has advanced stats, equipment, and completed quests!"
+                      title: "Hero Mode Activated!",
+                      description: "Welcome back, legendary coffee shop warrior! Your epic journey continues..."
                     });
                   }}
                   className="text-xs"
@@ -657,15 +905,23 @@ export const DailyRoutineQuest: React.FC = () => {
       {/* Quests Tab */}
       {activeTab === 'quests' && (
         <div className="space-y-6">
-          {/* Daily Quests */}
+          {/* Daily Adventures */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="w-5 h-5" />
-                Daily Quests
+                Today's Adventures
                 <Badge className="bg-blue-100 text-blue-800">
                   {availableQuests.filter(q => q.dailyTask).length} Available
                 </Badge>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={generateDailyQuests}
+                  className="ml-auto"
+                >
+                  Refresh Adventures
+                </Button>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -703,12 +959,12 @@ export const DailyRoutineQuest: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Story Quests */}
+          {/* Epic Quests */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                Story Quests
+                <Crown className="w-5 h-5" />
+                Epic Quests
                 <Badge className="bg-purple-100 text-purple-800">
                   {availableQuests.filter(q => !q.dailyTask).length} Available
                 </Badge>
@@ -752,6 +1008,118 @@ export const DailyRoutineQuest: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Story Tab */}
+      {activeTab === 'story' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5" />
+              The Chronicles of Modern Life
+              <Badge>Chapter {gameProgress.chapterUnlocked}</Badge>
+            </CardTitle>
+            <p className="text-sm text-gray-600">
+              An epic tale of coffee, code, and the pursuit of work-life balance
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {STORY_CHAPTERS.map((chapter) => (
+              <div
+                key={chapter.id}
+                className={`border rounded-lg p-4 ${
+                  gameProgress.chapterUnlocked >= chapter.id
+                    ? 'border-green-200 bg-green-50'
+                    : gameProgress.character.level >= chapter.requiredLevel
+                      ? 'border-blue-200 bg-blue-50'
+                      : 'border-gray-200 bg-gray-50 opacity-60'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <Badge
+                    variant={gameProgress.chapterUnlocked >= chapter.id ? 'default' : 'outline'}
+                    className="w-16 justify-center"
+                  >
+                    Ch. {chapter.id}
+                  </Badge>
+                  <h3 className="font-semibold">{chapter.title}</h3>
+                  {gameProgress.chapterUnlocked >= chapter.id && (
+                    <CheckCircle className="w-5 h-5 text-green-600 ml-auto" />
+                  )}
+                </div>
+                <p className="text-sm text-gray-600 mb-3">{chapter.description}</p>
+                <div className="flex items-center gap-2 text-xs">
+                  <span className="text-purple-600">Required Level: {chapter.requiredLevel}</span>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-blue-600">Zones: {chapter.zones.join(', ')}</span>
+                </div>
+                {gameProgress.character.level < chapter.requiredLevel && (
+                  <p className="text-xs text-red-600 mt-2">
+                    Reach level {chapter.requiredLevel} to unlock this chapter
+                  </p>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Leaderboard Tab */}
+      {activeTab === 'leaderboard' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="w-5 h-5" />
+              Global Leaderboard
+              <div className="ml-auto flex gap-2">
+                {LEADERBOARD_CATEGORIES.map((category) => (
+                  <Button
+                    key={category}
+                    size="sm"
+                    variant={selectedCategory === category ? 'default' : 'outline'}
+                    onClick={() => setSelectedCategory(category)}
+                    className="text-xs"
+                  >
+                    {category === 'totalScore' ? 'Score' : 
+                     category === 'questsCompleted' ? 'Quests' :
+                     category === 'dailyStreak' ? 'Streak' :
+                     category.charAt(0).toUpperCase() + category.slice(1)}
+                  </Button>
+                ))}
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {/* Mock leaderboard data */}
+              {[
+                { rank: 1, name: 'CoffeeKing42', score: 1250000, level: 87, badge: '👑' },
+                { rank: 2, name: 'CodeWizard', score: 980000, level: 73, badge: '🥈' },
+                { rank: 3, name: 'PlantWhisperer', score: 875000, level: 69, badge: '🥉' },
+                { rank: 4, name: 'DebugMaster', score: 720000, level: 61, badge: '⭐' },
+                { rank: 5, name: 'You', score: gameProgress.character.totalScore, level: gameProgress.character.level, badge: '🔥' }
+              ].map((player) => (
+                <div
+                  key={player.rank}
+                  className={`flex items-center gap-3 p-3 rounded-lg border ${
+                    player.name === 'You' ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'
+                  }`}
+                >
+                  <span className="text-lg">{player.badge}</span>
+                  <span className="font-bold text-lg w-8">#{player.rank}</span>
+                  <span className="font-medium flex-1">{player.name}</span>
+                  <Badge variant="outline">Lv. {player.level}</Badge>
+                  <span className="font-bold text-purple-600">{player.score.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+              <p className="text-sm text-yellow-800">
+                🏆 Leaderboards reset monthly with special rewards for top performers!
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Inventory Tab */}
