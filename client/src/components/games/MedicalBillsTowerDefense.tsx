@@ -544,20 +544,32 @@ export const MedicalBillsTowerDefense: React.FC = () => {
       <CardContent className="space-y-6">
         {/* Game Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="text-center bg-green-50 rounded-lg p-3">
-            <div className="text-lg font-bold text-green-600">${gameState.money}</div>
+          <div className="text-center bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
+            <div className="text-lg font-bold text-green-600">${gameState.money.toLocaleString()}</div>
             <div className="text-xs text-green-800">Available Funds</div>
           </div>
-          <div className="text-center bg-red-50 rounded-lg p-3">
-            <div className="text-lg font-bold text-red-600">{gameState.health}%</div>
-            <div className="text-xs text-red-800">Financial Health</div>
+          <div className={`text-center rounded-lg p-3 transition-colors ${
+            gameState.health > 50 ? 'bg-green-50 hover:bg-green-100' : 
+            gameState.health > 25 ? 'bg-yellow-50 hover:bg-yellow-100' : 
+            'bg-red-50 hover:bg-red-100'
+          }`}>
+            <div className={`text-lg font-bold ${
+              gameState.health > 50 ? 'text-green-600' : 
+              gameState.health > 25 ? 'text-yellow-600' : 
+              'text-red-600'
+            }`}>{gameState.health}%</div>
+            <div className={`text-xs ${
+              gameState.health > 50 ? 'text-green-800' : 
+              gameState.health > 25 ? 'text-yellow-800' : 
+              'text-red-800'
+            }`}>Financial Health</div>
           </div>
-          <div className="text-center bg-blue-50 rounded-lg p-3">
+          <div className="text-center bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors">
             <div className="text-lg font-bold text-blue-600">{gameState.billTowerHeight}</div>
             <div className="text-xs text-blue-800">Bills Stacked</div>
           </div>
-          <div className="text-center bg-purple-50 rounded-lg p-3">
-            <div className="text-lg font-bold text-purple-600">{gameState.score}</div>
+          <div className="text-center bg-purple-50 rounded-lg p-3 hover:bg-purple-100 transition-colors">
+            <div className="text-lg font-bold text-purple-600">${gameState.score.toLocaleString()}</div>
             <div className="text-xs text-purple-800">Total Spent</div>
           </div>
         </div>
@@ -770,9 +782,10 @@ export const MedicalBillsTowerDefense: React.FC = () => {
             )}
           </div>
           {!gameState.gameActive && (
-            <p className="text-xs text-gray-500">
-              Start a game to test tower defense mechanics with medical bills!
-            </p>
+            <div className="text-center bg-blue-50 rounded-lg p-3">
+              <p className="text-xs text-blue-800 mb-2">Ready to defend against financial attacks?</p>
+              <p className="text-xs text-blue-600">Start a game to stack medical bills and survive bankruptcy!</p>
+            </div>
           )}
         </div>
 
