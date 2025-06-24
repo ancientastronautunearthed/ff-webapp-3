@@ -568,10 +568,14 @@ export const MedicalBillsTowerDefense: React.FC = () => {
                 Next Wave
               </Button>
             )}
-            {gameState.gameActive && gameState.money >= 100 && (
-              <Button onClick={addBill} className="bg-yellow-600 hover:bg-yellow-700">
+            {gameState.gameActive && (
+              <Button 
+                onClick={addBill} 
+                disabled={gameState.money < 100}
+                className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400"
+              >
                 <Plus className="w-4 h-4 mr-2" />
-                Add Bill ($100+)
+                Add Medical Bill
               </Button>
             )}
           </div>
@@ -697,31 +701,57 @@ export const MedicalBillsTowerDefense: React.FC = () => {
           )}
         </div>
 
-        {/* Demo Progress */}
-        <div className="text-center">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => {
-              if (!gameProgress) return;
-              const demoProgress: TowerDefenseProgress = {
-                ...gameProgress,
-                highestWave: 15,
-                totalGamesPlayed: 25,
-                totalBillsStacked: 127,
-                totalMoneySaved: 8450,
-                achievementsUnlocked: ['Survivor', 'Bill Stacker', 'Wave Master']
-              };
-              setGameProgress(demoProgress);
-              toast({
-                title: "Demo Progress Applied",
-                description: "Game now shows demo achievements and statistics!"
-              });
-            }}
-            className="text-xs"
-          >
-            Demo Progress (Test)
-          </Button>
+        {/* Demo Progress and Quick Actions */}
+        <div className="text-center space-y-2">
+          <div className="flex justify-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                if (!gameProgress) return;
+                const demoProgress: TowerDefenseProgress = {
+                  ...gameProgress,
+                  highestWave: 15,
+                  totalGamesPlayed: 25,
+                  totalBillsStacked: 127,
+                  totalMoneySaved: 8450,
+                  achievementsUnlocked: ['Survivor', 'Bill Stacker', 'Wave Master', 'Bankruptcy Avoider']
+                };
+                setGameProgress(demoProgress);
+                toast({
+                  title: "Demo Progress Applied",
+                  description: "Game now shows demo achievements and statistics!"
+                });
+              }}
+              className="text-xs"
+            >
+              Demo Progress (Test)
+            </Button>
+            {gameState.gameActive && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setGameState(prev => ({
+                    ...prev,
+                    money: prev.money + 1000
+                  }));
+                  toast({
+                    title: "Emergency Funds Added",
+                    description: "+$1000 for testing purposes"
+                  });
+                }}
+                className="text-xs"
+              >
+                Add Test Funds
+              </Button>
+            )}
+          </div>
+          {!gameState.gameActive && (
+            <p className="text-xs text-gray-500">
+              Start a game to test tower defense mechanics with medical bills!
+            </p>
+          )}
         </div>
 
         {/* Achievements */}
