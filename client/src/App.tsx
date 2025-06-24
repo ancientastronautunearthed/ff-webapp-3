@@ -29,6 +29,7 @@ import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
 import DoctorLogin from "@/pages/DoctorLogin";
 import DoctorDashboard from "@/pages/DoctorDashboard";
 import DemoLogin from "@/pages/DemoLogin";
+import DoctorDemo from "@/pages/DoctorDemo";
 import { PeerMatching } from "@/components/PeerMatching";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
@@ -55,11 +56,12 @@ function AppContent() {
     );
   }
 
+  // Handle doctor demo route separately - no authentication required
+  if (location === '/doctor-demo') {
+    return <DoctorDemo />;
+  }
+
   if (!user) {
-    // Check if accessing doctor demo specifically
-    if (location === '/doctor-demo') {
-      return <DemoLogin />;
-    }
     // Check if accessing doctor portal
     if (location.startsWith('/doctor')) {
       return <DoctorLogin />;
