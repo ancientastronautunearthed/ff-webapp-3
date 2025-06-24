@@ -632,7 +632,7 @@ export const SymptomMemoryMatch: React.FC = () => {
                 } ${card.isMatched ? 'opacity-90' : ''}`}
                 onClick={() => flipCard(card.id)}
               >
-                <div className="w-full h-full flex flex-col items-center justify-center p-2">
+                <div className="w-full h-full flex flex-col items-center justify-center p-2 relative">
                   {card.isFlipped || card.isMatched ? (
                     <>
                       <div className="text-white mb-1">
@@ -660,7 +660,17 @@ export const SymptomMemoryMatch: React.FC = () => {
         ) : (
           <div className="text-center py-8">
             <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-600">Click "Start Game" to begin pattern matching!</p>
+            <p className="text-gray-600 mb-4">Click "Start Game" to begin pattern matching!</p>
+            <div className="bg-blue-50 rounded-lg p-4 max-w-md mx-auto">
+              <h4 className="font-medium text-blue-900 mb-2">How to Play:</h4>
+              <ul className="text-sm text-blue-800 space-y-1 text-left">
+                <li>• Click cards to flip them and reveal patterns</li>
+                <li>• Match symptoms with their triggers or treatments</li>
+                <li>• Discover health insights with each successful match</li>
+                <li>• Complete levels to unlock harder challenges</li>
+                <li>• Beat the timer to earn better scores</li>
+              </ul>
+            </div>
           </div>
         )}
 
