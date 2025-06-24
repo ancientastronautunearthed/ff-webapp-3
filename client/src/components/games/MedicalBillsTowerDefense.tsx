@@ -348,6 +348,15 @@ export const MedicalBillsTowerDefense: React.FC = () => {
   }, []);
 
   const addBill = useCallback(() => {
+    if (gameState.money < 100) {
+      toast({
+        title: "Not Enough Money",
+        description: "Need at least $100 to add a bill",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const billType = BILL_TYPES[Math.floor(Math.random() * BILL_TYPES.length)];
     const newBill: Bill = {
       ...billType,
@@ -359,16 +368,15 @@ export const MedicalBillsTowerDefense: React.FC = () => {
       ...prev,
       bills: [...prev.bills, newBill],
       billTowerHeight: prev.billTowerHeight + 1,
-      money: prev.money - newBill.cost,
       score: prev.score + newBill.cost
     }));
 
     toast({
-      title: `New Bill Added: ${newBill.name}`,
+      title: `New Medical Bill: ${newBill.name}`,
       description: `$${newBill.cost} - ${newBill.description}`,
       duration: 3000
     });
-  }, [gameState.billTowerHeight, toast]);
+  }, [gameState.money, gameState.billTowerHeight, toast]);
 
   const placeDefense = useCallback((defense: Defense, position: number) => {
     if (gameState.money < defense.cost) {
@@ -603,24 +611,31 @@ export const MedicalBillsTowerDefense: React.FC = () => {
         </div>
 
         {/* Game Field */}
-        <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-4 min-h-64 relative">
+        <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-4 min-h-80 relative overflow-hidden">
           <div className="absolute top-2 left-2">
-            <Badge variant="outline">Financial Path</Badge>
+            <Badge variant="outline">Financial Battlefield</Badge>
           </div>
           
+          {/* Enemy Path */}
+          <div className="absolute top-16 left-0 w-full h-2 bg-red-200 rounded opacity-50" />
+          
           {/* Defense Positions */}
-          {[100, 200, 300, 400].map((position) => (
+          {[80, 180, 280, 380].map((position) => (
             <div
               key={position}
-              className={`absolute top-20 w-12 h-12 border-2 border-dashed border-gray-400 rounded cursor-pointer hover:bg-white hover:bg-opacity-50 ${
-                selectedDefense ? 'border-blue-500' : ''
+              className={`absolute top-12 w-14 h-14 border-2 border-dashed border-gray-400 rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-75 transition-all ${
+                selectedDefense ? 'border-blue-500 border-solid bg-blue-50' : ''
               }`}
               style={{ left: `${position}px` }}
               onClick={() => selectedDefense && placeDefense(selectedDefense, position)}
             >
-              {gameState.defenses.find(d => d.position === position) && (
-                <div className={`w-full h-full rounded ${gameState.defenses.find(d => d.position === position)?.color} flex items-center justify-center text-white`}>
+              {gameState.defenses.find(d => d.position === position) ? (
+                <div className={`w-full h-full rounded-lg ${gameState.defenses.find(d => d.position === position)?.color} flex items-center justify-center text-white shadow-lg`}>
                   {gameState.defenses.find(d => d.position === position)?.icon}
+                </div>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <Plus className="w-6 h-6" />
                 </div>
               )}
             </div>
@@ -630,17 +645,20 @@ export const MedicalBillsTowerDefense: React.FC = () => {
           {gameState.enemies.map((enemy) => (
             <div
               key={enemy.id}
-              className="absolute top-32 transition-all duration-100"
-              style={{ left: `${enemy.position}px` }}
+              className="absolute top-14 transition-all duration-100 z-10"
+              style={{ left: `${Math.min(enemy.position, 480)}px` }}
             >
-              <div className={`w-8 h-8 rounded border-2 border-red-500 bg-white flex items-center justify-center ${enemy.color}`}>
+              <div className={`w-10 h-10 rounded-lg border-2 border-red-500 bg-white flex items-center justify-center ${enemy.color} shadow-md`}>
                 {enemy.icon}
               </div>
-              <div className="w-12 bg-gray-200 rounded-full h-1 mt-1">
+              <div className="w-12 bg-gray-200 rounded-full h-2 mt-1">
                 <div 
-                  className="bg-red-500 h-1 rounded-full transition-all"
+                  className="bg-red-500 h-2 rounded-full transition-all"
                   style={{ width: `${(enemy.health / enemy.maxHealth) * 100}%` }}
                 />
+              </div>
+              <div className="text-xs text-center mt-1 font-bold text-red-600">
+                ${enemy.damage}
               </div>
             </div>
           ))}
@@ -648,22 +666,35 @@ export const MedicalBillsTowerDefense: React.FC = () => {
           {/* Bill Tower */}
           <div className="absolute bottom-4 right-4">
             <div className="flex flex-col-reverse items-center">
-              {gameState.bills.slice(-10).map((bill, index) => (
+              {gameState.bills.slice(-8).map((bill, index) => (
                 <div
                   key={bill.id}
-                  className={`w-16 h-4 ${bill.color} rounded mb-1 flex items-center justify-center text-white text-xs`}
+                  className={`w-20 h-5 ${bill.color} rounded mb-1 flex items-center justify-center text-white text-xs shadow-sm`}
                   style={{ zIndex: index }}
                 >
                   {bill.icon}
+                  <span className="ml-1">${bill.cost}</span>
                 </div>
               ))}
               {gameState.billTowerHeight > 0 && (
                 <Badge variant="secondary" className="mb-2">
-                  ${gameState.bills.reduce((sum, bill) => sum + bill.cost, 0).toLocaleString()}
+                  Tower: ${gameState.bills.reduce((sum, bill) => sum + bill.cost, 0).toLocaleString()}
                 </Badge>
               )}
             </div>
           </div>
+
+          {/* Game Status */}
+          {!gameState.gameActive && gameState.wave > 1 && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-white rounded-lg p-6 text-center">
+                <Skull className="w-12 h-12 text-red-600 mx-auto mb-4" />
+                <h3 className="text-lg font-bold mb-2">Financial Bankruptcy!</h3>
+                <p className="text-gray-600 mb-4">Survived {gameState.wave - 1} waves</p>
+                <p className="text-sm text-gray-500">Total Bills: ${gameState.score.toLocaleString()}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Demo Progress */}

@@ -107,7 +107,7 @@ const WELLNESS_GAMES: GameInfo[] = [
 ];
 
 export const WellnessGamesHub: React.FC = () => {
-  const [selectedGame, setSelectedGame] = useState<string | null>('memory_patterns');
+  const [selectedGame, setSelectedGame] = useState<string | null>('medical_bills_tower');
 
   const getCategoryColor = (category: string) => {
     switch (category) {
