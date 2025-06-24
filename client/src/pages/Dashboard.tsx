@@ -1,609 +1,511 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSymptomEntries } from '@/hooks/useSymptomData';
-import { useJournalEntries } from '@/hooks/useJournalData';
-import { getWeeklyStats } from '@/utils/symptomAnalysis';
-import { 
-  collection, 
-  getDocs, 
-  query, 
-  where
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { WelcomeTour } from '@/components/WelcomeTour';
-import { AIHealthCoach } from '@/components/AIHealthCoach';
-import { SmartDailyCheckin } from '@/components/SmartDailyCheckin';
-import { GamifiedProgress } from '@/components/GamifiedProgress';
-import { DailyTaskList } from '@/components/DailyTaskList';
-import { DailyCheckin } from '@/components/DailyCheckin';
-import { Link } from 'wouter';
-import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Activity, 
-  Calendar, 
-  TrendingUp, 
-  TrendingDown, 
-  Heart, 
-  BookOpen, 
-  Users, 
-  FileText,
+  Home,
+  Activity,
+  Brain,
+  Users,
+  Calendar,
+  MessageSquare,
+  Stethoscope,
+  BarChart3,
+  Settings,
+  Menu,
+  X,
   Plus,
-  Eye,
-  Lightbulb,
   Target,
-  Clock,
-  ChevronRight,
-  HelpCircle,
-  CheckCircle
+  Award,
+  Heart,
+  Zap,
+  TrendingUp,
+  CheckCircle2
 } from 'lucide-react';
-import { PeerMatchingWidget } from '@/components/PeerMatchingWidget';
+
+// Import existing components
+import { DailyTaskList } from '@/components/DailyTaskList';
+import { SymptomTracker } from '@/components/SymptomTracker';
+import { DigitalMatchbox } from '@/components/DigitalMatchbox';
+import { AIHealthCoach } from '@/components/AIHealthCoach';
+import { AIInsights } from '@/components/AIInsights';
+import { CommunityForum } from '@/components/CommunityForum';
+import { PeerMatching } from '@/components/PeerMatching';
+import CalendarView from '@/pages/CalendarView';
+import { DataVisualization } from '@/components/DataVisualization';
+import { GamifiedProgress } from '@/components/GamifiedProgress';
 import { CompanionWidget } from '@/components/CompanionWidget';
-import { ChallengeSystem } from '@/components/ChallengeSystem';
+import { TelemedicineScheduling } from '@/components/TelemedicineScheduling';
+import { ResearchDashboardEnhanced } from '@/components/ResearchDashboardEnhanced';
+
+interface NavigationItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  component?: React.ComponentType;
+  badge?: string;
+  description?: string;
+}
+
+interface NavigationSection {
+  title: string;
+  items: NavigationItem[];
+}
+
+const navigationSections: NavigationSection[] = [
+  {
+    title: "Overview",
+    items: [
+      {
+        id: 'home',
+        label: 'Dashboard Home',
+        icon: Home,
+        description: 'Daily tasks, quick actions, and overview'
+      }
+    ]
+  },
+  {
+    title: "Health Tracking",
+    items: [
+      {
+        id: 'symptoms',
+        label: 'Symptom Tracker',
+        icon: Activity,
+        component: SymptomTracker,
+        description: 'Log and track your symptoms'
+      },
+      {
+        id: 'journal',
+        label: 'Digital Matchbox',
+        icon: MessageSquare,
+        component: DigitalMatchbox,
+        description: 'Private journal and observations'
+      },
+      {
+        id: 'calendar',
+        label: 'Calendar View',
+        icon: Calendar,
+        component: CalendarView,
+        description: 'Monthly overview and yearly heatmap'
+      },
+      {
+        id: 'data-viz',
+        label: 'Data & Insights',
+        icon: BarChart3,
+        component: DataVisualization,
+        description: 'Charts and pattern analysis'
+      }
+    ]
+  },
+  {
+    title: "AI & Support",
+    items: [
+      {
+        id: 'ai-coach',
+        label: 'AI Health Coach',
+        icon: Brain,
+        component: AIHealthCoach,
+        description: 'Personalized health insights'
+      },
+      {
+        id: 'ai-insights',
+        label: 'AI Insights',
+        icon: Zap,
+        component: AIInsights,
+        description: 'Pattern detection and predictions'
+      },
+      {
+        id: 'companion',
+        label: 'AI Companion',
+        icon: Heart,
+        description: 'Your personal health companion'
+      }
+    ]
+  },
+  {
+    title: "Community",
+    items: [
+      {
+        id: 'forum',
+        label: 'Community Forum',
+        icon: Users,
+        component: CommunityForum,
+        description: 'Connect with others'
+      },
+      {
+        id: 'peer-matching',
+        label: 'Peer Matching',
+        icon: Target,
+        component: PeerMatching,
+        description: 'Find compatible connections'
+      },
+      {
+        id: 'progress',
+        label: 'Rewards & Progress',
+        icon: Award,
+        component: GamifiedProgress,
+        description: 'Achievements and challenges'
+      }
+    ]
+  },
+  {
+    title: "Professional Care",
+    items: [
+      {
+        id: 'telemedicine',
+        label: 'Find Support',
+        icon: Stethoscope,
+        component: TelemedicineScheduling,
+        description: 'Schedule appointments with doctors'
+      }
+    ]
+  },
+  {
+    title: "Research",
+    items: [
+      {
+        id: 'research',
+        label: 'Research Dashboard',
+        icon: TrendingUp,
+        component: ResearchDashboardEnhanced,
+        description: 'Contribute to research studies'
+      }
+    ]
+  }
+];
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { data: symptomEntries } = useSymptomEntries();
-  const { data: journalEntries } = useJournalEntries();
-  const [showTour, setShowTour] = useState(false);
-  const [showCheckin, setShowCheckin] = useState(false);
-  const [checkinCompleted, setCheckinCompleted] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const ActiveComponent = navigationSections
+    .flatMap(section => section.items)
+    .find(item => item.id === activeSection)?.component;
 
-
-  useEffect(() => {
-    // Don't auto-show tour, only show when user clicks button
-    const hasSeenTour = localStorage.getItem('hasSeenDashboardTour');
-    // Removed auto-show for better UX
-    
-    // Check if daily check-in was completed today
-    checkDailyCheckinStatus();
-  }, []);
-
-  const checkDailyCheckinStatus = async () => {
-    if (!user) return;
-
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      const checkinQuery = query(
-        collection(db, 'dailyCheckins'),
-        where('userId', '==', user.uid),
-        where('timestamp', '>=', today),
-        where('timestamp', '<', tomorrow)
-      );
-
-      const snapshot = await getDocs(checkinQuery);
-      setCheckinCompleted(!snapshot.empty);
-    } catch (error) {
-      console.error('Error checking daily checkin status:', error);
-    }
-  };
-
-  const completeTour = () => {
-    console.log('completeTour called');
-    localStorage.setItem('hasSeenDashboardTour', 'true');
-    setShowTour(false);
-    toast({
-      title: "Welcome to Fiber Friends!",
-      description: "You're all set to start tracking your health journey.",
-    });
-  };
-
-  const skipTour = () => {
-    console.log('skipTour called');
-    localStorage.setItem('hasSeenDashboardTour', 'true');
-    setShowTour(false);
-  };
-
-  const startTour = () => {
-    setShowTour(true);
-  };
-
-  // Calculate real stats from Firebase data
-  const weeklyData = symptomEntries ? getWeeklyStats(symptomEntries) : null;
-  const todayStats = {
-    entriesCompleted: weeklyData?.trackingDays || 0,
-    totalEntries: 7, // Week target
-    trackingStreak: weeklyData?.trackingDays || 0,
-    completionRate: weeklyData?.completionRate || 0
-  };
-
-  // Load real insights from AI analysis
-  const [recentInsights, setRecentInsights] = useState<any[]>([]);
-  
-  useEffect(() => {
-    loadAIInsights();
-  }, [user, symptomEntries, journalEntries]);
-
-  const loadAIInsights = async () => {
-    if (!user || !symptomEntries || !journalEntries) return;
-    
-    try {
-      const response = await fetch('/api/ai/analyze-health-patterns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.uid,
-          symptoms: symptomEntries.slice(0, 30),
-          journals: journalEntries.slice(0, 20)
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const insights = (data.insights || []).slice(0, 3).map((insight: any) => ({
-          type: insight.type,
-          title: insight.title,
-          description: insight.description,
-          color: insight.priority === 'high' ? 'blue' : 'green',
-          icon: insight.type === 'prediction' ? TrendingUp : Lightbulb
-        }));
-        setRecentInsights(insights);
-      }
-    } catch (error) {
-      console.error('Error loading AI insights:', error);
-      setRecentInsights([]); // Empty array when AI unavailable
-    }
-  };
-
-  const quickActions = [
-    {
-      title: 'Track Today\'s Symptoms',
-      description: 'Record your current symptoms and factors',
-      href: '/tracker',
-      icon: Heart,
-      color: 'bg-primary-500 hover:bg-primary-600',
-      urgent: todayStats.entriesCompleted < 3,
-      type: 'link'
-    },
-    {
-      title: 'Complete Daily Check-in',
-      description: checkinCompleted ? 'Completed today!' : 'Quick health assessment',
-      icon: Target,
-      color: checkinCompleted ? 'bg-green-500 hover:bg-green-600' : 'bg-purple-500 hover:bg-purple-600',
-      urgent: !checkinCompleted,
-      type: 'action',
-      action: () => {
-        console.log('Daily Check-in clicked!');
-        setShowCheckin(true);
-      }
-    },
-    {
-      title: 'Add Journal Entry',
-      description: 'Document observations in Digital Matchbox',
-      href: '/journal',
-      icon: BookOpen,
-      color: 'bg-secondary-500 hover:bg-secondary-600',
-      urgent: false,
-      type: 'link'
-    },
-    {
-      title: 'View Community',
-      description: 'Connect with others and share experiences',
-      href: '/community',
-      icon: Users,
-      color: 'bg-purple-500 hover:bg-purple-600',
-      urgent: false,
-      type: 'link'
-    },
-    {
-      title: 'Generate Report',
-      description: 'Create provider-ready health summary',
-      href: '/reports',
-      icon: FileText,
-      color: 'bg-indigo-500 hover:bg-indigo-600',
-      urgent: false,
-      type: 'link'
-    }
-  ];
-
-  const weeklyOverview = [
-    { day: 'Mon', completed: true, symptoms: 4.2 },
-    { day: 'Tue', completed: true, symptoms: 3.8 },
-    { day: 'Wed', completed: true, symptoms: 4.1 },
-    { day: 'Thu', completed: true, symptoms: 3.6 },
-    { day: 'Fri', completed: true, symptoms: 3.9 },
-    { day: 'Sat', completed: false, symptoms: 0 },
-    { day: 'Sun', completed: false, symptoms: 0 }
-  ];
-
-  const getTimeOfDay = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'morning';
-    if (hour < 17) return 'afternoon';
-    return 'evening';
-  };
-
-  return (
-    <>
-      {showTour && (
-        <WelcomeTour 
-          onComplete={() => {
-            console.log('Tour onComplete triggered');
-            completeTour();
-          }}
-          onSkip={() => {
-            console.log('Tour onSkip triggered');
-            skipTour();
-          }}
-        />
-      )}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  const renderHomeView = () => (
+    <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Good {getTimeOfDay()}, {user?.displayName || user?.email?.split('@')[0] || 'there'}!
-          </h1>
-          <p className="text-xl text-gray-600 mt-2">
-            Here's your health tracking overview for today
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setShowCheckin(true)}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 daily-checkin-button"
-          >
-            <Target className="h-4 w-4 mr-2" />
-            Daily Check-in
-          </Button>
-          <Button
-            variant="outline"
-            onClick={startTour}
-            className="flex items-center gap-2"
-            data-tour="take-tour-button"
-          >
-            <HelpCircle className="h-4 w-4" />
-            Take Tour
-          </Button>
-        </div>
-      </div>
-
-
-
-      {/* Daily Task List - Main Focus */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-2">
-          <DailyTaskList />
-        </div>
-        <div className="space-y-6">
-          <SmartDailyCheckin />
-          <AIHealthCoach />
-          {/* AI Companion Widget */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Welcome back, {user?.displayName || 'User'}!
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Let's continue your health journey together
+            </p>
+          </div>
           <CompanionWidget />
         </div>
       </div>
-
-      {/* Gamified Challenge System */}
-      <div className="mb-8">
-        <ChallengeSystem />
-      </div>
-
 
       {/* Quick Stats */}
-      <div className="grid md:grid-cols-4 gap-6 mb-8" data-tour="stats-cards">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Today's Progress</p>
-                <p className="text-2xl font-bold text-primary-600">
-                  {todayStats.entriesCompleted}/{todayStats.totalEntries}
-                </p>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Activity className="h-5 w-5 text-blue-600" />
               </div>
-              <Activity className="h-8 w-8 text-primary-500" />
-            </div>
-            <Progress value={todayStats.completionRate} className="mt-3" />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Tracking Streak</p>
-                <p className="text-2xl font-bold text-secondary-600">{todayStats.trackingStreak} days</p>
+                <p className="text-sm text-gray-600">This Week</p>
+                <p className="text-xl font-semibold">5 Entries</p>
               </div>
-              <Target className="h-8 w-8 text-secondary-500" />
             </div>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Symptoms</p>
-                <p className="text-2xl font-bold text-yellow-600">4.1/10</p>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
               </div>
-              <TrendingDown className="h-8 w-8 text-green-500" />
+              <div>
+                <p className="text-sm text-gray-600">Streak</p>
+                <p className="text-xl font-semibold">12 Days</p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">This Week</p>
-                <p className="text-2xl font-bold text-purple-600">5/7 days</p>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Award className="h-5 w-5 text-purple-600" />
               </div>
-              <Calendar className="h-8 w-8 text-purple-500" />
+              <div>
+                <p className="text-sm text-gray-600">Points</p>
+                <p className="text-xl font-semibold">2,450</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Users className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Connections</p>
+                <p className="text-xl font-semibold">8</p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Quick Actions */}
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Daily Tasks - Takes up 2 columns */}
         <div className="lg:col-span-2">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid md:grid-cols-2 gap-4 mb-8" data-tour="quick-actions">
-            {quickActions.map((action, index) => {
-              const Icon = action.icon;
-              
-              if (action.type === 'action') {
-                return (
-                  <Card 
-                    key={index} 
-                    className="hover:shadow-md transition-shadow cursor-pointer group"
-                    onClick={() => {
-                      console.log('Daily Check-in card clicked');
-                      action.action();
-                    }}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <Icon className="h-6 w-6 text-white" />
-                        </div>
-                        {action.urgent && (
-                          <Badge variant="destructive" className="text-xs">
-                            Due today
-                          </Badge>
-                        )}
-                        {action.title.includes('Check-in') && checkinCompleted && (
-                          <CheckCircle className="h-5 w-5 text-green-500" />
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                        {action.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3">{action.description}</p>
-                      <div className="flex items-center text-primary-600 text-sm font-medium">
-                        <span className="group-hover:mr-2 transition-all">
-                          {checkinCompleted && action.title.includes('Check-in') ? 'View details' : 'Get started'}
-                        </span>
-                        <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              }
-              
-              return (
-                <Link key={index} href={action.href}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <Icon className="h-6 w-6 text-white" />
-                        </div>
-                        {action.urgent && (
-                          <Badge variant="destructive" className="text-xs">
-                            Due today
-                          </Badge>
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                        {action.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3">{action.description}</p>
-                      <div className="flex items-center text-primary-600 text-sm font-medium">
-                        <span className="group-hover:mr-2 transition-all">Get started</span>
-                        <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Weekly Overview */}
-          <Card data-tour="weekly-overview">
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5 text-primary-500" />
-                This Week's Tracking
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Today's Health Goals
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-between items-end space-x-2">
-                {weeklyOverview.map((day, index) => (
-                  <div key={index} className="flex flex-col items-center space-y-2">
-                    <div className="text-xs font-medium text-gray-600">{day.day}</div>
-                    <div 
-                      className={`w-8 h-12 rounded-md flex items-end justify-center ${
-                        day.completed 
-                          ? 'bg-primary-500' 
-                          : 'bg-gray-200 border-2 border-dashed border-gray-400'
-                      }`}
-                    >
-                      {day.completed && (
-                        <div 
-                          className="w-6 bg-white rounded-sm mb-1"
-                          style={{ height: `${(day.symptoms / 10) * 100}%` }}
-                        />
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {day.completed ? day.symptoms.toFixed(1) : '—'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 text-center">
-                <Button variant="outline" size="sm">
-                  <Eye className="mr-2 h-4 w-4" />
-                  View Detailed Analytics
-                </Button>
-              </div>
+              <DailyTaskList />
             </CardContent>
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Recent Insights */}
+        {/* Quick Actions */}
+        <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Recent Insights</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {recentInsights.length > 0 ? (
-                recentInsights.map((insight, index) => {
-                  const Icon = insight.icon;
-                  return (
-                    <div key={index} className={`p-3 rounded-lg ${
-                      insight.color === 'blue' ? 'bg-blue-50 border-blue-200' :
-                      insight.color === 'green' ? 'bg-green-50 border-green-200' :
-                      'bg-gray-50 border-gray-200'
-                    } border`}>
-                      <div className="flex items-start space-x-3">
-                        <Icon className={`h-5 w-5 mt-0.5 ${
-                          insight.color === 'blue' ? 'text-blue-600' :
-                          insight.color === 'green' ? 'text-green-600' :
-                          'text-gray-600'
-                        }`} />
-                        <div>
-                          <p className={`font-medium text-sm ${
-                            insight.color === 'blue' ? 'text-blue-800' :
-                            insight.color === 'green' ? 'text-green-800' :
-                            'text-gray-800'
-                          }`}>
-                            {insight.title}
-                          </p>
-                          <p className={`text-xs mt-1 ${
-                            insight.color === 'blue' ? 'text-blue-600' :
-                            insight.color === 'green' ? 'text-green-600' :
-                            'text-gray-600'
-                          }`}>
-                            {insight.description}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="text-center py-8">
-                  <Lightbulb className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 text-sm">
-                    Start tracking to generate AI insights
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Today's Reminders */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center">
-                <Clock className="mr-2 h-5 w-5 text-yellow-500" />
-                Today's Reminders
-              </CardTitle>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                <div>
-                  <p className="text-sm font-medium text-yellow-800">Evening symptom check</p>
-                  <p className="text-xs text-yellow-600">Due in 3 hours</p>
-                </div>
-                <Button size="sm" variant="outline" className="border-yellow-400 text-yellow-700">
-                  <Plus className="h-3 w-3" />
-                </Button>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div>
-                  <p className="text-sm font-medium text-blue-800">Take evening medication</p>
-                  <p className="text-xs text-blue-600">Antihistamine</p>
-                </div>
-                <Button size="sm" variant="outline" className="border-blue-400 text-blue-700">
-                  Done
-                </Button>
-              </div>
+              <Button 
+                onClick={() => setActiveSection('symptoms')} 
+                className="w-full justify-start" 
+                variant="outline"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Log Symptoms
+              </Button>
+              <Button 
+                onClick={() => setActiveSection('journal')} 
+                className="w-full justify-start" 
+                variant="outline"
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Add Journal Entry
+              </Button>
+              <Button 
+                onClick={() => setActiveSection('ai-coach')} 
+                className="w-full justify-start" 
+                variant="outline"
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                Get AI Insights
+              </Button>
             </CardContent>
           </Card>
 
-          {/* AI Companion Widget */}
-          <CompanionWidget />
-          
-          {/* Peer Matching Widget */}
-          <PeerMatchingWidget />
-
-          {/* Community Activity */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Community Activity</CardTitle>
+              <CardTitle className="text-lg">Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    S
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">New post in Coping with Itching</p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
-                  </div>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>Symptom entry logged</span>
+                  <span className="text-gray-500 ml-auto">2h ago</span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    M
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">3 new replies to your post</p>
-                    <p className="text-xs text-gray-500">5 hours ago</p>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span>Journal entry added</span>
+                  <span className="text-gray-500 ml-auto">1d ago</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  <span>New connection made</span>
+                  <span className="text-gray-500 ml-auto">2d ago</span>
                 </div>
               </div>
-              <Link href="/community">
-                <Button variant="outline" size="sm" className="w-full mt-4">
-                  <Users className="mr-2 h-4 w-4" />
-                  View Community
-                </Button>
-              </Link>
             </CardContent>
           </Card>
         </div>
       </div>
-      
-      {/* Daily Check-in Modal */}
-      <DailyCheckin 
-        isOpen={showCheckin} 
-        onClose={() => setShowCheckin(false)}
-        onComplete={() => {
-          setCheckinCompleted(true);
-          checkDailyCheckinStatus();
-          toast({
-            title: "Daily Check-in Complete!",
-            description: "Your health data has been recorded for today.",
-          });
-        }}
-      />
-      </div>
-    </>
+    </div>
+  );
+
+  const renderSidebarItem = (item: NavigationItem) => (
+    <button
+      key={item.id}
+      onClick={() => {
+        setActiveSection(item.id);
+        setMobileMenuOpen(false);
+      }}
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors ${
+        activeSection === item.id
+          ? 'bg-blue-100 text-blue-700 border border-blue-200'
+          : 'text-gray-700 hover:bg-gray-100'
+      } ${sidebarCollapsed ? 'justify-center px-2' : ''}`}
+      title={sidebarCollapsed ? item.label : undefined}
+    >
+      <item.icon className={`h-5 w-5 flex-shrink-0 ${
+        activeSection === item.id ? 'text-blue-600' : 'text-gray-500'
+      }`} />
+      {!sidebarCollapsed && (
+        <>
+          <span className="font-medium truncate">{item.label}</span>
+          {item.badge && (
+            <Badge variant="secondary" className="ml-auto">
+              {item.badge}
+            </Badge>
+          )}
+        </>
+      )}
+    </button>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed top-0 left-0 z-50 h-full bg-white border-r border-gray-200 shadow-sm transition-all duration-300 ${
+        sidebarCollapsed ? 'w-16' : 'w-72'
+      } ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        
+        {/* Sidebar Header */}
+        <div className={`p-4 border-b border-gray-200 ${sidebarCollapsed ? 'px-2' : ''}`}>
+          <div className="flex items-center justify-between">
+            {!sidebarCollapsed && (
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <Heart className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="font-bold text-gray-900">Fiber Friends</h1>
+                  <p className="text-xs text-gray-500">Health Companion</p>
+                </div>
+              </div>
+            )}
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="hidden lg:flex"
+              >
+                <Menu className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(false)}
+                className="lg:hidden"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <ScrollArea className="h-[calc(100vh-5rem)]">
+          <nav className={`p-2 space-y-1 ${sidebarCollapsed ? 'px-1' : ''}`}>
+            {navigationSections.map((section) => (
+              <div key={section.title}>
+                {!sidebarCollapsed && (
+                  <h3 className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    {section.title}
+                  </h3>
+                )}
+                <div className="space-y-1">
+                  {section.items.map(renderSidebarItem)}
+                </div>
+                {!sidebarCollapsed && <Separator className="my-3" />}
+              </div>
+            ))}
+          </nav>
+        </ScrollArea>
+      </aside>
+
+      {/* Main Content */}
+      <main className={`transition-all duration-300 ${
+        sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-72'
+      }`}>
+        {/* Top Bar */}
+        <header className="bg-white border-b border-gray-200 px-4 py-3 lg:px-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(true)}
+                className="lg:hidden"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {navigationSections
+                    .flatMap(section => section.items)
+                    .find(item => item.id === activeSection)?.label || 'Dashboard'}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {navigationSections
+                    .flatMap(section => section.items)
+                    .find(item => item.id === activeSection)?.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
+              
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.photoURL || undefined} />
+                <AvatarFallback>
+                  {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
+        </header>
+
+        {/* Page Content */}
+        <div className="p-4 lg:p-6">
+          {activeSection === 'home' ? (
+            renderHomeView()
+          ) : ActiveComponent ? (
+            <ActiveComponent />
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Feature coming soon...</p>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }

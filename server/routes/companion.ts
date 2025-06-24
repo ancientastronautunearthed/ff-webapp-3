@@ -82,7 +82,18 @@ companionRoutes.post('/chat', async (req, res) => {
 
     // Get current companion memory
     const memoryDoc = await db.collection('companionMemory').doc(userId).get();
-    let memory: CompanionMemory = memoryDoc.exists ? memoryDoc.data() as CompanionMemory : await initializeCompanionMemory(userId);
+    let memory: CompanionMemory;
+    try {
+      const memoryDoc = await db.collection('companionMemory').doc(userId).get();
+      memory = memoryDoc.exists ? memoryDoc.data() as CompanionMemory : await initializeCompanionMemory(userId);
+    } catch (error) {
+      console.error('Error accessing companion memory:', error);
+      // Return a default response if database is unavailable
+      return res.json({
+        response: "I'm currently experiencing some technical difficulties, but I'm here to help! Please try again in a moment.",
+        memory: null
+      });
+    }
 
     // Analyze the message and generate response
     const response = await generateCompanionResponse(userId, message, memory);
