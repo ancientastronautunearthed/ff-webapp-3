@@ -375,7 +375,7 @@ export const SymptomMemoryMatch: React.FC = () => {
           ));
         }
         setFlippedCards([]);
-      }, 1000);
+      }, 800);
     }
   }, [gameActive, flippedCards, cards, toast]);
 
@@ -500,22 +500,54 @@ export const SymptomMemoryMatch: React.FC = () => {
       <CardContent className="space-y-6">
         {/* Progress Stats */}
         <div className="grid grid-cols-4 gap-4">
-          <div className="text-center bg-purple-50 rounded-lg p-3">
+          <div className="text-center bg-purple-50 rounded-lg p-3 hover:bg-purple-100 transition-colors">
             <div className="text-lg font-bold text-purple-600">{gameProgress?.levelsCompleted.length || 0}</div>
             <div className="text-xs text-purple-800">Levels Complete</div>
           </div>
-          <div className="text-center bg-blue-50 rounded-lg p-3">
+          <div className="text-center bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors">
             <div className="text-lg font-bold text-blue-600">{gameProgress?.totalGamesPlayed || 0}</div>
             <div className="text-xs text-blue-800">Games Played</div>
           </div>
-          <div className="text-center bg-green-50 rounded-lg p-3">
+          <div className="text-center bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
             <div className="text-lg font-bold text-green-600">{Math.round(gameProgress?.accuracyRate || 0)}%</div>
             <div className="text-xs text-green-800">Accuracy Rate</div>
           </div>
-          <div className="text-center bg-orange-50 rounded-lg p-3">
+          <div className="text-center bg-orange-50 rounded-lg p-3 hover:bg-orange-100 transition-colors">
             <div className="text-lg font-bold text-orange-600">{gameProgress?.discoveredPatterns.length || 0}</div>
             <div className="text-xs text-orange-800">Insights</div>
           </div>
+        </div>
+        
+        {/* Demo Progress Button for Testing */}
+        <div className="text-center">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              if (!gameProgress) return;
+              const demoProgress: MemoryGameProgress = {
+                ...gameProgress,
+                levelsCompleted: [0, 1],
+                totalGamesPlayed: 8,
+                accuracyRate: 85,
+                discoveredPatterns: [
+                  'Humidity often triggers tactile sensations',
+                  'Sleep quality directly affects energy levels',
+                  'Stress impairs cognitive function',
+                  'Heat increases skin sensitivity'
+                ],
+                bestTimes: { 'basic_symptoms': 45, 'trigger_patterns': 78 }
+              };
+              setGameProgress(demoProgress);
+              toast({
+                title: "Demo Progress Applied",
+                description: "Game now has demo progress with completed levels and discovered patterns!"
+              });
+            }}
+            className="text-xs"
+          >
+            Demo Progress (Test)
+          </Button>
         </div>
 
         {/* Level Selection */}
@@ -588,16 +620,16 @@ export const SymptomMemoryMatch: React.FC = () => {
         </div>
 
         {/* Game Board */}
-        {cards.length > 0 && (
+        {cards.length > 0 ? (
           <div className={`grid ${getGridCols()} gap-3 max-w-3xl mx-auto`}>
             {cards.map((card) => (
               <div
                 key={card.id}
                 className={`aspect-square border-2 rounded-lg cursor-pointer transition-all duration-300 ${
                   card.isFlipped || card.isMatched
-                    ? `${card.color} text-white border-transparent scale-105`
-                    : 'border-gray-300 bg-gray-100 hover:border-gray-400 hover:scale-105'
-                }`}
+                    ? `${card.color} text-white border-transparent scale-105 shadow-lg`
+                    : 'border-gray-300 bg-gray-100 hover:border-gray-400 hover:scale-105 hover:shadow-md'
+                } ${card.isMatched ? 'opacity-90' : ''}`}
                 onClick={() => flipCard(card.id)}
               >
                 <div className="w-full h-full flex flex-col items-center justify-center p-2">
@@ -612,6 +644,11 @@ export const SymptomMemoryMatch: React.FC = () => {
                       <span className="text-xs text-white opacity-75 capitalize">
                         {card.type}
                       </span>
+                      {card.isMatched && (
+                        <div className="absolute top-1 right-1">
+                          <Star className="w-3 h-3 text-yellow-300" />
+                        </div>
+                      )}
                     </>
                   ) : (
                     <Brain className="w-6 h-6 text-gray-400" />
@@ -619,6 +656,11 @@ export const SymptomMemoryMatch: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Brain className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-600">Click "Start Game" to begin pattern matching!</p>
           </div>
         )}
 
