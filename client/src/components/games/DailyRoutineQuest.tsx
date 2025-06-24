@@ -199,6 +199,92 @@ const LEADERBOARD_CATEGORIES = [
   'discoveries'
 ];
 
+const SHOP_ITEMS = [
+  {
+    id: 'health_potion',
+    name: 'Superior Health Potion',
+    description: 'Instantly restore full health and gain temporary vitality boost',
+    price: 150,
+    category: 'consumable',
+    icon: <Heart className="w-4 h-4" />,
+    color: 'text-red-600',
+    effects: { healthRestore: 100, vitality: 5 }
+  },
+  {
+    id: 'xp_booster',
+    name: 'Experience Multiplier',
+    description: 'Double XP gains for the next 5 quests completed',
+    price: 300,
+    category: 'booster',
+    icon: <Star className="w-4 h-4" />,
+    color: 'text-purple-600',
+    effects: { xpMultiplier: 2, duration: 5 }
+  },
+  {
+    id: 'lucky_charm',
+    name: 'Lucky Rabbit\'s Foot',
+    description: 'Permanently increase luck stat and improve quest rewards',
+    price: 500,
+    category: 'permanent',
+    icon: <Sparkles className="w-4 h-4" />,
+    color: 'text-yellow-600',
+    effects: { luck: 10, questRewardBonus: 0.2 }
+  },
+  {
+    id: 'energy_crystal',
+    name: 'Eternal Energy Crystal',
+    description: 'Increase maximum energy and regeneration rate',
+    price: 750,
+    category: 'equipment',
+    icon: <Zap className="w-4 h-4" />,
+    color: 'text-blue-600',
+    effects: { maxEnergy: 50, energyRegen: 10 }
+  },
+  {
+    id: 'wisdom_tome',
+    name: 'Ancient Wisdom Tome',
+    description: 'Permanently boost wisdom and unlock advanced quest types',
+    price: 1000,
+    category: 'permanent',
+    icon: <BookOpen className="w-4 h-4" />,
+    color: 'text-indigo-600',
+    effects: { wisdom: 15, unlocksAdvancedQuests: true }
+  }
+];
+
+const RANDOM_EVENTS = [
+  {
+    id: 'coffee_shortage',
+    title: 'The Great Coffee Shortage',
+    description: 'All coffee shops in the district have run out of beans! Emergency quest available.',
+    type: 'emergency',
+    choices: [
+      { id: 'help', text: 'Help find emergency coffee supplies', reward: { xp: 100, gold: 50 } },
+      { id: 'ignore', text: 'Ignore and drink tea instead', reward: { xp: 10, wisdom: 2 } }
+    ]
+  },
+  {
+    id: 'wifi_blessing',
+    title: 'The WiFi Gods Smile Upon You',
+    description: 'Your internet connection is mysteriously perfect today!',
+    type: 'blessing',
+    choices: [
+      { id: 'appreciate', text: 'Appreciate the moment', reward: { xp: 50, luck: 1 } }
+    ]
+  },
+  {
+    id: 'social_media_drama',
+    title: 'Social Media Drama Unfolds',
+    description: 'A heated debate about pineapple on pizza threatens to tear the community apart!',
+    type: 'social',
+    choices: [
+      { id: 'mediate', text: 'Try to mediate the conflict', reward: { xp: 75, charisma: 3 } },
+      { id: 'avoid', text: 'Stay out of it entirely', reward: { wisdom: 2 } },
+      { id: 'stir', text: 'Add fuel to the fire', reward: { xp: 25, luck: -1 } }
+    ]
+  }
+];
+
 const DYNAMIC_QUESTS: Omit<Quest, 'id' | 'completed'>[] = [
   {
     title: 'The Morning Coffee Ritual',
@@ -407,9 +493,11 @@ export const DailyRoutineQuest: React.FC = () => {
   const [gameProgress, setGameProgress] = useState<GameProgress | null>(null);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story'>('character');
+  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story' | 'shop'>('character');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('totalScore');
+  const [questFilter, setQuestFilter] = useState<'all' | 'daily' | 'epic'>('all');
+  const [showCompletedQuests, setShowCompletedQuests] = useState(false);
 
   const createNewCharacter = (characterClass: keyof typeof CHARACTER_CLASSES): Character => {
     const classData = CHARACTER_CLASSES[characterClass];
@@ -508,50 +596,110 @@ export const DailyRoutineQuest: React.FC = () => {
     }
   }, [user?.uid]);
 
+  const triggerRandomEvent = useCallback(() => {
+    if (!gameProgress || Math.random() > 0.15) return; // 15% chance
+
+    const availableEvents = RANDOM_EVENTS.filter(event => 
+      !gameProgress.worldEvents.some(we => we.id === event.id && we.active)
+    );
+    
+    if (availableEvents.length === 0) return;
+
+    const randomEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+    const worldEvent: WorldEvent = {
+      id: randomEvent.id,
+      title: randomEvent.title,
+      description: randomEvent.description,
+      type: randomEvent.type as any,
+      active: true,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      choices: randomEvent.choices.map(choice => ({
+        id: choice.id,
+        text: choice.text,
+        consequences: [`Gain ${choice.reward.xp || 0} XP`, `Gain ${choice.reward.gold || 0} Gold`],
+        requirements: []
+      }))
+    };
+
+    setGameProgress(prev => ({
+      ...prev!,
+      worldEvents: [...prev!.worldEvents, worldEvent]
+    }));
+
+    toast({
+      title: "Random Event!",
+      description: randomEvent.title,
+      duration: 5000
+    });
+  }, [gameProgress, toast]);
+
   const completeQuest = useCallback((quest: Quest) => {
     if (!gameProgress) return;
 
     const newProgress = { ...gameProgress };
     
-    // Calculate score bonus
-    const scoreMultiplier = 1 + (newProgress.character.level * 0.1) + (newProgress.prestige * 0.5);
-    const scoreGained = Math.floor(quest.xpReward * scoreMultiplier);
+    // Calculate score bonus with difficulty multiplier
+    const difficultyMultiplier = {
+      'easy': 1,
+      'medium': 1.5,
+      'hard': 2,
+      'epic': 3,
+      'legendary': 5
+    }[quest.difficulty] || 1;
+    
+    const scoreMultiplier = 1 + (newProgress.character.level * 0.1) + (newProgress.character.prestige * 0.5);
+    const scoreGained = Math.floor(quest.xpReward * scoreMultiplier * difficultyMultiplier);
     newProgress.character.totalScore += scoreGained;
 
     // Add XP and level up if needed
-    newProgress.character.xp += quest.xpReward;
+    let xpGained = quest.xpReward;
+    if (newProgress.character.luck > 50) {
+      xpGained = Math.floor(xpGained * (1 + (newProgress.character.luck - 50) / 100));
+    }
+    
+    newProgress.character.xp += xpGained;
     newProgress.character.gold += quest.goldReward;
     
+    let leveledUp = false;
     while (newProgress.character.xp >= newProgress.character.xpToNext) {
       newProgress.character.xp -= newProgress.character.xpToNext;
       newProgress.character.level += 1;
       newProgress.character.xpToNext = Math.floor(newProgress.character.xpToNext * 1.15);
+      leveledUp = true;
       
       // Level up bonuses - more dramatic increases
-      newProgress.character.maxHealth += 15;
+      newProgress.character.maxHealth += 15 + Math.floor(newProgress.character.vitality / 10);
       newProgress.character.health = newProgress.character.maxHealth;
-      newProgress.character.maxMana += 8;
+      newProgress.character.maxMana += 8 + Math.floor(newProgress.character.wisdom / 15);
       newProgress.character.mana = newProgress.character.maxMana;
-      newProgress.character.maxEnergy += 10;
+      newProgress.character.maxEnergy += 10 + Math.floor(newProgress.character.vitality / 12);
       newProgress.character.energy = newProgress.character.maxEnergy;
       
-      // Stat increases
-      newProgress.character.strength += Math.floor(Math.random() * 3) + 1;
-      newProgress.character.wisdom += Math.floor(Math.random() * 3) + 1;
-      newProgress.character.vitality += Math.floor(Math.random() * 3) + 1;
-      newProgress.character.charisma += Math.floor(Math.random() * 2) + 1;
-      newProgress.character.luck += Math.floor(Math.random() * 2) + 1;
+      // Stat increases with class bonuses
+      const classData = CHARACTER_CLASSES[newProgress.character.class];
+      newProgress.character.strength += Math.floor(Math.random() * 3) + 1 + (classData.bonuses.strength || 0);
+      newProgress.character.wisdom += Math.floor(Math.random() * 3) + 1 + (classData.bonuses.wisdom || 0);
+      newProgress.character.vitality += Math.floor(Math.random() * 3) + 1 + (classData.bonuses.vitality || 0);
+      newProgress.character.charisma += Math.floor(Math.random() * 2) + 1 + (classData.bonuses.charisma || 0);
+      newProgress.character.luck += Math.floor(Math.random() * 2) + 1 + (classData.bonuses.luck || 0);
       
       // Prestige system - every 100 levels
       if (newProgress.character.level % 100 === 0) {
         newProgress.character.prestige += 1;
         newProgress.character.rebornCount += 1;
         newProgress.character.totalScore += 10000;
+        
+        toast({
+          title: "PRESTIGE ASCENSION!",
+          description: `You have transcended to Prestige ${newProgress.character.prestige}! All future gains are enhanced!`,
+          duration: 8000
+        });
       }
     }
 
-    // Add rewards to inventory
-    newProgress.character.inventory.push(...quest.itemRewards);
+    // Add rewards to inventory with luck bonus
+    const bonusItems = newProgress.character.luck > 75 && Math.random() < 0.3 ? ['Lucky Bonus Item'] : [];
+    newProgress.character.inventory.push(...quest.itemRewards, ...bonusItems);
     
     // Mark quest as completed
     newProgress.completedQuests.push(quest.id);
@@ -560,24 +708,50 @@ export const DailyRoutineQuest: React.FC = () => {
     // Update daily streak if daily task
     if (quest.dailyTask) {
       newProgress.dailyStreak += 1;
+      
+      // Streak bonuses
+      if (newProgress.dailyStreak % 7 === 0) {
+        newProgress.character.gold += 100;
+        toast({
+          title: "Weekly Streak Bonus!",
+          description: "7-day streak achieved! Gained 100 bonus gold!",
+          duration: 4000
+        });
+      }
+    }
+
+    // Chapter progression
+    if (newProgress.character.level >= STORY_CHAPTERS[newProgress.chapterUnlocked]?.requiredLevel) {
+      if (newProgress.chapterUnlocked < STORY_CHAPTERS.length) {
+        newProgress.chapterUnlocked += 1;
+        toast({
+          title: "New Chapter Unlocked!",
+          description: `Chapter ${newProgress.chapterUnlocked}: ${STORY_CHAPTERS[newProgress.chapterUnlocked - 1]?.title}`,
+          duration: 6000
+        });
+      }
     }
 
     setGameProgress(newProgress);
 
+    // Trigger random events
+    triggerRandomEvent();
+
+    // Success messages
     toast({
       title: "Quest Completed!",
-      description: `Gained ${quest.xpReward} XP and rewards!`,
+      description: `Gained ${xpGained} XP, ${quest.goldReward} gold, and ${scoreGained.toLocaleString()} score!`,
       duration: 3000
     });
 
-    if (newProgress.character.level > gameProgress.character.level) {
+    if (leveledUp) {
       toast({
         title: "Level Up!",
         description: `Congratulations! You reached level ${newProgress.character.level}!`,
         duration: 5000
       });
     }
-  }, [gameProgress, toast]);
+  }, [gameProgress, toast, triggerRandomEvent]);
 
   const generateDailyQuests = useCallback((): Quest[] => {
     if (!gameProgress) return [];
@@ -700,6 +874,14 @@ export const DailyRoutineQuest: React.FC = () => {
           <Trophy className="w-4 h-4" />
           Leaderboard
         </Button>
+        <Button
+          variant={activeTab === 'shop' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('shop')}
+          className="flex items-center gap-2"
+        >
+          <Gem className="w-4 h-4" />
+          Shop
+        </Button>
       </div>
 
       {/* Character Tab */}
@@ -748,9 +930,20 @@ export const DailyRoutineQuest: React.FC = () => {
                     <Star className="w-3 h-3" />
                     Experience
                   </span>
-                  <span className="text-sm">{gameProgress.character.xp}/{gameProgress.character.xpToNext}</span>
+                  <span className="text-sm">{gameProgress.character.xp.toLocaleString()}/{gameProgress.character.xpToNext.toLocaleString()}</span>
                 </div>
                 <Progress value={(gameProgress.character.xp / gameProgress.character.xpToNext) * 100} className="h-2" />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-orange-600 flex items-center gap-1">
+                    <Zap className="w-3 h-3" />
+                    Energy
+                  </span>
+                  <span className="text-sm">{gameProgress.character.energy}/{gameProgress.character.maxEnergy}</span>
+                </div>
+                <Progress value={(gameProgress.character.energy / gameProgress.character.maxEnergy) * 100} className="h-2" />
               </div>
 
               {/* Equipment */}
@@ -894,7 +1087,7 @@ export const DailyRoutineQuest: React.FC = () => {
                   }}
                   className="text-xs"
                 >
-                  Demo Progress (Test)
+                  Hero Mode (Test)
                 </Button>
               </div>
             </CardContent>
@@ -905,6 +1098,90 @@ export const DailyRoutineQuest: React.FC = () => {
       {/* Quests Tab */}
       {activeTab === 'quests' && (
         <div className="space-y-6">
+          {/* Quest Filters */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex flex-wrap gap-2 items-center">
+                <span className="text-sm font-medium">Filter:</span>
+                <Button
+                  size="sm"
+                  variant={questFilter === 'all' ? 'default' : 'outline'}
+                  onClick={() => setQuestFilter('all')}
+                >
+                  All Quests
+                </Button>
+                <Button
+                  size="sm"
+                  variant={questFilter === 'daily' ? 'default' : 'outline'}
+                  onClick={() => setQuestFilter('daily')}
+                >
+                  Daily Only
+                </Button>
+                <Button
+                  size="sm"
+                  variant={questFilter === 'epic' ? 'default' : 'outline'}
+                  onClick={() => setQuestFilter('epic')}
+                >
+                  Epic Only
+                </Button>
+                <Button
+                  size="sm"
+                  variant={showCompletedQuests ? 'default' : 'outline'}
+                  onClick={() => setShowCompletedQuests(!showCompletedQuests)}
+                  className="ml-auto"
+                >
+                  {showCompletedQuests ? 'Hide' : 'Show'} Completed
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Active World Events */}
+          {gameProgress.worldEvents.filter(event => event.active).length > 0 && (
+            <Card className="border-orange-200 bg-orange-50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-orange-800">
+                  <AlertTriangle className="w-5 h-5" />
+                  Active World Events
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {gameProgress.worldEvents.filter(event => event.active).map(event => (
+                  <div key={event.id} className="border rounded-lg p-4 bg-white">
+                    <h4 className="font-bold text-orange-900">{event.title}</h4>
+                    <p className="text-sm text-orange-700 mb-3">{event.description}</p>
+                    <div className="flex gap-2">
+                      {event.choices?.map(choice => (
+                        <Button
+                          key={choice.id}
+                          size="sm"
+                          onClick={() => {
+                            // Handle event choice
+                            const updatedEvents = gameProgress.worldEvents.map(e => 
+                              e.id === event.id ? { ...e, active: false } : e
+                            );
+                            setGameProgress(prev => ({
+                              ...prev!,
+                              worldEvents: updatedEvents
+                            }));
+                            
+                            toast({
+                              title: "Event Completed!",
+                              description: choice.text,
+                              duration: 3000
+                            });
+                          }}
+                        >
+                          {choice.text}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Daily Adventures */}
           <Card>
             <CardHeader>
@@ -912,7 +1189,7 @@ export const DailyRoutineQuest: React.FC = () => {
                 <Calendar className="w-5 h-5" />
                 Today's Adventures
                 <Badge className="bg-blue-100 text-blue-800">
-                  {availableQuests.filter(q => q.dailyTask).length} Available
+                  {availableQuests.filter(q => q.dailyTask && (questFilter === 'all' || questFilter === 'daily')).length} Available
                 </Badge>
                 <Button 
                   size="sm" 
@@ -926,7 +1203,11 @@ export const DailyRoutineQuest: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {allQuests.filter(q => q.dailyTask).map((quest) => (
+                {allQuests.filter(q => 
+                  q.dailyTask && 
+                  (questFilter === 'all' || questFilter === 'daily') &&
+                  (showCompletedQuests || !q.completed)
+                ).map((quest) => (
                   <div
                     key={quest.id}
                     className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
@@ -972,7 +1253,11 @@ export const DailyRoutineQuest: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {allQuests.filter(q => !q.dailyTask).map((quest) => (
+                {allQuests.filter(q => 
+                  !q.dailyTask && 
+                  (questFilter === 'all' || questFilter === 'epic') &&
+                  (showCompletedQuests || !q.completed)
+                ).map((quest) => (
                   <div
                     key={quest.id}
                     className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
@@ -1122,6 +1407,101 @@ export const DailyRoutineQuest: React.FC = () => {
         </Card>
       )}
 
+      {/* Shop Tab */}
+      {activeTab === 'shop' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gem className="w-5 h-5" />
+              Mystical Shop
+              <Badge className="bg-yellow-100 text-yellow-800">
+                {gameProgress.character.gold.toLocaleString()} Gold
+              </Badge>
+            </CardTitle>
+            <p className="text-sm text-gray-600">
+              Enhance your character with magical items and permanent upgrades
+            </p>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {SHOP_ITEMS.map((item) => (
+                <div
+                  key={item.id}
+                  className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
+                    gameProgress.character.gold >= item.price
+                      ? 'hover:border-yellow-300'
+                      : 'opacity-60 cursor-not-allowed'
+                  }`}
+                  onClick={() => {
+                    if (gameProgress.character.gold >= item.price) {
+                      const newProgress = { ...gameProgress };
+                      newProgress.character.gold -= item.price;
+                      
+                      // Apply item effects
+                      if (item.effects.healthRestore) {
+                        newProgress.character.health = Math.min(
+                          newProgress.character.health + item.effects.healthRestore,
+                          newProgress.character.maxHealth
+                        );
+                      }
+                      if (item.effects.vitality) {
+                        newProgress.character.vitality += item.effects.vitality;
+                      }
+                      if (item.effects.luck) {
+                        newProgress.character.luck += item.effects.luck;
+                      }
+                      if (item.effects.wisdom) {
+                        newProgress.character.wisdom += item.effects.wisdom;
+                      }
+                      if (item.effects.maxEnergy) {
+                        newProgress.character.maxEnergy += item.effects.maxEnergy;
+                        newProgress.character.energy += item.effects.maxEnergy;
+                      }
+                      
+                      // Add to inventory
+                      newProgress.character.inventory.push(item.name);
+                      
+                      setGameProgress(newProgress);
+                      
+                      toast({
+                        title: "Item Purchased!",
+                        description: `You bought ${item.name} for ${item.price} gold!`,
+                        duration: 3000
+                      });
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`p-2 rounded bg-gray-100 ${item.color}`}>
+                      {item.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium">{item.name}</h4>
+                      <Badge variant="outline" className="text-xs">
+                        {item.category}
+                      </Badge>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">{item.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className={`font-bold ${
+                      gameProgress.character.gold >= item.price ? 'text-yellow-600' : 'text-red-600'
+                    }`}>
+                      {item.price} Gold
+                    </span>
+                    {Object.entries(item.effects).map(([key, value]) => (
+                      <span key={key} className="text-xs text-green-600">
+                        +{value} {key}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Inventory Tab */}
       {activeTab === 'inventory' && (
         <Card>
@@ -1198,8 +1578,9 @@ export const DailyRoutineQuest: React.FC = () => {
                 <Button
                   onClick={() => completeQuest(selectedQuest)}
                   className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={selectedQuest.completed}
                 >
-                  Complete Quest
+                  {selectedQuest.completed ? 'Already Completed' : 'Complete Quest'}
                 </Button>
                 <Button
                   variant="outline"
@@ -1207,6 +1588,18 @@ export const DailyRoutineQuest: React.FC = () => {
                 >
                   Cancel
                 </Button>
+              </div>
+              
+              {/* Quest Tips */}
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <h5 className="font-medium text-blue-900 mb-1">Pro Tip:</h5>
+                <p className="text-sm text-blue-800">
+                  {selectedQuest.difficulty === 'easy' && 'Perfect for building daily habits and maintaining consistency.'}
+                  {selectedQuest.difficulty === 'medium' && 'Moderate challenge that builds character and unlocks new abilities.'}
+                  {selectedQuest.difficulty === 'hard' && 'Significant challenge with major rewards and stat boosts.'}
+                  {selectedQuest.difficulty === 'epic' && 'Legendary quest that transforms your character permanently.'}
+                  {selectedQuest.difficulty === 'legendary' && 'The ultimate challenge reserved for true heroes.'}
+                </p>
               </div>
             </CardContent>
           </Card>
