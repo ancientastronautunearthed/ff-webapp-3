@@ -33,7 +33,8 @@ import {
   Stethoscope,
   Wrench,
   MessageSquare,
-  Accessibility
+  Accessibility,
+  Gamepad2
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, getDoc } from 'firebase/firestore';
@@ -92,6 +93,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { name: 'Track Symptoms', href: '/tracker', icon: Activity },
     { name: 'AI Companion', href: '/companion', icon: Heart },
     { name: 'Tech Assistant', href: '/tech-assistant', icon: Wrench },
+    { name: 'Wellness Games', href: '/wellness-games', icon: Gamepad2 },
     { name: 'Community', href: '/community', icon: Users },
     { name: 'Telemedicine', href: '/telemedicine', icon: Stethoscope },
     { name: 'My Data', href: '/insights', icon: TrendingUp },

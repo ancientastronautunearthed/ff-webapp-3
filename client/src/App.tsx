@@ -39,6 +39,7 @@ import { CompanionDashboard } from "@/components/CompanionDashboard";
 import { UserSettings } from "@/pages/UserSettings";
 import VoiceNavigationWidget from "@/components/VoiceNavigationWidget";
 import { TechAssistantDashboard } from "@/components/TechAssistantDashboard";
+import { WellnessGamesHub } from "@/components/games/WellnessGamesHub";
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -119,6 +120,7 @@ function AppContent() {
         <Route path="/peer-matching" component={PeerMatching} />
         <Route path="/companion" component={CompanionDashboard} />
         <Route path="/tech-assistant" component={TechAssistantDashboard} />
+        <Route path="/wellness-games" component={WellnessGamesHub} />
         <Route path="/settings" component={UserSettings} />
         <Route path="/landing" component={LandingPage} />
         <Route component={NotFound} />
