@@ -1092,6 +1092,10 @@ export const DailyRoutineQuest: React.FC = () => {
   const [storyHistory, setStoryHistory] = useState<any[]>([]);
   const [characterPortraits, setCharacterPortraits] = useState<Map<string, any>>(new Map());
   const [sceneImages, setSceneImages] = useState<Map<string, any>>(new Map());
+  const [adaptiveRelationships, setAdaptiveRelationships] = useState<Map<string, any>>(new Map());
+  const [adaptiveCareer, setAdaptiveCareer] = useState<any>(null);
+  const [relationshipAnalysis, setRelationshipAnalysis] = useState<any>(null);
+  const [careerAnalysis, setCareerAnalysis] = useState<any>(null);
   const [characterChoices, setCharacterChoices] = useState<string[]>([]);
   const [worldState, setWorldState] = useState({
     aiTrustLevel: 50, // 0-100, affects how AIs interact with player
@@ -1169,6 +1173,198 @@ export const DailyRoutineQuest: React.FC = () => {
       
     } catch (error) {
       console.error('Scene image generation error:', error);
+      return null;
+    }
+  };
+
+  const analyzeRelationshipDynamics = async (relationship: any) => {
+    try {
+      const response = await fetch('/api/adaptive-simulation/analyze-relationship', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          relationship: {
+            id: relationship.id,
+            relationshipType: relationship.type === 'romantic_partner' ? 'romantic' : 'friendship',
+            intimacyLevel: relationship.relationshipLevel || 50,
+            trustLevel: (relationship.relationshipLevel || 50) + Math.floor(Math.random() * 20) - 10,
+            communicationStyle: 'empathetic',
+            personalityCompatibility: 75,
+            conflictHistory: [],
+            sharedMemories: relationship.relationshipHistory || [],
+            growthTogether: [{ phase: 'developing', startDate: new Date() }],
+            adaptiveTraits: [],
+            relationshipDynamics: []
+          },
+          recentInteractions: relationship.relationshipHistory || [],
+          personalityTraits: gameProgress.character.lifeSimulation?.personalityTraits || ['Empathetic', 'Curious']
+        })
+      });
+
+      if (!response.ok) throw new Error('Analysis failed');
+      
+      const data = await response.json();
+      setRelationshipAnalysis(data.analysis);
+      
+      toast({
+        title: "Relationship Analysis Complete",
+        description: `AI has analyzed your relationship with ${relationship.name}`,
+        duration: 4000
+      });
+      
+      return data.analysis;
+      
+    } catch (error) {
+      console.error('Relationship analysis error:', error);
+      return null;
+    }
+  };
+
+  const adaptRelationshipToEvent = async (relationship: any, event: any) => {
+    try {
+      const response = await fetch('/api/adaptive-simulation/adapt-relationship', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          relationship: {
+            id: relationship.id,
+            relationshipType: relationship.type === 'romantic_partner' ? 'romantic' : 'friendship',
+            intimacyLevel: relationship.relationshipLevel || 50,
+            trustLevel: relationship.relationshipLevel || 50,
+            communicationStyle: 'empathetic',
+            personalityCompatibility: 75,
+            conflictHistory: [],
+            sharedMemories: relationship.relationshipHistory || [],
+            growthTogether: [{ phase: 'developing', startDate: new Date() }],
+            adaptiveTraits: [],
+            relationshipDynamics: []
+          },
+          event,
+          characterPersonality: gameProgress.character.lifeSimulation?.personalityTraits || ['Empathetic', 'Curious']
+        })
+      });
+
+      if (!response.ok) throw new Error('Adaptation failed');
+      
+      const data = await response.json();
+      const newAdaptiveRelationships = new Map(adaptiveRelationships);
+      newAdaptiveRelationships.set(relationship.id, data.adaptedRelationship);
+      setAdaptiveRelationships(newAdaptiveRelationships);
+      
+      return data.adaptedRelationship;
+      
+    } catch (error) {
+      console.error('Relationship adaptation error:', error);
+      return null;
+    }
+  };
+
+  const analyzeCareerTrajectory = async () => {
+    try {
+      const currentCareer = {
+        id: 'player_career',
+        characterId: gameProgress.character.id || 'player',
+        currentPosition: gameProgress.character.lifeSimulation?.employment?.position || 'Professional',
+        industry: gameProgress.character.lifeSimulation?.employment?.company || 'Technology',
+        careerPhase: gameProgress.character.age < 30 ? 'exploration' : 
+                     gameProgress.character.age < 45 ? 'establishment' : 'advancement',
+        aiCollaborationLevel: 70,
+        futureProofingScore: 65,
+        skillSet: Object.entries(gameProgress.character.skills || {}).map(([name, level]) => ({
+          name,
+          level: level as number,
+          category: 'technical',
+          relevanceToFuture: 80
+        })),
+        careerGoals: [
+          { title: 'Leadership Role', priority: 'high', timeline: '2 years', progress: 30 },
+          { title: 'AI Mastery', priority: 'medium', timeline: '1 year', progress: 60 }
+        ],
+        networkConnections: gameProgress.character.lifeSimulation?.relationships?.length || 0,
+        workPersonality: {
+          adaptabilityScore: 75,
+          leadershipPotential: 70,
+          workStyle: 'collaborative'
+        }
+      };
+
+      const response = await fetch('/api/adaptive-simulation/analyze-career', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          career: currentCareer,
+          recentPerformance: [
+            { metric: 'productivity', value: 85, date: new Date() },
+            { metric: 'collaboration', value: 90, date: new Date() }
+          ],
+          marketTrends: ['AI integration', 'remote collaboration', 'sustainability', 'human-AI teams']
+        })
+      });
+
+      if (!response.ok) throw new Error('Career analysis failed');
+      
+      const data = await response.json();
+      setCareerAnalysis(data.analysis);
+      setAdaptiveCareer(currentCareer);
+      
+      toast({
+        title: "Career Analysis Complete",
+        description: "AI has analyzed your career trajectory and future opportunities",
+        duration: 4000
+      });
+      
+      return data.analysis;
+      
+    } catch (error) {
+      console.error('Career analysis error:', error);
+      return null;
+    }
+  };
+
+  const adaptCareerToMarketChange = async (marketChange: any) => {
+    if (!adaptiveCareer) return null;
+    
+    try {
+      const response = await fetch('/api/adaptive-simulation/adapt-career', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          career: adaptiveCareer,
+          marketChange,
+          personalStrengths: gameProgress.character.lifeSimulation?.personalityTraits || ['Adaptable', 'Creative']
+        })
+      });
+
+      if (!response.ok) throw new Error('Career adaptation failed');
+      
+      const data = await response.json();
+      setAdaptiveCareer(data.adaptedCareer);
+      
+      // Update character skills based on adaptation
+      const newProgress = { ...gameProgress };
+      data.adaptedCareer.skillSet.forEach((skill: any) => {
+        if (!newProgress.character.skills[skill.name]) {
+          newProgress.character.skills[skill.name] = skill.level;
+        }
+      });
+      
+      // Boost AI collaboration
+      if (data.adaptationSummary.aiCollaborationChange > 0) {
+        newProgress.character.cryptoCoins += Math.floor(data.adaptationSummary.aiCollaborationChange / 10);
+      }
+      
+      setGameProgress(newProgress);
+      
+      toast({
+        title: "Career Adapted",
+        description: `Your career has evolved with market changes. +${Math.floor(data.adaptationSummary.aiCollaborationChange / 10)} Crypto Coins`,
+        duration: 5000
+      });
+      
+      return data.adaptedCareer;
+      
+    } catch (error) {
+      console.error('Career adaptation error:', error);
       return null;
     }
   };

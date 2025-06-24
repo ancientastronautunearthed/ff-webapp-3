@@ -34,6 +34,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import and use character images routes
   const { characterImagesRoutes } = await import('./routes/character-images');
   app.use('/api/character-images', characterImagesRoutes);
+  
+  // Import and use adaptive simulation routes
+  const { adaptiveSimulationRoutes } = await import('./routes/adaptive-simulation');
+  app.use('/api/adaptive-simulation', adaptiveSimulationRoutes);
 
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {
