@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { CommunityConnectionPuzzle } from './CommunityConnectionPuzzle';
+import { BreathingGarden } from './BreathingGarden';
 import { 
   Gamepad2, 
   Puzzle, 
@@ -46,8 +47,7 @@ const WELLNESS_GAMES: GameInfo[] = [
     color: 'from-green-500 to-teal-600',
     difficulty: 'Easy',
     category: 'Mindfulness',
-    available: false,
-    comingSoon: true
+    available: true
   },
   {
     id: 'memory_patterns',
@@ -121,6 +121,8 @@ export const WellnessGamesHub: React.FC = () => {
     switch (selectedGame) {
       case 'community_puzzle':
         return <CommunityConnectionPuzzle />;
+      case 'breathing_garden':
+        return <BreathingGarden />;
       default:
         return (
           <Card className="w-full max-w-2xl mx-auto">
