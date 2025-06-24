@@ -42,6 +42,7 @@ import { CompanionWidget } from '@/components/CompanionWidget';
 import { WeatherWidget } from '@/components/WeatherWidget';
 import { TelemedicineScheduling } from '@/components/TelemedicineScheduling';
 import { ResearchDashboardEnhanced } from '@/components/ResearchDashboardEnhanced';
+import { WeatherHealthCorrelation } from '@/components/WeatherHealthCorrelation';
 
 interface NavigationItem {
   id: string;
@@ -99,6 +100,13 @@ const navigationSections: NavigationSection[] = [
         icon: BarChart3,
         component: DataVisualization,
         description: 'Charts and pattern analysis'
+      },
+      {
+        id: 'weather-correlation',
+        label: 'Weather Correlations',
+        icon: TrendingUp,
+        component: WeatherHealthCorrelation,
+        description: 'Weather-health pattern analysis'
       }
     ]
   },
