@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-{
   "scripts": {
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
@@ -11,8 +10,7 @@
     "deploy": "npm run build && firebase deploy",
     "serve": "firebase serve",
     "postbuild": "cp -r public/* dist/ 2>/dev/null || :"
-  }
-}
+  },
   "dependencies": {
     "@genkit-ai/ai": "^1.13.0",
     "@genkit-ai/firebase": "^1.13.0",
@@ -101,20 +99,6 @@
     "@types/node": "20.16.11",
     "@types/passport": "^1.0.16",
     "@types/passport-local": "^1.0.38",
-    "@types/react": "^18.3.11",
-    "@types/react-dom": "^18.3.1",
-    "@types/ws": "^8.5.13",
-    "@vitejs/plugin-react": "^4.3.2",
-    "autoprefixer": "^10.4.20",
-    "drizzle-kit": "^0.30.4",
-    "esbuild": "^0.25.0",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.17",
-    "tsx": "^4.19.1",
-    "typescript": "5.6.3",
-    "vite": "^5.4.19"
-  },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.8"
-  }
-}
+        "@types/react": "^18.3.0"
+      }
+    }
