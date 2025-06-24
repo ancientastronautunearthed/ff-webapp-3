@@ -138,6 +138,38 @@ const BILL_TYPES: Omit<Bill, 'id' | 'stackHeight'>[] = [
     description: 'For your "stress-related" symptoms',
     icon: <Heart className="w-4 h-4" />,
     color: 'bg-green-500'
+  },
+  {
+    type: 'specialist',
+    name: 'Rheumatologist',
+    cost: 425,
+    description: '"Maybe try yoga?"',
+    icon: <FileText className="w-4 h-4" />,
+    color: 'bg-orange-500'
+  },
+  {
+    type: 'test',
+    name: 'Allergy Panel',
+    cost: 680,
+    description: 'Testing for everything except fiber sensitivity',
+    icon: <HelpCircle className="w-4 h-4" />,
+    color: 'bg-indigo-500'
+  },
+  {
+    type: 'prescription',
+    name: 'Topical Steroids',
+    cost: 85,
+    description: 'The universal "solution"',
+    icon: <Plus className="w-4 h-4" />,
+    color: 'bg-teal-500'
+  },
+  {
+    type: 'emergency',
+    name: 'Urgent Care',
+    cost: 850,
+    description: '"Have you Googled your symptoms?"',
+    icon: <AlertTriangle className="w-4 h-4" />,
+    color: 'bg-yellow-600'
   }
 ];
 
@@ -262,6 +294,32 @@ const DEFENSE_TYPES: Defense[] = [
     icon: <Heart className="w-4 h-4" />,
     color: 'bg-pink-500',
     cooldown: 2500,
+    lastFired: 0
+  },
+  {
+    id: 'savings',
+    type: 'savings',
+    name: 'Emergency Fund',
+    damage: 250,
+    range: 90,
+    cost: 600,
+    description: 'Your rainy day stash',
+    icon: <Banknote className="w-4 h-4" />,
+    color: 'bg-yellow-500',
+    cooldown: 2200,
+    lastFired: 0
+  },
+  {
+    id: 'gofundme',
+    type: 'advocate',
+    name: 'GoFundMe',
+    damage: 600,
+    range: 110,
+    cost: 200,
+    description: 'Crowdsourced medical bankruptcy prevention',
+    icon: <Users className="w-4 h-4" />,
+    color: 'bg-indigo-500',
+    cooldown: 3500,
     lastFired: 0
   }
 ];
@@ -602,16 +660,24 @@ export const MedicalBillsTowerDefense: React.FC = () => {
 
         {/* Defense Selection */}
         <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-medium text-gray-900 mb-3">Choose Your Defense</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            Choose Your Financial Defense
+            {selectedDefense && (
+              <Badge variant="outline" className="ml-2">
+                {selectedDefense.name} Selected
+              </Badge>
+            )}
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {DEFENSE_TYPES.map((defense) => (
               <div
                 key={defense.id}
-                className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                className={`border rounded-lg p-3 cursor-pointer transition-all hover:scale-105 ${
                   selectedDefense?.id === defense.id
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-blue-500 bg-blue-50 shadow-md'
                     : gameState.money >= defense.cost
-                      ? 'border-gray-200 hover:border-gray-300'
+                      ? 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                       : 'border-gray-200 bg-gray-100 opacity-50 cursor-not-allowed'
                 }`}
                 onClick={() => gameState.money >= defense.cost && setSelectedDefense(defense)}
@@ -624,12 +690,23 @@ export const MedicalBillsTowerDefense: React.FC = () => {
                 </div>
                 <p className="text-xs text-gray-600 mb-2">{defense.description}</p>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-green-600">${defense.cost}</span>
+                  <span className={`font-bold ${defense.cost === 0 ? 'text-green-600' : gameState.money >= defense.cost ? 'text-green-600' : 'text-red-600'}`}>
+                    {defense.cost === 0 ? 'FREE' : `$${defense.cost}`}
+                  </span>
                   <span className="text-blue-600">{defense.damage} DMG</span>
+                </div>
+                <div className="flex items-center justify-between text-xs mt-1">
+                  <span className="text-purple-600">Range: {defense.range}</span>
+                  <span className="text-orange-600">{defense.cooldown/1000}s CD</span>
                 </div>
               </div>
             ))}
           </div>
+          {selectedDefense && (
+            <div className="mt-3 p-2 bg-blue-50 rounded text-sm text-blue-800">
+              Click on a defense position to place your {selectedDefense.name}
+            </div>
+          )}
         </div>
 
         {/* Game Field */}
@@ -642,7 +719,7 @@ export const MedicalBillsTowerDefense: React.FC = () => {
           <div className="absolute top-16 left-0 w-full h-2 bg-red-200 rounded opacity-50" />
           
           {/* Defense Positions */}
-          {[80, 180, 280, 380].map((position) => (
+          {[80, 180, 280, 380, 480].map((position) => (
             <div
               key={position}
               className={`absolute top-12 w-14 h-14 border-2 border-dashed border-gray-400 rounded-lg cursor-pointer hover:bg-white hover:bg-opacity-75 transition-all ${
@@ -652,8 +729,13 @@ export const MedicalBillsTowerDefense: React.FC = () => {
               onClick={() => selectedDefense && placeDefense(selectedDefense, position)}
             >
               {gameState.defenses.find(d => d.position === position) ? (
-                <div className={`w-full h-full rounded-lg ${gameState.defenses.find(d => d.position === position)?.color} flex items-center justify-center text-white shadow-lg`}>
-                  {gameState.defenses.find(d => d.position === position)?.icon}
+                <div className={`w-full h-full rounded-lg ${gameState.defenses.find(d => d.position === position)?.color} flex flex-col items-center justify-center text-white shadow-lg relative`}>
+                  <div className="text-sm">
+                    {gameState.defenses.find(d => d.position === position)?.icon}
+                  </div>
+                  <div className="absolute -bottom-1 left-0 right-0 text-xs text-center bg-black bg-opacity-50 rounded-b">
+                    ${gameState.defenses.find(d => d.position === position)?.damage}
+                  </div>
                 </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -663,45 +745,81 @@ export const MedicalBillsTowerDefense: React.FC = () => {
             </div>
           ))}
 
+          {/* Enemy Path Line */}
+          <div className="absolute top-16 left-0 w-full h-1 bg-red-300 rounded opacity-60" />
+          <div className="absolute top-16 left-0 w-2 h-2 bg-red-500 rounded-full -mt-0.5" />
+          <div className="absolute top-16 right-0 w-2 h-2 bg-red-600 rounded-full -mt-0.5" />
+
           {/* Enemies */}
           {gameState.enemies.map((enemy) => (
             <div
               key={enemy.id}
               className="absolute top-14 transition-all duration-100 z-10"
-              style={{ left: `${Math.min(enemy.position, 480)}px` }}
+              style={{ left: `${Math.min(enemy.position, 520)}px` }}
             >
-              <div className={`w-10 h-10 rounded-lg border-2 border-red-500 bg-white flex items-center justify-center ${enemy.color} shadow-md`}>
+              <div className={`w-10 h-10 rounded-lg border-2 border-red-500 bg-white flex items-center justify-center ${enemy.color} shadow-md hover:scale-110 transition-transform`}>
                 {enemy.icon}
               </div>
               <div className="w-12 bg-gray-200 rounded-full h-2 mt-1">
                 <div 
-                  className="bg-red-500 h-2 rounded-full transition-all"
+                  className={`h-2 rounded-full transition-all ${
+                    enemy.health / enemy.maxHealth > 0.6 ? 'bg-red-500' :
+                    enemy.health / enemy.maxHealth > 0.3 ? 'bg-yellow-500' : 'bg-green-500'
+                  }`}
                   style={{ width: `${(enemy.health / enemy.maxHealth) * 100}%` }}
                 />
               </div>
-              <div className="text-xs text-center mt-1 font-bold text-red-600">
+              <div className="text-xs text-center mt-1 font-bold text-red-600 bg-white rounded px-1">
                 ${enemy.damage}
               </div>
             </div>
           ))}
 
+          {/* Defense Range Indicators */}
+          {selectedDefense && gameState.defenses.map((defense) => (
+            <div
+              key={`range-${defense.id}`}
+              className="absolute top-12 border border-blue-300 bg-blue-100 bg-opacity-30 rounded-full pointer-events-none"
+              style={{
+                left: `${(defense.position || 0) - defense.range/2 + 28}px`,
+                width: `${defense.range}px`,
+                height: `${defense.range}px`,
+                top: `${48 - defense.range/2 + 28}px`
+              }}
+            />
+          ))}
+
           {/* Bill Tower */}
           <div className="absolute bottom-4 right-4">
             <div className="flex flex-col-reverse items-center">
-              {gameState.bills.slice(-8).map((bill, index) => (
+              {gameState.bills.slice(-10).map((bill, index) => (
                 <div
                   key={bill.id}
-                  className={`w-20 h-5 ${bill.color} rounded mb-1 flex items-center justify-center text-white text-xs shadow-sm`}
-                  style={{ zIndex: index }}
+                  className={`w-20 h-4 ${bill.color} rounded mb-0.5 flex items-center justify-center text-white text-xs shadow-sm hover:scale-105 transition-transform`}
+                  style={{ 
+                    zIndex: index,
+                    transform: `translateX(${Math.sin(index * 0.5) * 2}px)` // Slight wobble effect
+                  }}
+                  title={`${bill.name}: $${bill.cost} - ${bill.description}`}
                 >
                   {bill.icon}
                   <span className="ml-1">${bill.cost}</span>
                 </div>
               ))}
+              {gameState.billTowerHeight > 10 && (
+                <div className="text-xs text-gray-600 bg-white rounded px-1 mb-1">
+                  +{gameState.billTowerHeight - 10} more bills...
+                </div>
+              )}
               {gameState.billTowerHeight > 0 && (
-                <Badge variant="secondary" className="mb-2">
+                <Badge variant="secondary" className="mb-2 bg-red-100 text-red-800">
                   Tower: ${gameState.bills.reduce((sum, bill) => sum + bill.cost, 0).toLocaleString()}
                 </Badge>
+              )}
+              {gameState.billTowerHeight === 0 && (
+                <div className="text-xs text-gray-500 text-center">
+                  Add medical bills<br/>to build tower
+                </div>
               )}
             </div>
           </div>
