@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, Brain, TrendingUp, AlertCircle, Lightbulb, Heart } from 'lucide-react';
+import { Send, Brain, TrendingUp, AlertCircle, Lightbulb, Heart, Bot, User, Volume2, VolumeX, Play, Pause, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { synthesizeSpeech, VoiceConfig } from '@/lib/textToSpeech';

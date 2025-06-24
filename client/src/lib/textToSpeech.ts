@@ -1,3 +1,40 @@
+export interface VoiceConfig {
+  name: string;
+  gender: 'MALE' | 'FEMALE' | 'NEUTRAL';
+  language: string;
+  style?: 'calming' | 'encouraging' | 'validating' | 'supportive';
+}
+
+// Available therapeutic voices optimized for health companion interactions
+export const THERAPEUTIC_VOICES: VoiceConfig[] = [
+  {
+    name: 'en-US-Wavenet-H',
+    gender: 'FEMALE',
+    language: 'en-US',
+    style: 'supportive'
+  },
+  {
+    name: 'en-US-Wavenet-F',
+    gender: 'FEMALE', 
+    language: 'en-US',
+    style: 'calming'
+  },
+  {
+    name: 'en-US-Wavenet-I',
+    gender: 'MALE',
+    language: 'en-US',
+    style: 'encouraging'
+  },
+  {
+    name: 'en-US-Wavenet-A',
+    gender: 'MALE',
+    language: 'en-US',
+    style: 'validating'
+  }
+];
+
+const DEFAULT_VOICE: VoiceConfig = THERAPEUTIC_VOICES[0];
+
 interface TextToSpeechConfig {
   text: string;
   voice?: {

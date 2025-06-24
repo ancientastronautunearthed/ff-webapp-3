@@ -7,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Volume2, Play, Settings } from 'lucide-react';
-import { VoiceConfig, THERAPEUTIC_VOICES, synthesizeSpeech } from '@/lib/textToSpeech';
+import { VoiceConfig, THERAPEUTIC_VOICES } from '@/lib/textToSpeech';
 
 interface VoiceSettingsProps {
   voiceConfig: VoiceConfig;
@@ -28,21 +28,37 @@ export const VoiceSettings: React.FC<VoiceSettingsProps> = ({
     setIsTestPlaying(true);
     try {
       const testText = "Hello! I'm your AI health companion. I'm here to support you on your wellness journey with care and understanding.";
-      const audioBlob = await synthesizeSpeech(testText, voiceConfig);
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
       
-      audio.onended = () => {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(testText);
+        
+        // Try to find a voice that matches our config
+        const voices = speechSynthesis.getVoices();
+        const matchingVoice = voices.find(voice => 
+          voice.lang.includes('en') &&
+          (voiceConfig.gender === 'FEMALE' ? voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('samantha') : true)
+        );
+        
+        if (matchingVoice) {
+          utterance.voice = matchingVoice;
+        }
+        
+        utterance.rate = 0.9;
+        utterance.pitch = voiceConfig.gender === 'FEMALE' ? 1.1 : 0.9;
+        utterance.volume = 0.8;
+
+        utterance.onend = () => {
+          setIsTestPlaying(false);
+        };
+        
+        utterance.onerror = () => {
+          setIsTestPlaying(false);
+        };
+        
+        speechSynthesis.speak(utterance);
+      } else {
         setIsTestPlaying(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      audio.onerror = () => {
-        setIsTestPlaying(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      await audio.play();
+      }
     } catch (error) {
       console.error('Voice test failed:', error);
       setIsTestPlaying(false);
