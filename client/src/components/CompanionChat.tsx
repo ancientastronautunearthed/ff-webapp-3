@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Send, Brain, TrendingUp, AlertCircle, Lightbulb, Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { synthesizeSpeech, VoiceConfig } from '@/lib/textToSpeech';
 
 interface Message {
   id: string;
