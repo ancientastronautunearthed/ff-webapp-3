@@ -94,6 +94,18 @@ export default function DoctorDashboard() {
     loadDoctorData();
   }, [user]);
 
+  useEffect(() => {
+    const loadDemoStats = async () => {
+      try {
+        const { demoDashboardStats } = await import('@/data/demoDoctor');
+        setDashboardStats(demoDashboardStats);
+      } catch (error) {
+        console.error('Error loading demo stats:', error);
+      }
+    };
+    loadDemoStats();
+  }, []);
+
   const loadDoctorData = async () => {
     // Check if this is a demo session
     const isDemo = localStorage.getItem('demoDoctor') === 'true';

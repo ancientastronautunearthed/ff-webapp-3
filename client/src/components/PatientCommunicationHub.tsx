@@ -116,42 +116,12 @@ export const PatientCommunicationHub = () => {
     
     setLoading(true);
     try {
-      // In real implementation, this would load patients assigned to the doctor
-      const mockPatients: Patient[] = [
-        {
-          id: 'patient1',
-          name: 'Sarah Chen',
-          email: 'sarah.chen@email.com',
-          lastActive: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-          symptomSeverity: 'high',
-          unreadMessages: 3,
-          nextAppointment: new Date(Date.now() + 24 * 60 * 60 * 1000), // tomorrow
-          companionTier: 5
-        },
-        {
-          id: 'patient2',
-          name: 'Michael Rodriguez',
-          email: 'michael.r@email.com',
-          lastActive: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-          symptomSeverity: 'moderate',
-          unreadMessages: 1,
-          nextAppointment: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days
-          companionTier: 3
-        },
-        {
-          id: 'patient3',
-          name: 'Emma Thompson',
-          email: 'emma.t@email.com',
-          lastActive: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
-          symptomSeverity: 'critical',
-          unreadMessages: 7,
-          companionTier: 2
-        }
-      ];
+      // Load demo patients with comprehensive data
+      const { demoPatients } = await import('@/data/demoDoctor');
       
-      setPatients(mockPatients);
-      if (mockPatients.length > 0) {
-        setSelectedPatient(mockPatients[0]);
+      setPatients(demoPatients);
+      if (demoPatients.length > 0) {
+        setSelectedPatient(demoPatients[0]);
       }
     } catch (error) {
       console.error('Error loading patients:', error);
@@ -161,88 +131,17 @@ export const PatientCommunicationHub = () => {
 
   const loadPatientData = async (patientId: string) => {
     try {
-      // Load messages
-      const mockMessages: Message[] = [
-        {
-          id: 'msg1',
-          patientId: patientId,
-          senderId: patientId,
-          senderType: 'patient',
-          content: 'Hi Dr. Smith, I\'ve been experiencing increased crawling sensations over the past few days. My AI companion suggested it might be related to the recent weather changes. Could we discuss adjusting my treatment?',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          read: false,
-          messageType: 'text',
-          priority: 'high'
-        },
-        {
-          id: 'msg2',
-          patientId: patientId,
-          senderId: 'doctor1',
-          senderType: 'doctor',
-          content: 'Thank you for reaching out. I\'ve reviewed your recent symptom reports and AI companion insights. Let\'s schedule a telehealth appointment to discuss treatment adjustments. I see your companion has identified some interesting patterns.',
-          timestamp: new Date(Date.now() - 30 * 60 * 1000),
-          read: true,
-          messageType: 'text',
-          priority: 'normal'
-        }
-      ];
+      // Load comprehensive demo data for selected patient
+      const { demoMessages, demoSymptomReports, demoCompanionInsights } = await import('@/data/demoDoctor');
+      
+      // Filter data for selected patient
+      const patientMessages = demoMessages.filter(msg => msg.patientId === patientId);
+      const patientReports = demoSymptomReports.filter(report => report.patientId === patientId);
+      const patientInsights = demoCompanionInsights.filter(insight => insight.patientId === patientId);
 
-      // Load symptom reports
-      const mockSymptomReports: SymptomReport[] = [
-        {
-          id: 'report1',
-          patientId: patientId,
-          date: new Date(Date.now() - 24 * 60 * 60 * 1000),
-          symptoms: {
-            itchingIntensity: 7,
-            crawlingSensations: 'severe',
-            newLesionsCount: 3,
-            fatigueLevel: 8,
-            mood: ['anxious', 'frustrated']
-          },
-          factors: {
-            medications: ['antihistamine', 'topical steroid'],
-            environmentalFactors: ['high humidity', 'mold exposure']
-          },
-          notes: 'Symptoms worse after cleaning basement. AI companion suggested mold connection.',
-          aiInsights: [
-            'Pattern detected: Symptoms correlate with high humidity (85% accuracy)',
-            'Recommendation: Environmental mold testing suggested',
-            'Alert: Symptom intensity increasing over 7-day trend'
-          ],
-          reviewed: false
-        }
-      ];
-
-      // Load companion insights
-      const mockCompanionInsights: CompanionInsight[] = [
-        {
-          id: 'insight1',
-          patientId: patientId,
-          date: new Date(Date.now() - 6 * 60 * 60 * 1000),
-          type: 'pattern_detection',
-          title: 'Environmental Trigger Pattern Identified',
-          description: 'AI analysis shows 78% correlation between basement cleaning activities and symptom flares. Patient reports mold smell during cleaning.',
-          confidence: 78,
-          actionable: true,
-          doctorReviewed: false
-        },
-        {
-          id: 'insight2',
-          patientId: patientId,
-          date: new Date(Date.now() - 12 * 60 * 60 * 1000),
-          type: 'symptom_prediction',
-          title: 'Potential Symptom Escalation Predicted',
-          description: 'Based on current trend analysis, AI predicts 68% likelihood of symptom escalation in next 48-72 hours without intervention.',
-          confidence: 68,
-          actionable: true,
-          doctorReviewed: false
-        }
-      ];
-
-      setMessages(mockMessages);
-      setSymptomReports(mockSymptomReports);
-      setCompanionInsights(mockCompanionInsights);
+      setMessages(patientMessages);
+      setSymptomReports(patientReports);
+      setCompanionInsights(patientInsights);
     } catch (error) {
       console.error('Error loading patient data:', error);
     }
