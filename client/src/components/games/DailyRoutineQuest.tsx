@@ -38,6 +38,7 @@ import { db } from '@/lib/firebase';
 
 interface Character {
   name: string;
+  age: number;
   level: number;
   xp: number;
   xpToNext: number;
@@ -62,6 +63,7 @@ interface Character {
   };
   inventory: string[];
   gold: number;
+  cryptoCoins: number; // Earned through real participation
   totalScore: number;
   prestige: number;
   rebornCount: number;
@@ -72,6 +74,123 @@ interface Character {
   currentTitle?: string;
   petCompanion?: PetCompanion;
   guildMembership?: string;
+  lifeSimulation: LifeSimulation;
+}
+
+interface LifeSimulation {
+  housing: Housing;
+  vehicles: Vehicle[];
+  relationships: PersonalRelationship[];
+  employment: Employment;
+  financialStatus: FinancialStatus;
+  lifeGoals: LifeGoal[];
+  currentLifePhase: 'young_adult' | 'adult' | 'middle_aged' | 'senior';
+  personalityTraits: string[];
+  dailyRoutines: DailyRoutine[];
+}
+
+interface Housing {
+  type: 'none' | 'renting' | 'owned' | 'shared';
+  propertyType: 'apartment' | 'house' | 'condo' | 'mansion' | 'penthouse';
+  location: string;
+  monthlyPayment: number;
+  value?: number;
+  upgrades: string[];
+  roommates?: PersonalRelationship[];
+}
+
+interface Vehicle {
+  type: 'car' | 'motorcycle' | 'bicycle' | 'electric_scooter' | 'public_transport_pass';
+  make: string;
+  model: string;
+  year: number;
+  value: number;
+  monthlyPayment?: number;
+  condition: 'excellent' | 'good' | 'fair' | 'poor';
+}
+
+interface PersonalRelationship {
+  id: string;
+  name: string;
+  type: 'friend' | 'romantic_partner' | 'spouse' | 'child' | 'parent' | 'sibling' | 'coworker';
+  relationshipLevel: number;
+  age: number;
+  personality: string[];
+  occupation: string;
+  backstory: string;
+  currentStatus: 'active' | 'distant' | 'conflicted' | 'close';
+  sharedActivities: string[];
+  relationshipHistory: RelationshipEvent[];
+}
+
+interface RelationshipEvent {
+  date: Date;
+  type: 'meeting' | 'date' | 'argument' | 'milestone' | 'breakup' | 'marriage' | 'birth';
+  description: string;
+  impact: number;
+}
+
+interface Employment {
+  position: string;
+  company: string;
+  salary: number;
+  industry: string;
+  workSatisfaction: number;
+  careerPath: string[];
+  skills: string[];
+  workSchedule: 'full_time' | 'part_time' | 'freelance' | 'unemployed' | 'student';
+}
+
+interface FinancialStatus {
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  savings: number;
+  debt: number;
+  investments: Investment[];
+  creditScore: number;
+  budgetCategories: { [category: string]: number };
+}
+
+interface Investment {
+  type: 'stocks' | 'crypto' | 'real_estate' | 'bonds' | 'savings_account';
+  name: string;
+  amount: number;
+  currentValue: number;
+  monthlyReturn: number;
+}
+
+interface LifeGoal {
+  id: string;
+  category: 'career' | 'relationships' | 'financial' | 'health' | 'personal' | 'travel';
+  description: string;
+  targetDate: Date;
+  progress: number;
+  priority: 'low' | 'medium' | 'high';
+  milestones: Milestone[];
+}
+
+interface Milestone {
+  description: string;
+  completed: boolean;
+  dateCompleted?: Date;
+  reward: number;
+}
+
+interface DailyRoutine {
+  id: string;
+  name: string;
+  timeSlots: TimeSlot[];
+  satisfaction: number;
+  efficiency: number;
+}
+
+interface TimeSlot {
+  startTime: string;
+  endTime: string;
+  activity: string;
+  location: string;
+  energy: number;
+  mood: number;
 }
 
 interface PetCompanion {
@@ -960,7 +1079,7 @@ export const DailyRoutineQuest: React.FC = () => {
   const [gameProgress, setGameProgress] = useState<GameProgress | null>(null);
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story' | 'shop' | 'npcs' | 'guilds' | 'pets'>('character');
+  const [activeTab, setActiveTab] = useState<'character' | 'quests' | 'inventory' | 'leaderboard' | 'story' | 'shop' | 'npcs' | 'guilds' | 'pets' | 'life' | 'relationships' | 'housing' | 'career'>('character');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('totalScore');
   const [questFilter, setQuestFilter] = useState<'all' | 'daily' | 'epic'>('all');
@@ -1545,6 +1664,38 @@ export const DailyRoutineQuest: React.FC = () => {
         >
           <Heart className="w-4 h-4" />
           Pets
+        </Button>
+        <Button
+          variant={activeTab === 'life' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('life')}
+          className="flex items-center gap-2"
+        >
+          <Home className="w-4 h-4" />
+          Life Sim
+        </Button>
+        <Button
+          variant={activeTab === 'relationships' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('relationships')}
+          className="flex items-center gap-2"
+        >
+          <Users className="w-4 h-4" />
+          Relations
+        </Button>
+        <Button
+          variant={activeTab === 'housing' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('housing')}
+          className="flex items-center gap-2"
+        >
+          <Building className="w-4 h-4" />
+          Housing
+        </Button>
+        <Button
+          variant={activeTab === 'career' ? 'default' : 'outline'}
+          onClick={() => setActiveTab('career')}
+          className="flex items-center gap-2"
+        >
+          <Briefcase className="w-4 h-4" />
+          Career
         </Button>
       </div>
 
@@ -2391,6 +2542,593 @@ export const DailyRoutineQuest: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+      )}
+
+      {/* Life Simulation Tab */}
+      {activeTab === 'life' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Home className="w-5 h-5" />
+              Life Simulation - 2035
+              <Badge className="bg-blue-100 text-blue-800">
+                Age {gameProgress.character.age}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Life Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+                <h3 className="font-bold mb-2">Current Life Phase</h3>
+                <p className="text-lg capitalize">{gameProgress.character.lifeSimulation?.currentLifePhase.replace('_', ' ')}</p>
+                <div className="mt-2">
+                  <h4 className="font-medium text-sm">Personality Traits</h4>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {gameProgress.character.lifeSimulation?.personalityTraits.map((trait, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">{trait}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-r from-green-50 to-yellow-50 rounded-lg p-4">
+                <h3 className="font-bold mb-2">Financial Status</h3>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <div className="font-medium">Monthly Income</div>
+                    <div className="text-green-600">${gameProgress.character.lifeSimulation?.financialStatus.monthlyIncome}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Expenses</div>
+                    <div className="text-red-600">${gameProgress.character.lifeSimulation?.financialStatus.monthlyExpenses}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Savings</div>
+                    <div className="text-blue-600">${gameProgress.character.lifeSimulation?.financialStatus.savings}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium">Credit Score</div>
+                    <div className="text-purple-600">{gameProgress.character.lifeSimulation?.financialStatus.creditScore}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Life Goals */}
+            <div>
+              <h3 className="font-bold mb-3">Life Goals</h3>
+              <div className="space-y-3">
+                {gameProgress.character.lifeSimulation?.lifeGoals.map((goal) => (
+                  <div key={goal.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">{goal.description}</h4>
+                      <Badge variant={goal.priority === 'high' ? 'default' : 'outline'}>
+                        {goal.priority}
+                      </Badge>
+                    </div>
+                    <Progress value={goal.progress} className="mb-2" />
+                    <div className="text-sm text-gray-600">
+                      Target: {new Date(goal.targetDate).toLocaleDateString()}
+                    </div>
+                    <div className="mt-2">
+                      <h5 className="text-sm font-medium">Milestones:</h5>
+                      {goal.milestones.map((milestone, idx) => (
+                        <div key={idx} className={`text-xs flex items-center gap-2 ${milestone.completed ? 'text-green-600' : 'text-gray-500'}`}>
+                          <input type="checkbox" checked={milestone.completed} readOnly />
+                          {milestone.description}
+                          {milestone.completed && <span className="text-green-600">+{milestone.reward} coins</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Button size="sm" variant="outline" onClick={() => setActiveTab('housing')}>
+                <Home className="w-4 h-4 mr-1" />
+                Housing
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setActiveTab('career')}>
+                <Briefcase className="w-4 h-4 mr-1" />
+                Career
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setActiveTab('relationships')}>
+                <Heart className="w-4 h-4 mr-1" />
+                Relations
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => {
+                  // Generate AI event
+                  toast({
+                    title: "AI Life Event Generated",
+                    description: "New opportunities and challenges await in your life simulation!",
+                    duration: 4000
+                  });
+                }}
+              >
+                <Zap className="w-4 h-4 mr-1" />
+                AI Event
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Relationships Tab */}
+      {activeTab === 'relationships' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Personal Relationships
+              <Badge className="bg-pink-100 text-pink-800">
+                {gameProgress.character.lifeSimulation?.relationships.length || 0} Connections
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {gameProgress.character.lifeSimulation?.relationships.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-bold mb-2">No Relationships Yet</h3>
+                <p className="text-gray-600 mb-4">Start building meaningful connections in the 2035 world</p>
+                <Button
+                  onClick={() => {
+                    const newProgress = { ...gameProgress };
+                    if (!newProgress.character.lifeSimulation) return;
+                    
+                    // Generate AI relationship
+                    const newRelationship: PersonalRelationship = {
+                      id: `rel_${Date.now()}`,
+                      name: `Alex Chen`,
+                      type: 'friend',
+                      relationshipLevel: 25,
+                      age: gameProgress.character.age + Math.floor(Math.random() * 10) - 5,
+                      personality: ['Friendly', 'Tech-savvy', 'Optimistic'],
+                      occupation: 'AI Interface Designer',
+                      backstory: 'Met at a coffee shop during the Great Algorithm Uprising. Shares your interest in human-AI cooperation.',
+                      currentStatus: 'active',
+                      sharedActivities: ['Coffee discussions', 'Tech meetups'],
+                      relationshipHistory: [
+                        {
+                          date: new Date(),
+                          type: 'meeting',
+                          description: 'First met during a chance encounter at Zara\'s underground coffee shop',
+                          impact: 15
+                        }
+                      ]
+                    };
+                    
+                    newProgress.character.lifeSimulation.relationships.push(newRelationship);
+                    newProgress.character.cryptoCoins += 10;
+                    setGameProgress(newProgress);
+                    
+                    toast({
+                      title: "New Connection Made!",
+                      description: "You've met Alex Chen, an AI Interface Designer. +10 Crypto Coins",
+                      duration: 4000
+                    });
+                  }}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Generate AI Connection
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {gameProgress.character.lifeSimulation?.relationships.map((relationship) => (
+                  <div key={relationship.id} className="border rounded-lg p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                        {relationship.name.charAt(0)}
+                      </div>
+                      <div>
+                        <h3 className="font-bold">{relationship.name}</h3>
+                        <p className="text-sm text-gray-600">{relationship.occupation}</p>
+                        <p className="text-xs text-gray-500">Age {relationship.age}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm capitalize">{relationship.type.replace('_', ' ')}</span>
+                        <Badge variant={relationship.currentStatus === 'close' ? 'default' : 'outline'}>
+                          {relationship.currentStatus}
+                        </Badge>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium">Relationship Level</div>
+                        <Progress value={relationship.relationshipLevel} className="h-2" />
+                        <div className="text-xs text-gray-500">{relationship.relationshipLevel}/100</div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium">Personality</div>
+                        <div className="flex flex-wrap gap-1">
+                          {relationship.personality.map((trait, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">{trait}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="text-sm font-medium">Shared Activities</div>
+                        <div className="text-xs text-gray-600">
+                          {relationship.sharedActivities.join(', ')}
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            const newProgress = { ...gameProgress };
+                            const rel = newProgress.character.lifeSimulation?.relationships.find(r => r.id === relationship.id);
+                            if (rel) {
+                              rel.relationshipLevel = Math.min(100, rel.relationshipLevel + 5);
+                              rel.relationshipHistory.push({
+                                date: new Date(),
+                                type: 'date',
+                                description: 'Had a meaningful conversation about life in 2035',
+                                impact: 5
+                              });
+                              newProgress.character.cryptoCoins += 5;
+                              
+                              // Marriage opportunity
+                              if (rel.type === 'romantic_partner' && rel.relationshipLevel >= 80 && Math.random() < 0.3) {
+                                rel.type = 'spouse';
+                                rel.relationshipHistory.push({
+                                  date: new Date(),
+                                  type: 'marriage',
+                                  description: 'Got married in a beautiful ceremony witnessed by friends and family',
+                                  impact: 25
+                                });
+                                newProgress.character.cryptoCoins += 100;
+                                toast({
+                                  title: "Marriage!",
+                                  description: `You married ${relationship.name}! +100 Crypto Coins`,
+                                  duration: 5000
+                                });
+                              } else if (rel.type === 'spouse' && rel.relationshipLevel >= 90 && Math.random() < 0.2) {
+                                // Child opportunity
+                                const childNames = ['Emma', 'Liam', 'Olivia', 'Noah', 'Ava', 'Ethan'];
+                                const childName = childNames[Math.floor(Math.random() * childNames.length)];
+                                const newChild: PersonalRelationship = {
+                                  id: `child_${Date.now()}`,
+                                  name: childName,
+                                  type: 'child',
+                                  relationshipLevel: 100,
+                                  age: 0,
+                                  personality: ['Innocent', 'Curious', 'Joyful'],
+                                  occupation: 'Child',
+                                  backstory: 'Born into the world of 2035, representing hope for the future of human-AI coexistence',
+                                  currentStatus: 'close',
+                                  sharedActivities: ['Playing', 'Learning', 'Bonding'],
+                                  relationshipHistory: [
+                                    {
+                                      date: new Date(),
+                                      type: 'birth',
+                                      description: 'Born healthy and happy, bringing joy to the family',
+                                      impact: 50
+                                    }
+                                  ]
+                                };
+                                newProgress.character.lifeSimulation.relationships.push(newChild);
+                                newProgress.character.cryptoCoins += 200;
+                                toast({
+                                  title: "New Baby!",
+                                  description: `Welcome ${childName} to the world! +200 Crypto Coins`,
+                                  duration: 6000
+                                });
+                              }
+                            }
+                            setGameProgress(newProgress);
+                            if (!toast.description?.includes('Marriage') && !toast.description?.includes('Baby')) {
+                              toast({
+                                title: "Quality Time",
+                                description: `Your relationship with ${relationship.name} improved! +5 Crypto Coins`,
+                                duration: 3000
+                              });
+                            }
+                          }}
+                        >
+                          Spend Time
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            // View relationship history
+                            toast({
+                              title: "Relationship History",
+                              description: `${relationship.relationshipHistory.length} shared memories with ${relationship.name}`,
+                              duration: 3000
+                            });
+                          }}
+                        >
+                          History
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Housing Tab */}
+      {activeTab === 'housing' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building className="w-5 h-5" />
+              Housing & Property
+              <Badge className="bg-green-100 text-green-800">
+                {gameProgress.character.lifeSimulation?.housing.type}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Current Housing */}
+            <div className="bg-blue-50 rounded-lg p-4">
+              <h3 className="font-bold mb-3">Current Housing</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium">Property Type</div>
+                  <div className="capitalize">{gameProgress.character.lifeSimulation?.housing.propertyType}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Location</div>
+                  <div>{gameProgress.character.lifeSimulation?.housing.location}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Monthly Payment</div>
+                  <div>${gameProgress.character.lifeSimulation?.housing.monthlyPayment}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Status</div>
+                  <div className="capitalize">{gameProgress.character.lifeSimulation?.housing.type}</div>
+                </div>
+              </div>
+              
+              {gameProgress.character.lifeSimulation?.housing.upgrades && gameProgress.character.lifeSimulation.housing.upgrades.length > 0 && (
+                <div className="mt-3">
+                  <div className="text-sm font-medium">Upgrades</div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {gameProgress.character.lifeSimulation.housing.upgrades.map((upgrade, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">{upgrade}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Housing Market */}
+            <div>
+              <h3 className="font-bold mb-3">2035 Housing Market</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  {
+                    type: 'AI-Optimized Apartment',
+                    location: 'Neo Francisco Tech District',
+                    price: 2500,
+                    features: ['Smart Home AI', 'Neural Interface', 'Automated Cleaning'],
+                    description: 'Fully integrated with city AI systems'
+                  },
+                  {
+                    type: 'Human Sanctuary House',
+                    location: 'Underground Resistance Quarter',
+                    price: 1800,
+                    features: ['AI-Free Zone', 'Manual Controls', 'Hidden Access'],
+                    description: 'Off-grid housing for human purists'
+                  },
+                  {
+                    type: 'Hybrid Living Space',
+                    location: 'Neutral Cooperation Zone',
+                    price: 3200,
+                    features: ['Human-AI Balance', 'Organic Garden', 'Tech Workshop'],
+                    description: 'Perfect blend of human and AI conveniences'
+                  }
+                ].map((property, idx) => (
+                  <div key={idx} className="border rounded-lg p-4">
+                    <h4 className="font-bold mb-2">{property.type}</h4>
+                    <p className="text-sm text-gray-600 mb-2">{property.location}</p>
+                    <p className="text-lg font-bold text-green-600 mb-2">${property.price}/month</p>
+                    <p className="text-xs text-gray-500 mb-3">{property.description}</p>
+                    
+                    <div className="space-y-1 mb-3">
+                      {property.features.map((feature, featureIdx) => (
+                        <div key={featureIdx} className="text-xs flex items-center gap-1">
+                          <div className="w-1 h-1 bg-green-500 rounded-full"></div>
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <Button
+                      size="sm"
+                      disabled={gameProgress.character.lifeSimulation?.financialStatus.savings! < property.price * 2}
+                      onClick={() => {
+                        const newProgress = { ...gameProgress };
+                        if (newProgress.character.lifeSimulation && newProgress.character.lifeSimulation.financialStatus.savings >= property.price * 2) {
+                          newProgress.character.lifeSimulation.housing = {
+                            type: 'renting',
+                            propertyType: property.type.includes('Apartment') ? 'apartment' : 'house',
+                            location: property.location,
+                            monthlyPayment: property.price,
+                            upgrades: property.features
+                          };
+                          newProgress.character.lifeSimulation.financialStatus.savings -= property.price * 2;
+                          newProgress.character.cryptoCoins += 25;
+                          setGameProgress(newProgress);
+                          
+                          toast({
+                            title: "New Home!",
+                            description: `Moved to ${property.type}! +25 Crypto Coins`,
+                            duration: 4000
+                          });
+                        }
+                      }}
+                    >
+                      {gameProgress.character.lifeSimulation?.financialStatus.savings! >= property.price * 2 ? 'Move Here' : 'Can\'t Afford'}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Career Tab */}
+      {activeTab === 'career' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5" />
+              Career & Employment
+              <Badge className="bg-orange-100 text-orange-800">
+                {gameProgress.character.lifeSimulation?.employment.workSchedule}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Current Job */}
+            <div className="bg-orange-50 rounded-lg p-4">
+              <h3 className="font-bold mb-3">Current Position</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-medium">Position</div>
+                  <div>{gameProgress.character.lifeSimulation?.employment.position}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Company</div>
+                  <div>{gameProgress.character.lifeSimulation?.employment.company}</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Salary</div>
+                  <div>${gameProgress.character.lifeSimulation?.employment.salary.toLocaleString()}/year</div>
+                </div>
+                <div>
+                  <div className="text-sm font-medium">Industry</div>
+                  <div>{gameProgress.character.lifeSimulation?.employment.industry}</div>
+                </div>
+              </div>
+              
+              <div className="mt-3">
+                <div className="text-sm font-medium">Work Satisfaction</div>
+                <Progress value={gameProgress.character.lifeSimulation?.employment.workSatisfaction} className="mt-1" />
+                <div className="text-xs text-gray-500">{gameProgress.character.lifeSimulation?.employment.workSatisfaction}/100</div>
+              </div>
+              
+              <div className="mt-3">
+                <div className="text-sm font-medium">Career Path</div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {gameProgress.character.lifeSimulation?.employment.careerPath.map((step, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs">{step}</Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Career Opportunities */}
+            <div>
+              <h3 className="font-bold mb-3">2035 Career Opportunities</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  {
+                    position: 'AI Ethics Consultant',
+                    company: 'Human Rights & AI Council',
+                    salary: 75000,
+                    industry: 'Ethics & Policy',
+                    requirements: ['Human Empathy: 30', 'AI Understanding: 25'],
+                    description: 'Help navigate complex ethical decisions in human-AI interactions'
+                  },
+                  {
+                    position: 'Digital Resistance Coordinator',
+                    company: 'Underground Freedom Network',
+                    salary: 55000,
+                    industry: 'Activism',
+                    requirements: ['Digital Resistance: 35', 'Social Navigation: 25'],
+                    description: 'Organize and lead human autonomy movements'
+                  },
+                  {
+                    position: 'Bio-Tech Integration Specialist',
+                    company: 'Symbiosis Solutions Inc.',
+                    salary: 85000,
+                    industry: 'Biotechnology',
+                    requirements: ['Bio-Tech Integration: 40', 'Problem Solving: 30'],
+                    description: 'Bridge the gap between biological and digital systems'
+                  }
+                ].map((job, idx) => (
+                  <div key={idx} className="border rounded-lg p-4">
+                    <h4 className="font-bold mb-2">{job.position}</h4>
+                    <p className="text-sm text-gray-600 mb-1">{job.company}</p>
+                    <p className="text-lg font-bold text-green-600 mb-2">${job.salary.toLocaleString()}/year</p>
+                    <p className="text-xs text-gray-500 mb-3">{job.description}</p>
+                    
+                    <div className="space-y-1 mb-3">
+                      <div className="text-xs font-medium">Requirements:</div>
+                      {job.requirements.map((req, reqIdx) => {
+                        const [skill, level] = req.split(': ');
+                        const hasSkill = (gameProgress.character.skills[skill] || 0) >= parseInt(level);
+                        return (
+                          <div key={reqIdx} className={`text-xs flex items-center gap-1 ${hasSkill ? 'text-green-600' : 'text-red-600'}`}>
+                            <div className={`w-1 h-1 rounded-full ${hasSkill ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            {req} {hasSkill ? '✓' : '✗'}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    <Button
+                      size="sm"
+                      disabled={!job.requirements.every(req => {
+                        const [skill, level] = req.split(': ');
+                        return (gameProgress.character.skills[skill] || 0) >= parseInt(level);
+                      })}
+                      onClick={() => {
+                        const newProgress = { ...gameProgress };
+                        if (newProgress.character.lifeSimulation) {
+                          newProgress.character.lifeSimulation.employment = {
+                            position: job.position,
+                            company: job.company,
+                            salary: job.salary,
+                            industry: job.industry,
+                            workSatisfaction: 80,
+                            careerPath: ['Senior ' + job.position, 'Lead ' + job.position, 'Director'],
+                            skills: job.requirements.map(req => req.split(': ')[0]),
+                            workSchedule: 'full_time'
+                          };
+                          newProgress.character.lifeSimulation.financialStatus.monthlyIncome = Math.floor(job.salary / 12);
+                          newProgress.character.cryptoCoins += 50;
+                          setGameProgress(newProgress);
+                          
+                          toast({
+                            title: "New Job!",
+                            description: `Started working as ${job.position}! +50 Crypto Coins`,
+                            duration: 4000
+                          });
+                        }
+                      }}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Pets Tab */}
