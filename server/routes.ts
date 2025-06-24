@@ -30,6 +30,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Import and use dynamic stories routes
   const { dynamicStoriesRoutes } = await import('./routes/dynamic-stories');
   app.use('/api/dynamic-stories', dynamicStoriesRoutes);
+  
+  // Import and use character images routes
+  const { characterImagesRoutes } = await import('./routes/character-images');
+  app.use('/api/character-images', characterImagesRoutes);
 
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {

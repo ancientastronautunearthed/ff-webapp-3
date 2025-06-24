@@ -1090,6 +1090,8 @@ export const DailyRoutineQuest: React.FC = () => {
   const [dynamicStoryModal, setDynamicStoryModal] = useState<any>(null);
   const [currentPersonalStory, setCurrentPersonalStory] = useState<any>(null);
   const [storyHistory, setStoryHistory] = useState<any[]>([]);
+  const [characterPortraits, setCharacterPortraits] = useState<Map<string, any>>(new Map());
+  const [sceneImages, setSceneImages] = useState<Map<string, any>>(new Map());
   const [characterChoices, setCharacterChoices] = useState<string[]>([]);
   const [worldState, setWorldState] = useState({
     aiTrustLevel: 50, // 0-100, affects how AIs interact with player
@@ -1098,6 +1100,78 @@ export const DailyRoutineQuest: React.FC = () => {
     discoveredSecrets: [] as string[],
     worldEvents: [] as string[]
   });
+
+  const generateCharacterPortrait = async (character: any) => {
+    try {
+      const response = await fetch('/api/character-images/get-or-generate-portrait', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          character: {
+            id: character.id,
+            name: character.name,
+            age: character.age,
+            personality: character.lifeSimulation?.personalityTraits || character.personality || ['Friendly'],
+            occupation: character.lifeSimulation?.employment?.position || character.occupation,
+            type: 'player'
+          },
+          existingPortraits: Array.from(characterPortraits.values())
+        })
+      });
+
+      if (!response.ok) throw new Error('Portrait generation failed');
+
+      const data = await response.json();
+      const newPortraits = new Map(characterPortraits);
+      newPortraits.set(character.id, data.image);
+      setCharacterPortraits(newPortraits);
+      
+      return data.image;
+      
+    } catch (error) {
+      console.error('Character portrait generation error:', error);
+      return null;
+    }
+  };
+
+  const generateSceneImage = async (sceneType: string, characters: any[], description: string) => {
+    try {
+      const response = await fetch('/api/character-images/generate-scene', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          scene: {
+            type: sceneType,
+            characters: characters.map(char => ({
+              id: char.id,
+              name: char.name,
+              age: char.age,
+              personality: char.personality || ['Friendly'],
+              type: char.type || 'character'
+            })),
+            location: '2035 futuristic setting',
+            emotionalTone: 'positive',
+            description,
+            keyElements: ['2035 technology', 'modern atmosphere', 'detailed environment']
+          }
+        })
+      });
+
+      if (!response.ok) throw new Error('Scene generation failed');
+
+      const data = await response.json();
+      const sceneKey = `${sceneType}_${Date.now()}`;
+      const newScenes = new Map(sceneImages);
+      newScenes.set(sceneKey, data.image);
+      setSceneImages(newScenes);
+      
+      return data.image;
+      
+    } catch (error) {
+      console.error('Scene image generation error:', error);
+      return null;
+    }
+  };
 
   const generateAIImage = async (prompt: string): Promise<string> => {
     try {
@@ -1113,7 +1187,7 @@ export const DailyRoutineQuest: React.FC = () => {
       return data.imageUrl;
     } catch (error) {
       console.error('AI image generation error:', error);
-      return '/placeholder-image.jpg'; // Fallback to placeholder
+      return '/placeholder-image.jpg';
     }
   };
 
@@ -2701,6 +2775,17 @@ export const DailyRoutineQuest: React.FC = () => {
                       ]
                     };
                     
+                    // Generate portrait for new relationship
+                    setTimeout(() => {
+                      generateCharacterPortrait({
+                        id: newRelationship.id,
+                        name: newRelationship.name,
+                        age: newRelationship.age,
+                        personality: newRelationship.personality,
+                        occupation: newRelationship.occupation
+                      });
+                    }, 1000);
+                    
                     newProgress.character.lifeSimulation.relationships.push(newRelationship);
                     newProgress.character.cryptoCoins += 10;
                     setGameProgress(newProgress);
@@ -2721,8 +2806,25 @@ export const DailyRoutineQuest: React.FC = () => {
                 {gameProgress.character.lifeSimulation?.relationships.map((relationship) => (
                   <div key={relationship.id} className="border rounded-lg p-4">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                        {relationship.name.charAt(0)}
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                        {characterPortraits.has(relationship.id) ? (
+                          <img 
+                            src={characterPortraits.get(relationship.id)?.url || '/fallback-avatar.png'}
+                            alt={relationship.name}
+                            className="w-full h-full object-cover"
+                            onLoad={() => {
+                              // Portrait loaded successfully
+                            }}
+                            onError={() => {
+                              // Fallback to initials if image fails
+                              console.log(`Portrait failed to load for ${relationship.name}`);
+                            }}
+                          />
+                        ) : (
+                          <div className="text-white font-bold text-lg">
+                            {relationship.name.charAt(0)}
+                          </div>
+                        )}
                       </div>
                       <div>
                         <h3 className="font-bold">{relationship.name}</h3>
@@ -2791,6 +2893,12 @@ export const DailyRoutineQuest: React.FC = () => {
                                 // Generate milestone story for marriage
                                 generateMilestoneStory('marriage');
                                 
+                                // Generate marriage scene image
+                                generateSceneImage('marriage', 
+                                  [gameProgress.character, relationship], 
+                                  `Wedding ceremony between ${gameProgress.character.name} and ${relationship.name} in 2035`
+                                );
+                                
                                 toast({
                                   title: "Marriage!",
                                   description: `You married ${relationship.name}! +100 Crypto Coins`,
@@ -2825,6 +2933,12 @@ export const DailyRoutineQuest: React.FC = () => {
                                 
                                 // Generate milestone story for birth
                                 generateMilestoneStory('birth');
+                                
+                                // Generate birth scene image
+                                generateSceneImage('birth', 
+                                  [gameProgress.character, rel, newChild], 
+                                  `Birth of ${childName} with parents celebrating new family member in modern 2035 setting`
+                                );
                                 
                                 toast({
                                   title: "New Baby!",
@@ -3142,6 +3256,12 @@ export const DailyRoutineQuest: React.FC = () => {
                               
                               // Generate property purchase milestone story
                               generateMilestoneStory('achievement');
+                              
+                              // Generate property purchase scene image
+                              generateSceneImage('purchase', 
+                                [newProgress.character], 
+                                `Property purchase celebration at new ${property.type} in ${property.location}`
+                              );
                               
                               toast({
                                 title: "Property Purchased!",
