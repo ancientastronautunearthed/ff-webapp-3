@@ -240,7 +240,17 @@ export const BreathingGarden: React.FC = () => {
     if (!soundEnabled || typeof window === 'undefined') return;
     
     try {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      // Create audio context only when needed
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) return;
+      
+      const audioContext = new AudioContext();
+      
+      // Resume context if suspended (required by some browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
       
@@ -256,8 +266,13 @@ export const BreathingGarden: React.FC = () => {
       
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + duration);
+      
+      // Clean up context after use
+      setTimeout(() => {
+        audioContext.close();
+      }, (duration + 0.5) * 1000);
     } catch (error) {
-      console.log('Audio not available');
+      console.log('Audio not available:', error);
     }
   }, [soundEnabled]);
 
@@ -490,18 +505,45 @@ export const BreathingGarden: React.FC = () => {
 
         {/* Progress Stats */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="text-center bg-blue-50 rounded-lg p-3">
+          <div className="text-center bg-blue-50 rounded-lg p-3 hover:bg-blue-100 transition-colors">
             <div className="text-lg font-bold text-blue-600">{gardenProgress?.totalMinutes || 0}</div>
             <div className="text-xs text-blue-800">Total Minutes</div>
           </div>
-          <div className="text-center bg-green-50 rounded-lg p-3">
+          <div className="text-center bg-green-50 rounded-lg p-3 hover:bg-green-100 transition-colors">
             <div className="text-lg font-bold text-green-600">{gardenProgress?.sessionsCompleted || 0}</div>
             <div className="text-xs text-green-800">Sessions</div>
           </div>
-          <div className="text-center bg-orange-50 rounded-lg p-3">
+          <div className="text-center bg-orange-50 rounded-lg p-3 hover:bg-orange-100 transition-colors">
             <div className="text-lg font-bold text-orange-600">{gardenProgress?.streakDays || 0}</div>
             <div className="text-xs text-orange-800">Day Streak</div>
           </div>
+        </div>
+        
+        {/* Quick Demo Button for Testing */}
+        <div className="text-center">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => {
+              if (!gardenProgress) return;
+              const demoProgress: GardenProgress = {
+                ...gardenProgress,
+                totalMinutes: 25,
+                sessionsCompleted: 5,
+                streakDays: 3,
+                plantsUnlocked: ['flower', 'tree'],
+                currentGarden: { flower: 2, tree: 1 }
+              };
+              setGardenProgress(demoProgress);
+              toast({
+                title: "Demo Progress Applied",
+                description: "Your garden now has demo progress to test the features!"
+              });
+            }}
+            className="text-xs"
+          >
+            Demo Progress (Test)
+          </Button>
         </div>
 
         {/* Breathing Session */}
@@ -535,11 +577,11 @@ export const BreathingGarden: React.FC = () => {
           {/* Breathing Interface */}
           {isActive ? (
             <div className="text-center space-y-4">
-              <div className={`text-4xl font-bold ${getPhaseColor()}`}>
+              <div className={`text-4xl font-bold transition-colors duration-300 ${getPhaseColor()}`}>
                 {getPhaseInstruction()}
               </div>
               <div className="text-2xl font-mono text-gray-700">
-                {timeRemaining}
+                {timeRemaining}s
               </div>
               <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                 <Timer className="w-4 h-4" />
@@ -549,6 +591,19 @@ export const BreathingGarden: React.FC = () => {
                 value={(currentCycle / selectedPattern.cycles) * 100} 
                 className="w-full max-w-xs mx-auto"
               />
+              
+              {/* Breathing Circle Visual */}
+              <div className="flex justify-center">
+                <div 
+                  className={`w-24 h-24 rounded-full border-4 transition-all duration-1000 ${
+                    currentPhase === 'inhale' ? 'scale-125 border-blue-500' :
+                    currentPhase === 'hold' ? 'scale-125 border-purple-500' :
+                    currentPhase === 'exhale' ? 'scale-75 border-green-500' :
+                    'scale-75 border-orange-500'
+                  } bg-gradient-to-br from-blue-100 to-green-100`}
+                />
+              </div>
+              
               <div className="flex gap-2 justify-center">
                 <Button variant="outline" onClick={stopBreathingSession}>
                   <Pause className="w-4 h-4 mr-2" />
