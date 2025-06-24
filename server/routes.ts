@@ -6,6 +6,7 @@ import { aiImageRoutes } from "./routes/ai-image";
 import { companionRoutes } from "./routes/companion";
 import { peerRecommendationsRoutes } from "./routes/peer-recommendations";
 import { researchRoutes } from "./routes/research";
+import { techAssistantRoutes } from "./routes/tech-assistant";
 import { updateUserProfileSchema, updateDoctorProfileSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -20,6 +21,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/companion", companionRoutes);
   app.use("/api/peer-recommendations", peerRecommendationsRoutes);
   app.use("/api/research", researchRoutes);
+  app.use("/api/tech-assistant", techAssistantRoutes);
 
   // User profile routes
   app.get('/api/users/profile', async (req: Request, res: Response) => {

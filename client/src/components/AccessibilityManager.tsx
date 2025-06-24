@@ -408,9 +408,9 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
   );
 };
 
-// Global accessibility styles
+// Global accessibility styles  
 export const AccessibilityStyles = () => (
-  <style jsx global>{`
+  <style>{`
     .sr-only {
       position: absolute;
       width: 1px;

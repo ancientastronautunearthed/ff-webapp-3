@@ -30,7 +30,10 @@ import {
   MoreVertical,
   Activity,
   TrendingUp,
-  Stethoscope
+  Stethoscope,
+  Wrench,
+  MessageSquare,
+  Accessibility
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, getDoc } from 'firebase/firestore';
@@ -88,6 +91,7 @@ export const Layout = ({ children }: LayoutProps) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Track Symptoms', href: '/tracker', icon: Activity },
     { name: 'AI Companion', href: '/companion', icon: Heart },
+    { name: 'Tech Assistant', href: '/tech-assistant', icon: Wrench },
     { name: 'Community', href: '/community', icon: Users },
     { name: 'Telemedicine', href: '/telemedicine', icon: Stethoscope },
     { name: 'My Data', href: '/insights', icon: TrendingUp },
@@ -178,6 +182,12 @@ export const Layout = ({ children }: LayoutProps) => {
                       <Link href="/settings">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings?tab=accessibility">
+                        <Accessibility className="mr-2 h-4 w-4" />
+                        <span>Accessibility</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

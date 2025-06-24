@@ -15,7 +15,8 @@ import {
   Shield, 
   Download,
   Trash2,
-  ArrowLeft
+  ArrowLeft,
+  Accessibility
 } from 'lucide-react';
 import { Link } from 'wouter';
 
@@ -23,6 +24,16 @@ export const UserSettings = () => {
   const { user, logOut } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('profile');
+  
+  // Check for accessibility tab in URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab === 'accessibility') {
+      setActiveTab('accessibility');
+    }
+  }, []);
 
   // Fetch user profile
   const { data: userProfile, isLoading } = useQuery({
@@ -130,7 +141,7 @@ export const UserSettings = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="profile" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="w-4 h-4" />
@@ -138,6 +149,14 @@ export const UserSettings = () => {
             </TabsTrigger>
             <TabsTrigger value="security" className="flex items-center gap-2">
               <Lock className="w-4 h-4" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="flex items-center gap-2">
+              <Bell className="w-4 h-4" />
+              Privacy
+            </TabsTrigger>
+            <TabsTrigger value="accessibility" className="flex items-center gap-2">
+              <Accessibility className="w-4 h-4" />
               Security
             </TabsTrigger>
             <TabsTrigger value="privacy" className="flex items-center gap-2">
@@ -318,6 +337,10 @@ export const UserSettings = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="accessibility" className="space-y-6">
+            <AccessibilityPanel />
           </TabsContent>
         </Tabs>
       </div>
