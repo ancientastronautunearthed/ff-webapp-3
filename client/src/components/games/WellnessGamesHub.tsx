@@ -6,6 +6,7 @@ import { CommunityConnectionPuzzle } from './CommunityConnectionPuzzle';
 import { BreathingGarden } from './BreathingGarden';
 import { SymptomMemoryMatch } from './SymptomMemoryMatch';
 import { MedicalBillsTowerDefense } from './MedicalBillsTowerDefense';
+import { DailyRoutineQuest } from './DailyRoutineQuest';
 import { 
   Gamepad2, 
   Puzzle, 
@@ -69,8 +70,7 @@ const WELLNESS_GAMES: GameInfo[] = [
     color: 'from-yellow-500 to-orange-600',
     difficulty: 'Medium',
     category: 'Physical',
-    available: false,
-    comingSoon: true
+    available: true
   },
   {
     id: 'medical_bills_tower',
@@ -107,7 +107,7 @@ const WELLNESS_GAMES: GameInfo[] = [
 ];
 
 export const WellnessGamesHub: React.FC = () => {
-  const [selectedGame, setSelectedGame] = useState<string | null>('medical_bills_tower');
+  const [selectedGame, setSelectedGame] = useState<string | null>('routine_quest');
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -138,6 +138,8 @@ export const WellnessGamesHub: React.FC = () => {
         return <SymptomMemoryMatch />;
       case 'medical_bills_tower':
         return <MedicalBillsTowerDefense />;
+      case 'routine_quest':
+        return <DailyRoutineQuest />;
       default:
         return (
           <Card className="w-full max-w-2xl mx-auto">
