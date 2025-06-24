@@ -368,6 +368,15 @@ export const SymptomMemoryMatch: React.FC = () => {
             description: firstCard.patternInsight || "Great pattern recognition!",
             duration: 3000
           });
+
+          // Check if all pairs are matched
+          const totalPairs = currentLevel.gridSize / 2;
+          const newMatchedCount = matchedPairs.length + 1;
+          if (newMatchedCount === totalPairs) {
+            setTimeout(() => {
+              completeGame(true);
+            }, 1000);
+          }
         } else {
           // No match - flip cards back
           setCards(prev => prev.map(c => 

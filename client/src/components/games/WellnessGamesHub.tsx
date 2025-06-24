@@ -96,7 +96,7 @@ const WELLNESS_GAMES: GameInfo[] = [
 ];
 
 export const WellnessGamesHub: React.FC = () => {
-  const [selectedGame, setSelectedGame] = useState<string | null>('community_puzzle');
+  const [selectedGame, setSelectedGame] = useState<string | null>('memory_patterns');
 
   const getCategoryColor = (category: string) => {
     switch (category) {
