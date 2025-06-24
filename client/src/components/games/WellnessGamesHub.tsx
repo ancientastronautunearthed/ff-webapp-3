@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { CommunityConnectionPuzzle } from './CommunityConnectionPuzzle';
 import { BreathingGarden } from './BreathingGarden';
+import { SymptomMemoryMatch } from './SymptomMemoryMatch';
 import { 
   Gamepad2, 
   Puzzle, 
@@ -57,8 +58,7 @@ const WELLNESS_GAMES: GameInfo[] = [
     color: 'from-orange-500 to-red-600',
     difficulty: 'Medium',
     category: 'Cognitive',
-    available: false,
-    comingSoon: true
+    available: true
   },
   {
     id: 'routine_quest',
@@ -123,6 +123,8 @@ export const WellnessGamesHub: React.FC = () => {
         return <CommunityConnectionPuzzle />;
       case 'breathing_garden':
         return <BreathingGarden />;
+      case 'memory_patterns':
+        return <SymptomMemoryMatch />;
       default:
         return (
           <Card className="w-full max-w-2xl mx-auto">
