@@ -28,7 +28,7 @@ import { Onboarding } from "@/components/Onboarding";
 import { TelemedicineScheduling } from "@/components/TelemedicineScheduling";
 import DoctorLogin from "@/pages/DoctorLogin";
 import DoctorDashboard from "@/pages/DoctorDashboard";
-import DoctorDemo from "@/pages/DoctorDemo";
+import DemoLogin from "@/pages/DemoLogin";
 import { PeerMatching } from "@/components/PeerMatching";
 import { AskDoctorForum } from "@/components/AskDoctorForum";
 import LandingPage from "@/pages/LandingPage";
@@ -56,6 +56,10 @@ function AppContent() {
   }
 
   if (!user) {
+    // Check if accessing doctor demo specifically
+    if (location === '/doctor-demo') {
+      return <DemoLogin />;
+    }
     // Check if accessing doctor portal
     if (location.startsWith('/doctor')) {
       return <DoctorLogin />;
@@ -103,7 +107,7 @@ function AppContent() {
         <Route path="/doctor" component={DoctorLogin} />
         <Route path="/doctor/login" component={DoctorLogin} />
         <Route path="/doctor/dashboard" component={DoctorDashboard} />
-        <Route path="/doctor/demo" component={DoctorDemo} />
+        <Route path="/doctor-demo" component={DemoLogin} />
         <Route path="/ask-doctor" component={AskDoctorForum} />
         <Route path="/peer-matching" component={PeerMatching} />
         <Route path="/companion" component={CompanionDashboard} />
