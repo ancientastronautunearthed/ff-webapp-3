@@ -1,9 +1,133 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if false;
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isDoctor() {
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+      allow read: if isDoctor() || isAdmin();
+    }
+
+    // Symptom entries - private to user
+    match /symptomEntries/{entryId} {
+      allow read, write: if isAuthenticated() && isOwner(resource.data.userId);
+      allow read: if isDoctor() && 
+                     exists(/databases/$(database)/documents/patientDoctorConnections/$(resource.data.userId + '_' + request.auth.uid));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+    }
+
+    // Journal entries - private to user
+    match /journalEntries/{entryId} {
+      allow read, write: if isAuthenticated() && isOwner(resource.data.userId);
+      allow read: if isDoctor() && 
+                     exists(/databases/$(database)/documents/patientDoctorConnections/$(resource.data.userId + '_' + request.auth.uid));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+    }
+
+    // Forum posts - public read, authenticated write
+    match /forumPosts/{postId} {
+      allow read: if true; // Public read
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (isOwner(resource.data.authorId) || isAdmin());
+      allow delete: if isAuthenticated() && (isOwner(resource.data.authorId) || isAdmin());
+      
+      // Forum replies subcollection
+      match /replies/{replyId} {
+        allow read: if true; // Public read
+        allow create: if isAuthenticated();
+        allow update: if isAuthenticated() && (isOwner(resource.data.authorId) || isAdmin());
+        allow delete: if isAuthenticated() && (isOwner(resource.data.authorId) || isAdmin());
+      }
+    }
+
+    // AI Companion data - private to user
+    match /aiCompanions/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Chat messages - private to user
+    match /chatMessages/{messageId} {
+      allow read, write: if isAuthenticated() && isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userId);
+    }
+
+    // Peer connections - accessible to both users
+    match /peerConnections/{connectionId} {
+      allow read, write: if isAuthenticated() && 
+                            (isOwner(resource.data.userId1) || isOwner(resource.data.userId2));
+      allow create: if isAuthenticated() && 
+                       (isOwner(request.resource.data.userId1) || isOwner(request.resource.data.userId2));
+    }
+
+    // Peer messages - accessible to participants
+    match /peerMessages/{messageId} {
+      allow read, write: if isAuthenticated() && 
+                            (isOwner(resource.data.senderId) || isOwner(resource.data.receiverId));
+      allow create: if isAuthenticated() && isOwner(request.resource.data.senderId);
+    }
+
+    // Doctors collection - read by authenticated users, write by doctors only
+    match /doctors/{doctorId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(doctorId);
+    }
+
+    // Research data - aggregated, anonymized access
+    match /researchData/{studyId} {
+      allow read: if isDoctor() || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Gamification data - private to user
+    match /gamification/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Achievements - private to user
+    match /achievements/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Life simulation data - private to user
+    match /lifeSimulation/{userId} {
+      allow read, write: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Patient-Doctor connections
+    match /patientDoctorConnections/{connectionId} {
+      allow read, write: if isAuthenticated() && 
+                            (request.auth.uid in resource.data.participantIds);
+      allow create: if isAuthenticated() && 
+                       (request.auth.uid in request.resource.data.participantIds);
+    }
+
+    // Admin-only collections
+    match /adminData/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Public collections (read-only for general info)
+    match /publicInfo/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
   }
 }

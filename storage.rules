@@ -1,10 +1,108 @@
 rules_version = '2';
-
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function isValidImageFile() {
+      return request.resource.contentType.matches('image/.*');
+    }
+    
+    function isValidFileSize() {
+      return request.resource.size < 10 * 1024 * 1024; // 10MB limit
+    }
+
+    // User profile images
+    match /profile-images/{userId}/{fileName} {
+      allow read: if true; // Public read for profile images
+      allow write: if isAuthenticated() && 
+                      isOwner(userId) && 
+                      isValidImageFile() && 
+                      isValidFileSize();
+    }
+
+    // Journal attachments - private to user
+    match /journal-entries/{userId}/{entryId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isOwner(userId) && 
+                            isValidFileSize();
+    }
+
+    // Symptom tracking photos - private to user
+    match /symptom-photos/{userId}/{entryId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isOwner(userId) && 
+                            isValidImageFile() && 
+                            isValidFileSize();
+    }
+
+    // AI Companion images - private to user
+    match /companion-images/{userId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isOwner(userId) && 
+                            isValidImageFile() && 
+                            isValidFileSize();
+    }
+
+    // Forum attachments - public read, authenticated write
+    match /forum-attachments/{postId}/{fileName} {
+      allow read: if true; // Public read
+      allow write: if isAuthenticated() && 
+                      isValidFileSize();
+    }
+
+    // Doctor verification documents - private to doctor
+    match /doctor-documents/{doctorId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isOwner(doctorId) && 
+                            isValidFileSize();
+    }
+
+    // Peer message attachments - private to conversation participants
+    match /peer-messages/{connectionId}/{messageId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isValidFileSize();
+      // Note: Additional security through Firestore rules for connection verification
+    }
+
+    // Research data exports - admin only
+    match /research-exports/{fileName} {
+      allow read, write: if isAuthenticated(); 
+      // Note: Additional verification through Cloud Functions
+    }
+
+    // Temp files for AI-generated images
+    match /temp/{fileName} {
+      allow read: if true; // Public read for temporary files
+      allow write: if isAuthenticated() && 
+                      isValidImageFile() && 
+                      isValidFileSize();
+      allow delete: if isAuthenticated();
+    }
+
+    // Life simulation images
+    match /life-simulation/{userId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isOwner(userId) && 
+                            isValidImageFile() && 
+                            isValidFileSize();
+    }
+
+    // Character images for life simulation
+    match /character-images/{userId}/{characterId}/{fileName} {
+      allow read, write: if isAuthenticated() && 
+                            isOwner(userId) && 
+                            isValidImageFile() && 
+                            isValidFileSize();
+    }
+
+    // Fallback rule - deny all other access
     match /{allPaths=**} {
       allow read, write: if false;
     }
