@@ -1,23 +1,22 @@
-# Settings for Backend (on Cloud Run).
-# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
-runConfig:
-  minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
-
-# Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
-
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+# Environment variables for your deployed application
+env:
+  - variable: NEXT_PUBLIC_VITE_FIREBASE_API_KEY
+    value: "AIzaSyAI5w-Vy35w2W2a8nvR4dV4y9MJNrqWYJk"
+  - variable: NEXT_PUBLIC_VITE_FIREBASE_PROJECT_ID
+    value: "ff-webapp-3"
+  - variable: NEXT_PUBLIC_VITE_FIREBASE_APP_ID
+    value: "1:203261765331:web:b0e5a79272688154ddd626"
+  - variable: NEXT_PUBLIC_VITE_FIREBASE_AUTH_DOMAIN
+    value: "ff-webapp-3.firebaseapp.com"
+  - variable: NEXT_PUBLIC_VITE_FIREBASE_STORAGE_BUCKET
+    value: "ff-webapp-3.firebasestorage.app"
+  - variable: NEXT_PUBLIC_VITE_FIREBASE_MESSAGING_SENDER_ID
+    value: "203261765331"
+  - variable: NEXT_PUBLIC_VITE_GOOGLE_AI_API_KEY
+    value: "AIzaSyCy2Gf07DcLDlIvfEcSvErCw5hER-6iitc"
+  - variable: NEXT_PUBLIC_VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY
+    value: "AIzaSyAD1FmjTCu0M75A38c8WpNxaoYOn-X9JhU"
+  - variable: NEXT_PUBLIC_VITE_WEATHER_API_KEY
+    value: "7385adec6ce2452982913318252406"
+  - variable: NODE_ENV
+    value: "production"
