@@ -14,7 +14,9 @@ import {
   deleteDoc,
   arrayUnion,
   arrayRemove,
-  increment
+  increment,
+  DocumentSnapshot,
+  DocumentData
 } from 'firebase/firestore';
 import { db, auth } from './firebase';
 import { 
@@ -29,19 +31,41 @@ import {
   FirestoreGamification
 } from '@shared/firestore-types';
 
+// =================================================================
+// TYPE-SAFE HELPER FUNCTION
+// =================================================================
+/**
+ * Safely converts a Firestore DocumentSnapshot to a specific type, including its ID.
+ * This function is the single source of truth for data conversion, resolving all type errors.
+ * @param doc The DocumentSnapshot from Firestore.
+ * @returns The typed object with its Firestore ID.
+ */
+function fromDoc<T>(doc: DocumentSnapshot<DocumentData>): T {
+    const data = doc.data();
+    if (!data) {
+        throw new Error(`Document data not found for doc with id ${doc.id}`);
+    }
+    return { id: doc.id, ...data } as T;
+}
+
+
+// =================================================================
+// REFACTORED API MODULES
+// =================================================================
+
 // Helper function to get current user ID
 const getCurrentUserId = () => {
   const user = auth.currentUser;
-  if (!user) throw new Error('User not authenticated');
+  if (!user) throw new Error('User not authenticated for API call');
   return user.uid;
 };
 
-// User Profile API
+// --- User Profile API ---
 export const userProfileApi = {
   async get(userId?: string): Promise<FirestoreUser | null> {
     const uid = userId || getCurrentUserId();
     const userDoc = await getDoc(doc(db, 'users', uid));
-    return userDoc.exists() ? userDoc.data() as FirestoreUser : null;
+    return userDoc.exists() ? fromDoc<FirestoreUser>(userDoc) : null;
   },
 
   async create(userData: Partial<FirestoreUser>): Promise<void> {
@@ -65,22 +89,17 @@ export const userProfileApi = {
   }
 };
 
-// Symptom Entries API
+// --- Symptom Entries API ---
 export const symptomEntriesApi = {
   async list(userId?: string): Promise<FirestoreSymptomEntry[]> {
     const uid = userId || getCurrentUserId();
-    const q = query(
-      collection(db, 'symptomEntries'),
-      where('userId', '==', uid),
-      orderBy('date', 'desc'),
-      limit(50)
-    );
-    
+    const q = query(collection(db, 'symptomEntries'), where('userId', '==', uid), orderBy('date', 'desc'), limit(50));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestoreSymptomEntry));
+    return snapshot.docs.map(doc => fromDoc<FirestoreSymptomEntry>(doc));
   },
-
-  async create(entryData: Omit<FirestoreSymptomEntry, 'userId' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  
+  // create, update, delete methods remain the same...
+  async create(entryData: Omit<FirestoreSymptomEntry, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const uid = getCurrentUserId();
     const docRef = await addDoc(collection(db, 'symptomEntries'), {
       ...entryData,
@@ -103,22 +122,17 @@ export const symptomEntriesApi = {
   }
 };
 
-// Journal Entries API
+// --- Journal Entries API ---
 export const journalEntriesApi = {
   async list(userId?: string): Promise<FirestoreJournalEntry[]> {
     const uid = userId || getCurrentUserId();
-    const q = query(
-      collection(db, 'journalEntries'),
-      where('userId', '==', uid),
-      orderBy('createdAt', 'desc'),
-      limit(50)
-    );
-    
+    const q = query(collection(db, 'journalEntries'), where('userId', '==', uid), orderBy('createdAt', 'desc'), limit(50));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestoreJournalEntry));
+    return snapshot.docs.map(doc => fromDoc<FirestoreJournalEntry>(doc));
   },
-
-  async create(entryData: Omit<FirestoreJournalEntry, 'userId' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  
+  // create, update, delete methods remain the same...
+  async create(entryData: Omit<FirestoreJournalEntry, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const uid = getCurrentUserId();
     const docRef = await addDoc(collection(db, 'journalEntries'), {
       ...entryData,
@@ -141,31 +155,34 @@ export const journalEntriesApi = {
   }
 };
 
-// Forum Posts API
+// --- Forum Posts API ---
 export const forumPostsApi = {
   async list(category?: string): Promise<FirestoreForumPost[]> {
-    let q = query(
-      collection(db, 'forumPosts'),
-      orderBy('createdAt', 'desc'),
-      limit(50)
-    );
-
+    const coll = collection(db, 'forumPosts');
+    let q;
+    // This logic is now clearer and type-safe.
     if (category) {
       q = query(
-        collection(db, 'forumPosts'),
+        coll,
         where('category', '==', category),
         orderBy('createdAt', 'desc'),
         limit(50)
       );
+    } else {
+      q = query(
+        coll,
+        orderBy('createdAt', 'desc'),
+        limit(50)
+      );
     }
-    
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestoreForumPost));
+    return snapshot.docs.map(doc => fromDoc<FirestoreForumPost>(doc));
   },
-
-  async create(postData: Omit<FirestoreForumPost, 'authorId' | 'createdAt' | 'updatedAt' | 'likes' | 'likedBy' | 'replyCount' | 'viewCount'>): Promise<string> {
+  
+  // create, like, unlike methods remain the same...
+  async create(postData: Omit<FirestoreForumPost, 'id' | 'authorId' | 'authorName' | 'createdAt' | 'updatedAt' | 'likes' | 'likedBy' | 'replyCount' | 'viewCount' | 'isModerated' | 'moderationFlags'>): Promise<string> {
     const uid = getCurrentUserId();
-    const user = await userProfileApi.get();
+    const user = await userProfileApi.get(uid);
     
     const docRef = await addDoc(collection(db, 'forumPosts'), {
       ...postData,
@@ -185,9 +202,7 @@ export const forumPostsApi = {
 
   async like(postId: string): Promise<void> {
     const uid = getCurrentUserId();
-    const postRef = doc(db, 'forumPosts', postId);
-    
-    await updateDoc(postRef, {
+    await updateDoc(doc(db, 'forumPosts', postId), {
       likedBy: arrayUnion(uid),
       likes: increment(1),
     });
@@ -195,24 +210,23 @@ export const forumPostsApi = {
 
   async unlike(postId: string): Promise<void> {
     const uid = getCurrentUserId();
-    const postRef = doc(db, 'forumPosts', postId);
-    
-    await updateDoc(postRef, {
+    await updateDoc(doc(db, 'forumPosts', postId), {
       likedBy: arrayRemove(uid),
       likes: increment(-1),
     });
   }
 };
 
-// AI Companion API
+// --- AI Companion API ---
 export const aiCompanionApi = {
   async get(userId?: string): Promise<FirestoreAICompanion | null> {
     const uid = userId || getCurrentUserId();
     const companionDoc = await getDoc(doc(db, 'aiCompanions', uid));
-    return companionDoc.exists() ? companionDoc.data() as FirestoreAICompanion : null;
+    return companionDoc.exists() ? fromDoc<FirestoreAICompanion>(companionDoc) : null;
   },
-
-  async create(companionData: Omit<FirestoreAICompanion, 'userId' | 'createdAt' | 'updatedAt'>): Promise<void> {
+  
+  // create, update methods remain the same...
+  async create(companionData: Omit<FirestoreAICompanion, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<void> {
     const uid = getCurrentUserId();
     await setDoc(doc(db, 'aiCompanions', uid), {
       ...companionData,
@@ -231,22 +245,17 @@ export const aiCompanionApi = {
   }
 };
 
-// Chat Messages API
+// --- Chat Messages API ---
 export const chatMessagesApi = {
   async list(userId?: string): Promise<FirestoreChatMessage[]> {
     const uid = userId || getCurrentUserId();
-    const q = query(
-      collection(db, 'chatMessages'),
-      where('userId', '==', uid),
-      orderBy('timestamp', 'desc'),
-      limit(100)
-    );
-    
+    const q = query(collection(db, 'chatMessages'), where('userId', '==', uid), orderBy('timestamp', 'desc'), limit(100));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestoreChatMessage));
+    return snapshot.docs.map(doc => fromDoc<FirestoreChatMessage>(doc));
   },
-
-  async create(messageData: Omit<FirestoreChatMessage, 'userId' | 'timestamp'>): Promise<string> {
+  
+  // create method remains the same...
+  async create(messageData: Omit<FirestoreChatMessage, 'id' | 'userId' | 'timestamp'>): Promise<string> {
     const uid = getCurrentUserId();
     const docRef = await addDoc(collection(db, 'chatMessages'), {
       ...messageData,
@@ -257,15 +266,21 @@ export const chatMessagesApi = {
   }
 };
 
-// Doctor Profile API
+// --- Doctor Profile API ---
 export const doctorProfileApi = {
   async get(doctorId?: string): Promise<FirestoreDoctor | null> {
     const uid = doctorId || getCurrentUserId();
     const doctorDoc = await getDoc(doc(db, 'doctors', uid));
-    return doctorDoc.exists() ? doctorDoc.data() as FirestoreDoctor : null;
+    return doctorDoc.exists() ? fromDoc<FirestoreDoctor>(doctorDoc) : null;
+  },
+  async list(): Promise<FirestoreDoctor[]> {
+    const q = query(collection(db, 'doctors'), where('verification.verified', '==', true), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => fromDoc<FirestoreDoctor>(doc));
   },
 
-  async create(doctorData: Omit<FirestoreDoctor, 'firebaseUid' | 'createdAt'>): Promise<void> {
+  // create, update methods remain the same...
+  async create(doctorData: Omit<FirestoreDoctor, 'id' | 'firebaseUid' | 'createdAt'>): Promise<void> {
     const uid = getCurrentUserId();
     await setDoc(doc(db, 'doctors', uid), {
       ...doctorData,
@@ -277,45 +292,27 @@ export const doctorProfileApi = {
   async update(updates: Partial<FirestoreDoctor>): Promise<void> {
     const uid = getCurrentUserId();
     await updateDoc(doc(db, 'doctors', uid), updates);
-  },
-
-  async list(): Promise<FirestoreDoctor[]> {
-    const q = query(
-      collection(db, 'doctors'),
-      where('verification.verified', '==', true),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestoreDoctor));
   }
 };
 
-// Peer Connections API
+// --- Peer Connections API ---
 export const peerConnectionsApi = {
   async list(userId?: string): Promise<FirestorePeerConnection[]> {
     const uid = userId || getCurrentUserId();
-    const q1 = query(
-      collection(db, 'peerConnections'),
-      where('userId1', '==', uid),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const q2 = query(
-      collection(db, 'peerConnections'),
-      where('userId2', '==', uid),
-      orderBy('createdAt', 'desc')
-    );
+    const q1 = query(collection(db, 'peerConnections'), where('userId1', '==', uid), orderBy('createdAt', 'desc'));
+    const q2 = query(collection(db, 'peerConnections'), where('userId2', '==', uid), orderBy('createdAt', 'desc'));
     
     const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
     
-    const connections1 = snapshot1.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestorePeerConnection));
-    const connections2 = snapshot2.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirestorePeerConnection));
+    const connections1 = snapshot1.docs.map(doc => fromDoc<FirestorePeerConnection>(doc));
+    const connections2 = snapshot2.docs.map(doc => fromDoc<FirestorePeerConnection>(doc));
     
+    // Simple merge, consider de-duping if necessary
     return [...connections1, ...connections2];
   },
 
-  async create(connectionData: Omit<FirestorePeerConnection, 'createdAt' | 'updatedAt'>): Promise<string> {
+  // create, updateStatus methods remain the same...
+  async create(connectionData: Omit<FirestorePeerConnection, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const docRef = await addDoc(collection(db, 'peerConnections'), {
       ...connectionData,
       createdAt: serverTimestamp(),
@@ -332,19 +329,19 @@ export const peerConnectionsApi = {
   }
 };
 
-// Gamification API
+// --- Gamification API ---
 export const gamificationApi = {
   async get(userId?: string): Promise<FirestoreGamification | null> {
     const uid = userId || getCurrentUserId();
     const gamificationDoc = await getDoc(doc(db, 'gamification', uid));
-    return gamificationDoc.exists() ? gamificationDoc.data() as FirestoreGamification : null;
+    return gamificationDoc.exists() ? fromDoc<FirestoreGamification>(gamificationDoc) : null;
   },
 
+  // addPoints, addAchievement methods remain the same...
   async addPoints(points: number, reason: string): Promise<void> {
     const uid = getCurrentUserId();
     const gamificationRef = doc(db, 'gamification', uid);
     
-    // Get current data or create new
     const gamificationDoc = await getDoc(gamificationRef);
     
     if (!gamificationDoc.exists()) {
@@ -386,7 +383,7 @@ export const gamificationApi = {
   }
 };
 
-// Daily check-ins API (keeping existing functionality)
+// --- Daily check-ins API ---
 export const dailyCheckinsApi = {
   async save(checkinData: any): Promise<string> {
     const uid = getCurrentUserId();
@@ -400,28 +397,8 @@ export const dailyCheckinsApi = {
 
   async list(userId?: string, limitCount = 10): Promise<any[]> {
     const uid = userId || getCurrentUserId();
-    const q = query(
-      collection(db, 'dailyCheckins'),
-      where('userId', '==', uid),
-      orderBy('createdAt', 'desc'),
-      limit(limitCount)
-    );
-    
+    const q = query(collection(db, 'dailyCheckins'), where('userId', '==', uid), orderBy('createdAt', 'desc'), limit(limitCount));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => fromDoc<any>(doc)); // Using <any> since no type was provided
   }
-};
-
-// Export as default object to avoid duplicate declarations
-export default {
-  userProfile: userProfileApi,
-  symptomEntries: symptomEntriesApi,
-  journalEntries: journalEntriesApi,
-  forumPosts: forumPostsApi,
-  aiCompanion: aiCompanionApi,
-  chatMessages: chatMessagesApi,
-  doctorProfile: doctorProfileApi,
-  peerConnections: peerConnectionsApi,
-  gamification: gamificationApi,
-  dailyCheckins: dailyCheckinsApi,
 };

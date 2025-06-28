@@ -4,11 +4,12 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 
-// Access the API key from the new environment variable
-const apiKey = import.meta.env.NEXT_PUBLIC_VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY;
+// This correctly uses the standard Vite method for accessing environment variables.
+const apiKey = import.meta.env.VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY;
 
 if (!apiKey) {
-  throw new Error("VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY is not set");
+  // Updated the error message for clarity.
+  throw new Error("Configuration error: VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY is not set in the build environment.");
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);

@@ -4,12 +4,12 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 
-// Use the correct NEXT_PUBLIC_ prefixed variable
-const apiKey = import.meta.env.NEXT_PUBLIC_VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY;
+// This now correctly uses the standard Vite method for accessing environment variables.
+const apiKey = import.meta.env.VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY;
 
 if (!apiKey) {
-  // Update the error message to be more helpful for future debugging
-  throw new Error("NEXT_PUBLIC_VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY is not set");
+  // Updated the error message for clarity.
+  throw new Error("Configuration error: VITE_GOOGLE_GENERATIVE_LANGUAGE_API_KEY is not set in the build environment.");
 }
 
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -26,4 +26,14 @@ const generationConfig = {
   responseMimeType: "text/plain",
 };
 
-// The rest of your file's functions (like run, analyzeSymptom, etc.) would remain here...
+export async function run(prompt: string) {
+  const chatSession = model.startChat({
+    generationConfig,
+    history: [],
+  });
+
+  const result = await chatSession.sendMessage(prompt);
+  const response = result.response;
+  console.log(response.text());
+  return response.text();
+}
